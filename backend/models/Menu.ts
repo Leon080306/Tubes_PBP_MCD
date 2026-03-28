@@ -39,7 +39,6 @@ export class Menu extends Model {
     @Column({
         type: DataType.ENUM('Ala Carte', 'Paket'),
         allowNull: false,
-        defaultValue: 'Process',
     })
     tipe_menu!: 'Ala Carte' | 'Paket';
 
