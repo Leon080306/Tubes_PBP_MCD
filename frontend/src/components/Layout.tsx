@@ -9,16 +9,20 @@ export default function Layout() {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                backgroundImage: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/src/assets/background.JPG")',
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat"
             }}
         >
             <Box sx={{
-                border: "2px solid yellow",
-                width: "40%",
+                width: "550px",
                 height: "100%",
                 padding: "12px 24px",
                 overflow: "auto",
-                "&::-webkit-scrollbar": { display: "none" }, // Chrome/Safari
-                scrollbarWidth: "none", // Firefox
+                backgroundColor: "white",
+                "&::-webkit-scrollbar": { display: "none" },
+                scrollbarWidth: "none",
             }}>
                 <Outlet />
             </Box>
