@@ -1,10 +1,17 @@
-import { lazy } from 'react';
-// import { useAppSelector } from '../hooks/useAppSelector';
+import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router';
+import Layout from '../components/Layout';
 
 const HomePage = lazy(() => import('../pages/customer/HomePage'));
+
 export const AppRoutes = () => {
-    return <Routes>
-        <Route path='/' element={<HomePage />} />
-    </Routes>
-}
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <Routes>
+                <Route element={<Layout />}>
+                    <Route path="/" element={<HomePage />} />
+                </Route>
+            </Routes>
+        </Suspense>
+    );
+};
