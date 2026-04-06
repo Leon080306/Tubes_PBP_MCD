@@ -1,13 +1,13 @@
 import { Sequelize } from 'sequelize-typescript';
-import { appConfig } from '../appConfig';
+import { appConfig } from '../src/appConfig';
 
-import { Menu } from '../models/Menu';
-import { MenuVarian } from '../models/MenuVarian';
-import { MenuOption } from '../models/MenuOption';
-import { PaketItem } from '../models/PaketItem';
-import { Order } from '../models/Order';
-import { OrderMenu } from '../models/OrderMenu';
-import { Payment } from '../models/Payment';
+import { Menu } from '../src/models/Menu';
+import { MenuVarian } from '../src/models/MenuVarian';
+import { MenuOption } from '../src/models/MenuOption';
+import { PaketItem } from '../src/models/PaketItem';
+import { Order } from '../src/models/Order';
+import { OrderMenu } from '../src/models/OrderMenu';
+import { Payment } from '../src/models/Payment';
 
 export const sequelize = new Sequelize({
     username: appConfig.database.DBUsername,
