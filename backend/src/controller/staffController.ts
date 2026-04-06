@@ -13,6 +13,24 @@ export const getAllStaff = async (req: Request, res: Response) => {
     }
 }
 
+export const getOneStaff = async (req: Request, res:Response) => {
+    try {
+        const staffData = req.user;
+        if (!staffData) {
+            return res.status(404).json({
+                message: "Data tidak bisa di temukan"
+            })
+        }
+
+        res.status(200).json({
+            message:"succes",
+            user:staffData
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "data tidak ditemukan" });
+    }
+}
 export const loginStaff = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;

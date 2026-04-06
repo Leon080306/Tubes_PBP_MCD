@@ -21,7 +21,7 @@ export default function LoginPageAdmin() {
         }
 
         try {
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch('/api/staff/login', {
                 method: 'POST',
                 headers: { "content-type": "application/json"},
                 body: JSON.stringify({email, password})
@@ -37,7 +37,7 @@ export default function LoginPageAdmin() {
             const token = data.token;
             Cookies.set('token', token, { expires: 1}); //buat nyimpen tokennya
 
-            const profileResponse = await fetch('/api/auth/me', {
+            const profileResponse = await fetch('/api/staff/me', {
                 method: 'GET',
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -49,7 +49,7 @@ export default function LoginPageAdmin() {
             dispatch(authActions.setUserInfo(userData.user));
 
             alert('Login Berhasil!');
-            navigate('/admin/login');
+            navigate('/admin');
 
         } catch (error) {
             console.error("Fetch error:", error);

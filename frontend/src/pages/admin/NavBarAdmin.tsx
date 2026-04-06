@@ -14,13 +14,12 @@ export default function NavBar() {
     const handleLogout = () => {
         dispatch(authActions.logout());
         alert("Berhasil logout");
-        navigate('/login');
+        navigate('/admin/login');
     }
 
     return (
         <AppBar position="static" sx={{ mb: 4, backgroundColor: "#D52B1E" }}>
             <Toolbar>
-
 
                 <Box
                     component='img'
@@ -34,8 +33,13 @@ export default function NavBar() {
                     }}
                 />
 
+                {userInfo && (
+                    <Typography variant="h5" gap={20} sx={{ fontStyle: 'italic', whiteSpace: 'nowrap', ml: '25px' }}>
+                        Hi, {userInfo?.role}!!
+                    </Typography>
+                )}
 
-                {/* <Box sx={{ flexGrow: 3 }} /> */}
+                <Box sx={{ flexGrow: 1 }} />
 
                 {userInfo && (
                     <Box sx={{
@@ -43,10 +47,6 @@ export default function NavBar() {
                         alignItem: 'center',
                         gap: 2
                     }}>
-                        <Typography variant="h5" gap={20} sx={{ fontStyle: 'italic', whiteSpace: 'nowrap', ml: '25px' }}>
-                            Hi, {userInfo?.name}!!
-                        </Typography>
-
                         <Button sx={{ backgroundColor: "#FDC82F", color: 'white', boxShadow: 3 }} onClick={() => navigate('/')}>Update Menu</Button>
                         <Button sx={{ backgroundColor: "#FDC82F", color: 'white', boxShadow: 3 }} onClick={() => navigate('/post')}>List order</Button>
 
@@ -60,7 +60,7 @@ export default function NavBar() {
                         </Button>
                     </Box>
                 )}
-                
+
                 {/* {!userInfo && (
                     <Typography variant="h6" sx={{ color: 'white', fontWeight:'bold', fontStyle: 'italic'}}>
                         Login Page
