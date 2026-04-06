@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router';
 import Layout from '../components/Layout';
 
 const HomePage = lazy(() => import('../pages/customer/HomePage'));
+const OrderMenuPage = lazy(() => import('../pages/customer/OrderMenuPage'));
 
 export const AppRoutes = () => {
     return (
@@ -10,6 +11,7 @@ export const AppRoutes = () => {
             <Routes>
                 <Route element={<Layout />}>
                     <Route path="/" element={<HomePage />} />
+                    <Route path="/order/:id" element={<OrderMenuPage />} />
                 </Route>
             </Routes>
         </Suspense>
