@@ -3,8 +3,7 @@ import { Route, Routes } from 'react-router';
 import Layout from '../components/Layout';
 
 const MenuList = lazy(() => import('../pages/customer/MenuList.tsx'));
-const HomePage = lazy(() => import('../pages/customer/HomePage'));
-const OrderMenuPage = lazy(() => import('../pages/customer/OrderMenuPage'));
+const OrderMenu = lazy(() => import('../pages/customer/order/OrderMenu'));
 
 export const AppRoutes = () => {
     return (
@@ -12,8 +11,7 @@ export const AppRoutes = () => {
             <Routes>
                 <Route element={<Layout />}>
                     <Route path="/" element={<MenuList />} />
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/order/:id" element={<OrderMenuPage />} />
+                    <Route path="/order/:id" element={<OrderMenu />} />
                 </Route>
             </Routes>
         </Suspense>
