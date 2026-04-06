@@ -19,7 +19,7 @@ module.exports = {
                 allowNull: false,
             },
             kategori_menu: {
-                type: Sequelize.ENUM('Makanan', 'Minuman', 'Dessert'),
+                type: Sequelize.ENUM('Burger', 'Drinks', 'Dessert', 'Happy Meal', 'Camilan', 'Paket HeBat', 'PaMer', 'PaNas'),
                 allowNull: false,
             },
             tipe_menu: {
