@@ -2,12 +2,13 @@ import { Request, Response } from 'express';
 import { Menu } from '../models/Menu';
 import { MenuVarian } from '../models/MenuVarian';
 import { MenuOption } from '../models/MenuOption';
+import { sequelize } from "../../config/database";
 
 export class menuController {
     static async getAll(req: Request, res: Response) {
         try {
             const menus = await Menu.findAll({
-                where: { isAvailable: true },
+                where: { isAvailable: "true" },
                 include: [MenuVarian, MenuOption]
             });
 
@@ -26,7 +27,7 @@ export class menuController {
     }
 
     static async getById(req: Request, res: Response) {
-        const id = req.params.id;
+        const id = req.params.id as string;
 
         const menu = await Menu.findByPk(id, {
             include: [MenuVarian, MenuOption]

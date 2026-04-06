@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { MenuController } from '../controllers/menu.controller';
+import { menuController } from '../controllers/menuController';
 
-const menuRouter = express.Router();
+const menuRouter: Router = Router();
 
-Router.get("/", menuRouter.getAll());
-Router.get("/:id", menuRouter.getById());
+menuRouter.get("/", menuController.getAll);
+menuRouter.get("/:id", menuController.getById);
 
-export default router;
+export default menuRouter;
