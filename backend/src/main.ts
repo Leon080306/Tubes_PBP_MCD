@@ -1,8 +1,9 @@
 import express from "express";
-import { Sequelize } from "../config/config.cjs";
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
 import globalStaffApi from './roots/GlobalStaffApi';
-dotenv.config();
+import sequelize from "./../config/database";
+
+// dotenv.config();
 
 const app = express();
 
@@ -23,11 +24,11 @@ app.get("/", (req, res) => {
 // });
 
 sequelize.authenticate()
-  .then(() => console.log("DB Successfully Connected"))
-  .catch(err => console.error("DB Error: ", err));
+    .then(() => console.log("DB Successfully Connected"))
+    .catch(err => console.error("DB Error: ", err));
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("Server is Running")
+    console.log("Server is Running")
 });
