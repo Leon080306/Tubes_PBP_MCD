@@ -27,6 +27,7 @@ export const getMenuById = async (req: Request, res: Response) => {
 
 export const createMenu = async (req: Request, res: Response) => {
     try {
+        console.log("BODY:", req.body);
         const menu = await Menu.create(req.body);
         return res.status(201).json(menu);
     } catch (error: any) {

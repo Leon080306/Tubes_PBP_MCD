@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { createMenu, getMenus, getMenuById, updateMenu, deleteMenu } from "../controllers/menuCRUD";
+import { createMenu, getMenus, getMenuById, updateMenu, deleteMenu } from "../controller/menuCRUD";
 
 const router = Router();
 
-router.post("/", createMenu);
-
 router.get("/", getMenus);
 router.get("/:id", getMenuById);
+
+router.post("/", createMenu);
 
 router.put("/:id", updateMenu);
 

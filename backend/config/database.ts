@@ -10,7 +10,7 @@ const sequelize = new Sequelize({
     username: process.env.DB_USERNAME as string,
     password: process.env.DB_PASSWORD as string,
     database: process.env.DB_NAME as string,
-    models: [__dirname + "/../models"],
+    models: [__dirname + "/../models/*.ts"],
     logging: false,
 });
 

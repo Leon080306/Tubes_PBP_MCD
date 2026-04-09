@@ -1,4 +1,4 @@
-import { Staff } from "../../models/Staff";
+import { Staff } from "../models/Staff";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
