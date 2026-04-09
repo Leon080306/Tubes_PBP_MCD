@@ -1,5 +1,6 @@
-import { Table, Column, Model, DataType, PrimaryKey, HasMany, CreatedAt, UpdatedAt, DeletedAt } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, HasMany, CreatedAt, UpdatedAt, DeletedAt, HasOne } from 'sequelize-typescript';
 import { OrderMenu } from './OrderMenu';
+import { Payment } from './Payment';
 
 @Table({
     tableName: 'Order',

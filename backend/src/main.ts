@@ -1,14 +1,29 @@
-import express from "express";
-import { Sequelize } from "sequelize-typescript";
+import "reflect-metadata";
+import express from 'express';
+import cors from 'cors';
+
+import { sequelize } from "../config/database";
+import menuRouter from "./routes/menuRoutes";
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-    res.send("Hello World!");
-});
+app.use("/menu", menuRouter)
 
-app.listen(3000, "0.0.0.0", () => {
-    console.log("Server started!");
-});
+async function start() {
+    try {
+        await sequelize.authenticate();
+        console.log("DB Successfully Connected");
+
+        app.listen(3000, () => {
+            console.log("server started!");
+        });
+
+    } catch (error) {
+        console.error("Database connection failed:", error);
+    }
+}
+
+start();
