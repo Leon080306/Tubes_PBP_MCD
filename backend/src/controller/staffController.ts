@@ -15,7 +15,7 @@ export const getAllStaff = async (req: Request, res: Response) => {
 
 export const getOneStaff = async (req: Request, res:Response) => {
     try {
-        const staffData = req.user;
+        const staffData = (req as any).user;
         if (!staffData) {
             return res.status(404).json({
                 message: "Data tidak bisa di temukan"
