@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize-typescript";
 import dotenv from "dotenv";
+import path from "path";
 
 dotenv.config();
 
@@ -10,7 +11,7 @@ const sequelize = new Sequelize({
     username: process.env.DB_USERNAME as string,
     password: process.env.DB_PASSWORD as string,
     database: process.env.DB_NAME as string,
-    models: [__dirname + "/../models"],
+    models: [path.join(__dirname, "../src/models")],
     logging: false,
 });
 

@@ -3,6 +3,9 @@ import express from "express";
 import globalStaffApi from './roots/GlobalStaffApi';
 import sequelize from "./../config/database";
 
+import sequelize from "../config/database";
+
+console.log("MODELS:", sequelize.models);
 // dotenv.config();
 
 const app = express();
