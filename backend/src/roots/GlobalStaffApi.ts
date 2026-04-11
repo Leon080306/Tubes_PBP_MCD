@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import StaffRoutes from "./StaffRoutes"
-import menuRoutes from "./MenuAdminRoutes";
+import MenuAdminRoutes from "./MenuAdminRoutes";
 
 
 const router: Router = Router();
@@ -13,6 +13,6 @@ const router: Router = Router();
 //router.use("/tableInformation", authMiddleware, TableInformationRoutes)
 //router.use("/staff", authMiddleware, StaffRoutes);
 router.use("/staff", StaffRoutes);
-router.use("/menu", menuRoutes);
+router.use("/menu", MenuAdminRoutes);
 
 export default router; 

@@ -13,12 +13,18 @@ export const getMenus = async (_req: Request, res: Response) => {
 
 export const getMenuById = async (req: Request, res: Response) => {
     try {
-        const menu = await Menu.findByPk(req.params.id);
+        const id = req.params.id;
+
+        if (!id || Array.isArray(id)) {
+            return res.status(400).json({ message: "Invalid ID" });
+        }
+
+        const menu = await Menu.findByPk(id);
 
         if (!menu) {
             return res.status(404).json({ message: "Menu not found" });
         }
-        
+
         return res.json(menu);
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
@@ -37,7 +43,13 @@ export const createMenu = async (req: Request, res: Response) => {
 
 export const updateMenu = async (req: Request, res: Response) => {
     try {
-        const menu = await Menu.findByPk(req.params.id);
+        const id = req.params.id;
+
+        if (!id || Array.isArray(id)) {
+            return res.status(400).json({ message: "Invalid ID" });
+        }
+
+        const menu = await Menu.findByPk(id);
 
         if (!menu) {
             return res.status(404).json({ message: "Menu not found" });
@@ -53,7 +65,13 @@ export const updateMenu = async (req: Request, res: Response) => {
 
 export const deleteMenu = async (req: Request, res: Response) => {
     try {
-        const menu = await Menu.findByPk(req.params.id);
+        const id = req.params.id;
+
+        if (!id || Array.isArray(id)) {
+            return res.status(400).json({ message: "Invalid ID" });
+        }
+
+        const menu = await Menu.findByPk(id);
 
         if (!menu) {
             return res.status(404).json({ message: "Menu not found" });
