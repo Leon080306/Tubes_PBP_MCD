@@ -74,3 +74,12 @@ export const loginStaff = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Login error" });
     }
 }
+
+export const forgotPassword = async (req: Request, res:Response) => {
+    try {
+        
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Forgot Password error" });
+    }
+}
