@@ -37,7 +37,7 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
                 gap: "8px"
             }}>
                 <img
-                    src="/src/assets/ayam ala carte/Ayam Krispy McD - A la Carte.webp"
+                    src="/public/ayam ala carte/ayam krispy.webp"
                     alt=""
                     style={{
                         width: "50%",

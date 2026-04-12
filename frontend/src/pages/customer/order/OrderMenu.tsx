@@ -3,6 +3,7 @@ import PackageSelection from "./PackageSelection";
 import SetQuantity from "./SetQuantity";
 import Recommendation from "./Recommendation";
 import Modification from "./Modification";
+import Cart from "./Cart";
 
 export default function OrderMenu() {
     const [step, setStep] = useState("package");
@@ -26,6 +27,11 @@ export default function OrderMenu() {
             )}
             {step === "modification" && (
                 <Modification
+                    onNext={(nextStep: string) => setStep(nextStep)}
+                />
+            )}
+            {step === "cart" && (
+                <Cart
                     onNext={(nextStep: string) => setStep(nextStep)}
                 />
             )}

@@ -66,7 +66,7 @@ export default function PackageSelection({ onNext }: PackageSelectionProps) {
                     onClick={() => handleSelect("package")}
                 >
                     <img
-                        src="/src/assets/PaNas/PaNas 1.webp"
+                        src="/public/PaNas/PaNas 1.webp"
                         alt=""
                         style={{
                             width: "100%",
@@ -94,7 +94,7 @@ export default function PackageSelection({ onNext }: PackageSelectionProps) {
                     onClick={() => handleSelect("a la carte")}
                 >
                     <img
-                        src="/src/assets/ayam ala carte/Ayam Krispy McD - A la Carte.webp"
+                        src="/public/ayam ala carte/ayam krispy.webp"
                         alt=""
                         style={{
                             width: "100%",

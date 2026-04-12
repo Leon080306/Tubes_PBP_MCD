@@ -10,26 +10,26 @@ export default function Recomendation({ onNext }: PackageSelectionProps) {
         {
             name: "Big Mac",
             price: 35000,
-            image: "/src/assets/burger/bigmac.webp",
+            image: "/public/burger/bigmac.webp",
         }, {
             name: "Big Mac",
             price: 35000,
-            image: "/src/assets/burger/bigmac.webp",
+            image: "/public/burger/bigmac.webp",
         },
         {
             name: "Big Mac",
             price: 35000,
-            image: "/src/assets/burger/bigmac.webp",
+            image: "/public/burger/bigmac.webp",
         },
         {
             name: "Big Mac",
             price: 35000,
-            image: "/src/assets/burger/bigmac.webp",
+            image: "/public/burger/bigmac.webp",
         },
         {
             name: "Big Mac",
             price: 35000,
-            image: "/src/assets/burger/bigmac.webp",
+            image: "/public/burger/bigmac.webp",
         }
     ]
 
@@ -90,7 +90,7 @@ export default function Recomendation({ onNext }: PackageSelectionProps) {
             </Box>)}
         </Box>
 
-        <Button variant="outlined" onClick={() => onNext("checkout")} sx={{
+        <Button variant="outlined" onClick={() => onNext("cart")} sx={{
             color: "black",
             border: "1px solid rgba(0,0,0,0.2)",
             height: "40px",
