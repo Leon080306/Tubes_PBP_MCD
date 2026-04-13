@@ -16,7 +16,7 @@ export default function Layout() {
             }}
         >
             <Box sx={{
-                width: "550px",
+                width: "640px",
                 height: "100%",
                 padding: "12px 24px",
                 overflow: "auto",

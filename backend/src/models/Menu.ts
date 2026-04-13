@@ -31,10 +31,10 @@ export class Menu extends Model {
     harga_awal!: number;
 
     @Column({
-        type: DataType.ENUM('Makanan', 'Minuman', 'Dessert'),
+        type: DataType.ENUM('Burger', 'Drinks', 'Dessert', 'Happy Meal', 'Camilan', 'Paket HeBat', 'PaMer', 'PaNas', 'Ayam'),
         allowNull: false,
     })
-    kategori_menu!: 'Makanan' | 'Minuman' | 'Dessert';
+    kategori_menu!: 'Burger' | 'Drinks' | 'Dessert' | 'Happy Meal' | 'Camilan' | 'Paket HeBat' | 'PaMer' | 'PaNas'  | 'Ayam';
 
     @Column({
         type: DataType.ENUM('Ala Carte', 'Paket'),
