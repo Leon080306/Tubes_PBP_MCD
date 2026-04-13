@@ -1,85 +1,159 @@
-import { Staff } from "../models/Staff";
 import { Request, Response } from "express";
+import { v4 as uuidv4 } from 'uuid';
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { Staff } from "../models/Staff";
 
 export const getAllStaff = async (req: Request, res: Response) => {
     try {
-        const staff = await Staff.findAll();
+        const staff = await Staff.findAll({
+            attributes: {
+                exclude: ['password'] //ini passwordnya ga dimunculin
+            }
+        })
         res.json(staff);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "data error" });
+        res.status(500).json({ message: "Get All Staff error" });
     }
 }
 
-export const getOneStaff = async (req: Request, res:Response) => {
+export const getStaffById = async (req: Request, res: Response) => {
     try {
-        const staffData = (req as any).user;
-        if (!staffData) {
-            return res.status(404).json({
-                message: "Data tidak bisa di temukan"
-            })
-        }
-
-        res.status(200).json({
-            message:"succes",
-            user:staffData
-        })
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "data tidak ditemukan" });
-    }
-}
-export const loginStaff = async (req: Request, res: Response) => {
-    try {
-        const { email, password } = req.body;
-
+        const { id } = req.params;
         const staff = await Staff.findOne({
-            where: { email }
-        });
+            where:{
+                staff_id: id,
+            },
+            attributes: {
+                exclude: ['password']
+            }
+        })
 
         if (!staff) {
             return res.status(404).json({
-                message: "User dengan email tersebut tidak ditemukan"
+                status: "fail",
+                message: "Staff dengan ID tersebut tidak ditemukan"
             })
         }
 
-        const isMatch = await bcrypt.compare(password, staff.getDataValue("password"));
-        if (!isMatch) {
-            return res.status(401).json({ message: "Password Salah" })
+        return res.status(200).json({
+            status: "Success",
+            data: staff
+        })
+    } catch (error: any) {
+        console.error("DEBUG ERROR GET BY ID:", error.message);
+        res.status(500).json({ message: "Get staff by ID error", detail: error.message });
+    }
+}
+
+export const createStaff = async (req: Request, res: Response) => {
+    try {
+        const payload = req.body;
+        payload.staff_id = uuidv4();
+
+        const { email, password, role} = payload;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        payload.password = hashedPassword;
+
+        if (!email || !password || !role) {
+            return res.status(400).json({
+                status: "Fail",
+                message: "Data tidak boleh kosong"
+            })
         }
 
-        if (!process.env.JWT_SECRET) {
-            throw new Error("JWT_SECRET not defined")
+        const validRoles = ['Admin', 'Cashier'];
+        if (!validRoles) {
+            return res.status(400).json({
+                status: "Fail",
+                message: 'Role tidak sesuai'
+            })
         }
 
-        const token = jwt.sign(
-            {
-                id: staff.getDataValue("staff_id"),
-                email: staff.getDataValue("email"),
-                role: staff.getDataValue("role"),
+        const newStaff = await Staff.create({
+            staff_id: uuidv4(),
+            email,
+            password: hashedPassword,
+            role: role
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Staff berhasil di daftarkan",
+            data: {
+                staff_id: newStaff.staff_id,
+                email: newStaff.email,
+                role: newStaff.role
+            }
+        })
+    } catch (error: any) {
+        console.error(error);
+        res.status(500).json({ message: "Gagal Create Staff", detail: error.message })
+    }
+}
+
+export const updateStaff = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const {email} = req.body;
+        const staff = await Staff.findOne({
+            where:{
+                staff_id: id,
             },
-            process.env.JWT_SECRET, // nanti kita pindahin ke .env
-            { expiresIn: "1d" }
-        )
+            attributes: {
+                exclude: ['password']
+            }
+        })
 
-        res.json({
-            message: "Login success",
-            token
+        if (!staff) {
+            return res.status(404).json({
+                status: "fail",
+                message: "Staff dengan ID tersebut tidak ditemukan"
+            })
+        }
+
+        await staff.update({email});
+        return res.json({
+            success: true,
+            message: "Data Staff berhasil di update",
+            data: staff
         })
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Login error" });
+        res.status(500).json({ message: "Get Staff by ID error" })
     }
 }
 
-export const forgotPassword = async (req: Request, res:Response) => {
+export const deleteStaff = async (req: Request, res: Response) => {
     try {
-        
+        const { id } = req.params;
+        const staff = await Staff.findOne({
+            where: {
+                staff_id:id
+            },
+            attributes: {
+                exclude: ['password']
+            }
+        })
+
+        if (!staff) {
+            return res.status(404).json({
+                status: "fail",
+                message: "Staff dengan ID tersebut tidak ditemukan"
+            })
+        }
+
+        await staff.destroy();
+
+        return res.json({
+            success: true,
+            message: "Data Staff berhasil di delete",
+            data: staff
+        })
+
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Forgot Password error" });
+        res.status(500).json({ message: "Get Staff by ID error" })
     }
 }

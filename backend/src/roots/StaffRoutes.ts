@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { getAllStaff, getOneStaff, loginStaff, forgotPassword } from "../controller/staffController";
-import { authMiddleware } from '../middlewares/authMiddleware';
+import { createStaff, deleteStaff, getAllStaff, getStaffById, updateStaff } from "../controller/staffController";
 
 const router : Router = Router();
 
 router.get('/', getAllStaff);
-router.get('/me', authMiddleware, getOneStaff);
-router.post('/login', loginStaff);
-router.post('/forgot-password', forgotPassword)
+router.get('/:id',getStaffById);
+router.post('/', createStaff)
+router.put('/:id', updateStaff);
+router.delete('/:id', deleteStaff)
 
 export default router;

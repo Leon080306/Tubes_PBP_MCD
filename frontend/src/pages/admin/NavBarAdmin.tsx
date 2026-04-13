@@ -4,6 +4,8 @@ import { useAppSelector } from "../../hooks/useAppSelector";
 import { authActions } from "../../redux/authSlice";
 import logoMcD from '../../assets/logo_mcd.png';
 import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
 
 export default function NavBar() {
     const navigate = useNavigate();
@@ -11,8 +13,36 @@ export default function NavBar() {
 
     const userInfo = useAppSelector(state => state.auth.userInfo);
 
+    const token = Cookies.get('token');
+
+    useEffect(() => {
+        const getProfile = async () => {
+            if (token && !userInfo) {
+                try {
+                    const response = await fetch('/api/user/me', {
+                        method: 'GET',
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "content-type": "application/json"
+                        }
+                    });
+
+                    const userData = await response.json();
+
+                    if (response.status === 200 && userData.user) {
+                        dispatch(authActions.setUserInfo(userData.user));
+                    }
+                } catch (error) {
+                    console.log("error: ", error)
+                }
+            }
+        };
+        getProfile();
+    }, [token,userInfo,dispatch])
+
     const handleLogout = () => {
         dispatch(authActions.logout());
+        Cookies.remove('token')
         alert("Berhasil logout");
         navigate('/admin/login');
     }
@@ -34,7 +64,7 @@ export default function NavBar() {
                 />
 
                 {userInfo && (
-                    <Typography variant="h5" gap={20} sx={{ fontStyle: 'italic', whiteSpace: 'nowrap', ml: '25px' }}>
+                    <Typography sx={{ fontStyle: 'italic', whiteSpace: 'nowrap', ml: '25px', variant: "h5", gap: 20 }}>
                         Hi, {userInfo?.role}!!
                     </Typography>
                 )}
@@ -47,8 +77,9 @@ export default function NavBar() {
                         alignItem: 'center',
                         gap: 2
                     }}>
-                        <Button sx={{ backgroundColor: "#FDC82F", color: 'white', boxShadow: 3 }} onClick={() => navigate('/')}>Update Menu</Button>
-                        <Button sx={{ backgroundColor: "#FDC82F", color: 'white', boxShadow: 3 }} onClick={() => navigate('/post')}>List order</Button>
+                        <Button sx={{ backgroundColor: "#FDC82F", color: 'white', boxShadow: 3 }} onClick={() => navigate('/admin')}>Update Menu</Button>
+                        <Button sx={{ backgroundColor: "#FDC82F", color: 'white', boxShadow: 3 }} onClick={() => navigate('/admin/orderList')}>List Order</Button>
+                        <Button sx={{ backgroundColor: "#FDC82F", color: 'white', boxShadow: 3 }} onClick={() => navigate('/admin/staffList')}>List Staff</Button>
 
                         <Button
                             variant="contained"

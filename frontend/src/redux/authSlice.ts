@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { UserInfo } from '../types';
+import Cookies from "js-cookie";
 
 export type AuthState = {
     userInfo?: UserInfo;
@@ -20,7 +21,7 @@ export const authSlice = createSlice({
         },
         logout: (state) => {
             state.userInfo = undefined;
-            localStorage.removeItem('token');
+            Cookies.remove('token');
         }
     }
 })

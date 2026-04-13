@@ -7,6 +7,7 @@ import { useNavigate } from "react-router";
 import { AppBar } from "@mui/material";
 import NavBar from "../admin/NavBarAdmin";
 import Cookies from "js-cookie";
+import type { UserInfo } from "../../type";
 
 export default function LoginPageAdmin() {
     const [email, setEmail] = useState('');
@@ -21,7 +22,7 @@ export default function LoginPageAdmin() {
         }
 
         try {
-            const response = await fetch('/api/staff/login', {
+            const response = await fetch('/api/user/login', {
                 method: 'POST',
                 headers: { "content-type": "application/json"},
                 body: JSON.stringify({email, password})
@@ -37,14 +38,14 @@ export default function LoginPageAdmin() {
             const token = data.token;
             Cookies.set('token', token, { expires: 1}); //buat nyimpen tokennya
 
-            const profileResponse = await fetch('/api/staff/me', {
+            const profileResponse = await fetch('/api/user/me', {
                 method: 'GET',
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "content-type": "application/json"
                 }
             });
-            const userData = await profileResponse.json();
+            const userData : { message: string, user: UserInfo }= await profileResponse.json();
 
             dispatch(authActions.setUserInfo(userData.user));
 
@@ -64,7 +65,7 @@ export default function LoginPageAdmin() {
         }
 
         try {
-            const response = await fetch('/api/staff/forgot-password', {
+            const response = await fetch('/api/user/forgot-password', {
                 method:'POST',
                 headers: { 'Content-Type': 'application/json'},
                 body: JSON.stringify({email: emailTarget})

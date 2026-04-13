@@ -2,9 +2,9 @@ import { Router } from "express";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import StaffRoutes from "./StaffRoutes"
 import MenuAdminRoutes from "./MenuAdminRoutes";
-import staffRoutes from "./StaffRoutes"
 import menuRoutes from "./MenuAdminRoutes";
-import orderRoutes from "./OrderRoutes"
+import OrderRoutes from "./OrderRoutes"
+import UserRoutes from "./UserRoutes"
 
 
 const router: Router = Router();
@@ -15,9 +15,9 @@ const router: Router = Router();
 // Private
 //router.use("/tableInformation", authMiddleware, TableInformationRoutes)
 //router.use("/staff", authMiddleware, StaffRoutes);
-router.use("/staff", StaffRoutes);
+router.use("/user", UserRoutes);
+router.use("/staff", StaffRoutes)
 router.use("/menu", MenuAdminRoutes);
-router.use("/staff", staffRoutes);
-router.use("/order", orderRoutes);
+router.use("/order", OrderRoutes);
 
 export default router; 
