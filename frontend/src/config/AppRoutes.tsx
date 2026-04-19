@@ -11,6 +11,9 @@ const OrderList = lazy(() => import('../pages/admin/OrderListPage'));
 const ListStaff = lazy(() => import('../pages/admin/StaffPage'));
 const CreateStaff = lazy(() => import('../pages/admin/CreateStaffPage'));
 const EditStaff = lazy(() => import('../pages/admin/EditStaffPage'));
+const CreateMenu = lazy(() => import('../pages/admin/CreateMenuPage'));
+const CashierPage = lazy(() => import('../pages/admin/CashierPage'));
+const FormResetPassword = lazy(() => import('../pages/admin/FormResetPassword'));
 
 export const AppRoutes = () => {
     return (
@@ -21,11 +24,14 @@ export const AppRoutes = () => {
                 </Route>
                 {/* admin */}
                 <Route path= '/admin' element={<HomePageAdmin />} />
+                <Route path= '/admin/addMenu' element= {<CreateMenu />} />
                 <Route path= '/admin/login' element={<LoginAdmin />} />
                 <Route path= '/admin/orderList' element={<OrderList />} />
                 <Route path= '/admin/staffList' element={<ListStaff />} />
                 <Route path= '/staff/create' element={<CreateStaff />} />
                 <Route path= '/staff/edit/:id' element={<EditStaff />} />
+                <Route path= '/cashier' element={<CashierPage />} />
+                <Route path= '/reset' element={<FormResetPassword />} />
             </Routes>
         </Suspense>
     );

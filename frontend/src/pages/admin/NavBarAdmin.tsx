@@ -32,13 +32,14 @@ export default function NavBar() {
                     if (response.status === 200 && userData.user) {
                         dispatch(authActions.setUserInfo(userData.user));
                     }
+
                 } catch (error) {
                     console.log("error: ", error)
                 }
             }
         };
         getProfile();
-    }, [token,userInfo,dispatch])
+    }, [token, userInfo, dispatch])
 
     const handleLogout = () => {
         dispatch(authActions.logout());
@@ -48,9 +49,8 @@ export default function NavBar() {
     }
 
     return (
-        <AppBar position="static" sx={{ mb: 4, backgroundColor: "#D52B1E" }}>
+        <AppBar position="static" sx={{ mb: 0, backgroundColor: "#D52B1E", boxShadow: 0 }}>
             <Toolbar>
-
                 <Box
                     component='img'
                     src={logoMcD}
@@ -59,7 +59,6 @@ export default function NavBar() {
                         height: 40,
                         cursor: 'pointer',
                         flexGrow: 0,
-
                     }}
                 />
 
@@ -77,13 +76,77 @@ export default function NavBar() {
                         alignItem: 'center',
                         gap: 2
                     }}>
-                        <Button sx={{ backgroundColor: "#FDC82F", color: 'white', boxShadow: 3 }} onClick={() => navigate('/admin')}>Update Menu</Button>
-                        <Button sx={{ backgroundColor: "#FDC82F", color: 'white', boxShadow: 3 }} onClick={() => navigate('/admin/orderList')}>List Order</Button>
-                        <Button sx={{ backgroundColor: "#FDC82F", color: 'white', boxShadow: 3 }} onClick={() => navigate('/admin/staffList')}>List Staff</Button>
+
+                        {userInfo.role === 'Admin' && (
+                            <>
+
+                                <Button sx={{
+                                    backgroundColor: "#FDC82F",
+                                    color: 'white',
+                                    boxShadow: 3,
+                                    '&:hover': {
+                                        backgroundColor: "#ffdb70",
+                                        transform: 'translateY(-5px)',
+                                        boxShadow: 6,
+                                    }
+                                }}
+                                    onClick={() => navigate('/admin')}>
+                                    List Menu
+                                </Button>
+                                <Button sx={{
+                                    backgroundColor: "#FDC82F",
+                                    color: 'white',
+                                    boxShadow: 3,
+                                    '&:hover': {
+                                        backgroundColor: "#ffdb70",
+                                        transform: 'translateY(-5px)',
+                                        boxShadow: 6,
+                                    }
+                                }} onClick={() => navigate('/admin/orderList')}>
+                                    List Order
+                                </Button>
+                                <Button sx={{
+                                    backgroundColor: "#FDC82F",
+                                    color: 'white',
+                                    boxShadow: 3,
+                                    '&:hover': {
+                                        backgroundColor: "#ffdb70",
+                                        transform: 'translateY(-5px)',
+                                        boxShadow: 6,
+                                    }
+                                }} onClick={() => navigate('/admin/staffList')}>
+                                    List Staff
+                                </Button>
+                            </>
+                        )}
+
+                        {userInfo.role === 'Cashier' && (
+                            <Button sx={{
+                                backgroundColor: "#FDC82F",
+                                color: 'white',
+                                boxShadow: 3,
+                                '&:hover': {
+                                    backgroundColor: "#ffdb70",
+                                    transform: 'translateY(-5px)',
+                                    boxShadow: 6,
+                                }
+                            }} onClick={() => navigate('/cashier/addOrder')}>
+                                Add Order
+                            </Button>
+                        )}
 
                         <Button
                             variant="contained"
-                            sx={{ backgroundColor: "#FDC82F", color: 'white', boxShadow: 3 }}
+                            sx={{
+                                backgroundColor: "#FDC82F",
+                                color: 'white',
+                                boxShadow: 3,
+                                '&:hover': {
+                                    backgroundColor: "#ffdb70",
+                                    transform: 'translateY(-5px)',
+                                    boxShadow: 6,
+                                }
+                            }}
                             size="small"
                             onClick={handleLogout}
                         >

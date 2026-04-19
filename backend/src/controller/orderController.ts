@@ -1,9 +1,23 @@
 import { Request, Response } from "express";
 import { Order } from "../models/Order";
+import { OrderMenu } from "../models/OrderMenu";
+import { Menu } from "../models/Menu";
+import { MenuVarian } from "../models/MenuVarian";
+import { MenuOption } from "../models/MenuOption";
 
 export const getAllOrder = async (req: Request, res: Response) => {
     try {
-        const order = await Order.findAll();
+        const order = await Order.findAll({
+            order: [['order_no', 'ASC']],
+            include: [{
+                model:OrderMenu,
+                include: [
+                    { model: Menu},
+                    { model: MenuVarian},
+                    { model: MenuOption},
+                ]
+            }]
+        });
         res.json(order);
     } catch (error) {
         console.error(error);
@@ -14,7 +28,19 @@ export const getAllOrder = async (req: Request, res: Response) => {
 export const getTOrderById = async (req: Request, res: Response) => {
     try {
         const { order_id } = req.params;
-        const order = await Order.findByPk(order_id as string);
+        const order = await Order.findOne({
+            where: {
+                order_id: order_id
+            },
+            include: [{
+                model: OrderMenu,
+                include: [
+                    {model: Menu},
+                    {model: MenuVarian},
+                    {model: MenuOption}
+                ]
+            }]
+        });
 
         if (!order) {
             return res.status(404).json({
@@ -38,9 +64,14 @@ export const getTOrderById = async (req: Request, res: Response) => {
 export const updateOrder = async (req: Request, res: Response) => {
     try {
         const { order_id } = req.params;
+        
         const { total_harga, order_type, order_no, status } = req.body;
 
-        const order = await Order.findByPk(order_id as string);
+        const order = await Order.findOne({
+            where: {
+                order_id: order_id
+            }
+        });
 
         if (!order) {
             return res.status(404).json({

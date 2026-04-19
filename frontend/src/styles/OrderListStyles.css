@@ -9,9 +9,6 @@
     padding: 24px;
     margin-bottom: 8px;
     border-radius: 16px !important;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     transition: transform 0.2s, box-shadow 0.2s;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
     background-color: white !important;

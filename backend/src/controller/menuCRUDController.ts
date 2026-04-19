@@ -5,7 +5,7 @@ import { Menu } from "../models/Menu";
 export const getMenus = async (_req: Request, res: Response) => {
     try {
         const menus = await Menu.findAll();
-        return res.json(menus);
+        return res.json({ records: menus});
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }

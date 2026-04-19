@@ -2,14 +2,9 @@ import express from "express";
 // import dotenv from 'dotenv';
 import globalStaffApi from './roots/GlobalStaffApi';
 import sequelize from "./../config/database";
-
 console.log("MODELS:", sequelize.models);
-// dotenv.config();
 import "reflect-metadata";
-import express from 'express';
 import cors from 'cors';
-
-import { sequelize } from "../config/database";
 import menuRouter from "./routes/menuRoutes";
 
 const app = express();

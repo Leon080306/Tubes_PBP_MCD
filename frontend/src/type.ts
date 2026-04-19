@@ -11,6 +11,8 @@ export type MenuItemType = {
     harga_awal: number;
     gambarUrl: string;
     kategori_menu: string;
+    tipe_menu: string;
+    isAvailable: string;
 };
 
 export type OrderType = {
@@ -20,6 +22,21 @@ export type OrderType = {
     total_harga: number
     order_type: "Dine-in" | "Takeaway";
     status: "Cart" | "Paid" | "Process" | "Done" | "Canceled";
+    orderMenus?:{
+        menus: {
+            nama: string,
+            kategori_menu:string
+        };
+        mvs?: {
+            nama_varian: string,
+            harga_tambahan: number
+        };
+        mod?: {
+            nama_option: string,
+            tambahan_harga: number
+        }
+        harga_awal: number;
+    }[];
     createdAt?: string;
     deletedAt?: string;
     updatedAt?: string;

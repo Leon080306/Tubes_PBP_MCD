@@ -6,7 +6,7 @@
 
 .staff-layout {
     min-height: 100vh;
-    background-color: var(--mcd-white);
+    margin-top: 30px;
 }
 
 .header-section {

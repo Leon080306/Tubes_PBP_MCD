@@ -2,12 +2,12 @@ import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import {
     Container, Typography, Box, Paper, Button, Stack,
-    IconButton, CircularProgress, Divider, Avatar
+    IconButton, CircularProgress, Divider
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import PersonIcon from '@mui/icons-material/Person';
+// import PersonIcon from '@mui/icons-material/Person';
 import "../../styles/StaffStyles.css";
 import type { UserInfo } from "../../type";
 import NavBar from "./NavBarAdmin";
@@ -50,7 +50,7 @@ export default function StaffPage() {
             <NavBar />
 
             <div className="staff-layout">
-                <Container maxWidth="md" sx={{ py: 6 }}>
+                <Container maxWidth="md">
                     <Box className="header-section">
                         <Typography variant="h4" className="title">Staff Management</Typography>
                         <Button

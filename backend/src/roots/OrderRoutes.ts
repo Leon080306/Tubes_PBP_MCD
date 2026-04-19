@@ -4,7 +4,7 @@ import { getAllOrder, getTOrderById, updateOrder } from "../controller/orderCont
 const router : Router = Router();
 
 router.get('/', getAllOrder);
-router.get('/:id', getTOrderById);
-router.put('/:id', updateOrder);
+router.get('/:order_id', getTOrderById);
+router.put('/:order_id', updateOrder);
 
 export default router;
