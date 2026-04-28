@@ -3,6 +3,7 @@ import { Menu } from '../models/Menu';
 import { MenuVarian } from '../../src/models/MenuVarian';
 import { MenuOption } from '../../src/models/MenuOption';
 import sequelize from "../../config/database";
+// import { sequelize } from "../../config/database";
 
 export class menuController {
     static async getAll(req: Request, res: Response) {

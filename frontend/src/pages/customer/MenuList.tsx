@@ -110,58 +110,127 @@ export default function MenuList() {
         navigate("/order/" + cartItemId)
     };
 
+    const categories = ["All", ...new Set(menu.map((item) => item.kategori_menu))];
+
     return (
-        <Box>
-            {/* TITLE */}
-            {category !== "All" && (
-                <Typography variant="h6" fontWeight="bold" mb={2}>
-                    {category}
-                </Typography>
-            )}
-            {/* GRID */}
-            {sortedMenu.length > 0 ? (
-                <Box>
-                    {Object.entries(groupedMenu).map(([kategori, items], index) => (
-                        <Box key={kategori} mb={4}>
-                            <Box
-                                sx={{
-                                    borderTop: index === 0 ? "none" : "2px solid #eee",
-                                    pt: 2,
-                                    mb: 2,
-                                }}
-                            >
-                                <Typography
-                                    fontWeight="bold"
+        <Box
+            sx={{
+                display: "flex",
+                gap: 2,
+                width: "100%",
+                maxWidth: "900px",
+                margin: "0 auto",
+            }}
+        >
+
+            <Box
+                sx={{
+                    width: "140px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                    pt: 2,
+                }}
+            >
+                {categories.map((cat) => (
+                    <Box
+                        key={cat}
+                        onClick={() => setCategory(cat)}
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            cursor: "pointer",
+                            px: 1,
+                            py: 0.5,
+                            borderLeft:
+                                category === cat
+                                    ? "4px solid #ffcc00"
+                                    : "4px solid transparent",
+                            fontWeight: category === cat ? "bold" : "normal",
+                            color: category === cat ? "#000" : "#666",
+                            transition: "0.2s",
+                            "&:hover": {
+                                color: "#000",
+                            },
+                        }}
+                    >
+                        <Box
+                            component="img"
+                            src={`/icons/${cat}.png`}
+                            sx={{
+                                width: 24,
+                                height: 24,
+                                objectFit: "contain",
+                            }}
+                            onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                            }}
+                        />
+
+                        <Typography fontSize="14px">
+                            {cat}
+                        </Typography>
+                    </Box>
+                ))}
+            </Box>
+
+            <Box sx={{ flex: 1 }}>
+
+                {category !== "All" && (
+                    <Typography variant="h6" fontWeight="bold" mb={2}>
+                        {category}
+                    </Typography>
+                )}
+
+                {sortedMenu.length > 0 ? (
+                    <Box>
+                        {Object.entries(groupedMenu).map(([kategori, items], index) => (
+                            <Box key={kategori} mb={4}>
+
+                                <Box
                                     sx={{
-                                        borderLeft: "5px solid #ffcc00",
-                                        pl: 1,
+                                        borderTop: index === 0 ? "none" : "2px solid #eee",
+                                        pt: 2,
+                                        mb: 2,
                                     }}
                                 >
-                                    {kategori}
-                                </Typography>
-                            </Box>
+                                    <Typography
+                                        fontWeight="bold"
+                                        sx={{
+                                            borderLeft: "5px solid #ffcc00",
+                                            pl: 1,
+                                        }}
+                                    >
+                                        {kategori}
+                                    </Typography>
+                                </Box>
 
-                            <Box
-                                sx={{
-                                    display: "grid",
-                                    gridTemplateColumns: "repeat(2, 1fr)",
-                                    gap: 2,
-                                }}
-                            >
-                                {items.map((item) => (
-                                    <MenuCardItem key={item.menu_id} item={item} onClick={() => handleMenuClick(item)} />
-                                ))}
+                                <Box
+                                    sx={{
+                                        display: "grid",
+                                        gridTemplateColumns: "repeat(2, 1fr)",
+                                        gap: 2,
+                                    }}
+                                >
+                                    {items.map((item) => (
+                                        <MenuCardItem
+                                            key={item.menu_id}
+                                            item={item}
+                                            onClick={() => handleAdd(item)}
+                                        />
+                                    ))}
+                                </Box>
                             </Box>
-                        </Box>
-                    ))}
-                </Box>
-            ) : (
-                <Typography mt={4} sx={{
-                    textAlign: "center"
-                }}>
-                    Menu tidak ditemukan
-                </Typography>
-            )}
-        </Box>
+                        ))}
+                    </Box>
+                ) : (
+                    <Typography mt={4} textAlign="center">
+                        Menu tidak ditemukan
+                    </Typography>
+                )}
+
+            </Box>
+        </Box >
     );
 }
