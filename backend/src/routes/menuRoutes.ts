@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { menuController } from '../controllers/menuController';
+import { menuController } from '../controller/menuController';
+import { uploadMiddleware } from '../middlewares/imageUploadMiddleware';
 
 const menuRouter: Router = Router();
 

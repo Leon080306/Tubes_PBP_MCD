@@ -38,7 +38,11 @@ function MenuCardItem({ item, onClick }: {
                 }}
             />
 
-            <Typography fontWeight="bold" mt={1} fontSize="14px">
+            <Typography sx={{
+                fontWeight: "bold",
+                mt: 1,
+                fontSize: "14px",
+            }}>
                 {item.nama}
             </Typography>
 

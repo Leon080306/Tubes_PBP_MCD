@@ -52,7 +52,7 @@ export class Menu extends Model {
         type: DataType.STRING,
         allowNull: true,
     })
-    isAvailable!: string;
+    declare isAvailable: string;
 
     @CreatedAt
     declare createdAt: Date;

@@ -1,0 +1,41 @@
+.order-container {
+    min-height: 100vh;
+    background-color: #f8f9fa; 
+    padding-top: 0;
+    padding-bottom: 50px;
+}
+
+.order-card {
+    padding: 24px;
+    margin-bottom: 8px;
+    border-radius: 16px !important;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
+    background-color: white !important;
+    border: none !important;
+}
+
+.order-card:hover {
+    transform: translateX(8px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.1) !important;
+}
+
+.status-chip {
+    font-weight: 800 !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 1px;
+    color: white !important;
+    padding: 4px;
+}
+
+.loading-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px;
+}
+
+.order-card {
+    border-left-width: 8px !important;
+    border-left-style: solid !important;
+}
