@@ -2,7 +2,8 @@ import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import {
     Container, Typography, Box, Paper, Button, Stack,
-    IconButton, CircularProgress, Divider
+    IconButton, CircularProgress, Divider,
+    Avatar
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -76,10 +77,13 @@ export default function StaffPage() {
                                 staffs.map((s) => (
                                     <Box key={s.staff_id} className="staff-item">
                                         <Stack sx={{ direction: "row", spacing: 2, alignItems: "center" }} >
-                                            {/* <Avatar sx={{ bgcolor: 'var(--mocha-mousse)' }}><PersonIcon /></Avatar> */}
-                                            <Box>
-                                                <Typography variant="caption" sx={{ display: "block", fontWeight:"bold", fontSize: "1.1rem" }}>{s.email}</Typography>
-                                                <Typography variant="caption" color="text.secondary" sx={{fontSize: "0.95rem"}}>{s.role}</Typography>
+                                            <Box sx={{ textAlign: 'left' }}>
+                                                <Typography sx={{ fontWeight: '900', fontSize: "1.4rem", color: '#D52B1E', lineHeight: 1.2 }}>{s.name}</Typography>
+                                                <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mt: 0.5 }}>
+                                                    <Typography variant="body2" sx={{ color: "#666", fontWeight: "500" }}>{s.email}</Typography>
+                                                    <Typography sx={{ color: "#999", fontWeight: "0.8rem" }}> | </Typography>
+                                                    <Typography sx={{ fontSize: "0.85rem", fontWeight: '700', color: '#D52B1E', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.role}</Typography>
+                                                </Stack>
                                             </Box>
                                         </Stack>
                                         <Box>

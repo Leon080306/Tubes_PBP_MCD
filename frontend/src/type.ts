@@ -1,5 +1,6 @@
 export type UserInfo = {
     staff_id: string;
+    name: string;
     password: string;
     role: string;
     email: string;

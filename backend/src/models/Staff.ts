@@ -1,10 +1,4 @@
-import {
-    Table,
-    Column,
-    Model,
-    DataType,
-    PrimaryKey,
-} from "sequelize-typescript";
+import { Table, Column, Model, DataType, PrimaryKey, CreatedAt, UpdatedAt, DeletedAt } from "sequelize-typescript";
 
 @Table({
     tableName: "Staff",
@@ -24,6 +18,12 @@ export class Staff extends Model {
         type: DataType.STRING,
         allowNull: false,
     })
+    name!: string;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
     email!: string;
 
     @Column({
@@ -37,4 +37,13 @@ export class Staff extends Model {
         allowNull: false,
     })
     role!: "Admin" | "Cashier";
+
+    @CreatedAt
+    declare createdAt: Date;
+
+    @UpdatedAt
+    declare updatedAt: Date;
+
+    @DeletedAt
+    declare deletedAt: Date;
 }

@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { createMenu, getMenus, getMenuById, updateMenu, deleteMenu } from "../controller/menuCRUDController";
+import { uploadMiddleware } from "../middlewares/imageUploadMiddleware";
 
 const menuAdminRouter: Router = Router();
 
 menuAdminRouter.get("/", getMenus);
 menuAdminRouter.get("/:id", getMenuById);
 
-menuAdminRouter.post("/", createMenu);
+menuAdminRouter.post("/", uploadMiddleware, createMenu);
 
 menuAdminRouter.put("/:id", updateMenu);
 

@@ -60,7 +60,7 @@ export const loginUser = async (req: Request, res: Response) => {
                 email: staff.getDataValue("email"),
                 role: staff.getDataValue("role"),
             },
-            process.env.JWT_SECRET, // nanti kita pindahin ke .env
+            process.env.JWT_SECRET, 
             { expiresIn: "1d" }
         )
 

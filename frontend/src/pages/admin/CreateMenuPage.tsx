@@ -5,6 +5,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NavBar from './NavBarAdmin';
 
 export default function CreateMenuPage() {
+    const [image, setImage] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string>("");
     const navigate = useNavigate();
     const [form, setForm] = useState({
         nama: "",
@@ -15,17 +17,37 @@ export default function CreateMenuPage() {
         isAvailable: "true"
     });
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+
+        if (!file) return;
+
+        setImage(file);
+        setPreview(URL.createObjectURL(file));
+        // if(!image) return;
+        // const formData = new FormData();
+        // formData.append("image", image);
+    }
+
     const handleCreate = async () => {
-        if (!form.nama || !form.harga_awal || !form.kategori_menu || !form.tipe_menu || !form.gambarUrl) {
+        if (!form.nama || !form.harga_awal || !form.kategori_menu || !form.tipe_menu || !image) {
+            console.log(form)
             alert("Tidak boleh kosong");
             return;
         }
 
+        const formData = new FormData();
+        formData.append("nama", form.nama);
+        formData.append("harga_awal", form.harga_awal.toString());
+        formData.append("kategori_menu", form.kategori_menu);
+        formData.append("tipe_menu", form.tipe_menu);
+        formData.append("isAvailable", form.isAvailable);
+        formData.append("image", image);
+
         try {
             const response = await fetch('/api/menu/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form)
+                body: formData
             });
 
             if (response.ok) {
@@ -56,8 +78,11 @@ export default function CreateMenuPage() {
                     <Stack spacing={3}>
                         <TextField label="Menu Name" fullWidth required value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} />
                         <TextField label="Price" type="number" fullWidth required value={form.harga_awal} onChange={(e) => setForm({ ...form, harga_awal: Number(e.target.value) })} />
-                        <TextField label="Image URL" fullWidth required value={form.gambarUrl} onChange={(e) => setForm({ ...form, gambarUrl: e.target.value })} />
+                        {/* <TextField label="Image URL" fullWidth required value={form.gambarUrl} onChange={(e) => setForm({ ...form, gambarUrl: e.target.value })} /> */}
 
+                        <input type="file" accept="image/*" onChange={handleChange} />
+
+                        <img src={preview} alt="" />
                         <Stack direction="row" spacing={2}>
 
                             <TextField
@@ -89,16 +114,16 @@ export default function CreateMenuPage() {
                         </Stack>
 
                         <TextField
-                                select
-                                label="Is Available"
-                                fullWidth
-                                required
-                                value={form.isAvailable}
-                                onChange={(e) => setForm({ ...form, isAvailable: e.target.value })}
-                            >
-                                <MenuItem value="true">Available</MenuItem>
-                                <MenuItem value="false">Unavailable</MenuItem>
-                            </TextField>
+                            select
+                            label="Is Available"
+                            fullWidth
+                            required
+                            value={form.isAvailable}
+                            onChange={(e) => setForm({ ...form, isAvailable: e.target.value })}
+                        >
+                            <MenuItem value="true">Available</MenuItem>
+                            <MenuItem value="false">Unavailable</MenuItem>
+                        </TextField>
 
                         <Button onClick={handleCreate} variant="contained" size="large" sx={{
                             bgcolor: '#D52B1E',

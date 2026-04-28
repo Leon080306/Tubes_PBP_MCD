@@ -13,6 +13,7 @@ export default function EditStaffPage() {
     const { id } = useParams();
 
     const [form, setForm] = useState({
+        name: '',
         email: '',
         role: ''
     });
@@ -30,6 +31,7 @@ export default function EditStaffPage() {
 
                 if (result.status === "Success") {
                     setForm({
+                        name: result.data.name,
                         email: result.data.email,
                         role: result.data.role
                     })
@@ -47,15 +49,16 @@ export default function EditStaffPage() {
     }, [id, navigate]);
 
     const handleUpdate = async () => {
-        if (!form.email) {
+        if (!form.name || !form.email) {
             alert("Tidak Boleh Kosong");
             return;
         }
         try {
+            
             const response = await fetch(`/api/staff/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: form.email })
+                body: JSON.stringify({ email: form.email, name: form.name })
             });
 
             if (response.ok) {
@@ -106,6 +109,14 @@ export default function EditStaffPage() {
                             disabled
                             slotProps={{ input: { readOnly: true } }}
 
+                        />
+
+                        <TextField
+                            label="Name"
+                            fullWidth
+                            required
+                            value={form.name}
+                            onChange={(e) => setForm({ ...form, name: e.target.value })}
                         />
 
                         <TextField

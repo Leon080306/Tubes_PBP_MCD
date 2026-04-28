@@ -32,8 +32,10 @@ export const getMenuById = async (req: Request, res: Response) => {
 };
 
 export const createMenu = async (req: Request, res: Response) => {
+    console.log("uploading")
     try {
         console.log("BODY:", req.body);
+        req.body.gambarUrl = req.filePath;
         const menu = await Menu.create(req.body);
         return res.status(201).json(menu);
     } catch (error: any) {

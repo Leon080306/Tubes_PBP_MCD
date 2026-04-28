@@ -51,11 +51,11 @@ export const createStaff = async (req: Request, res: Response) => {
         const payload = req.body;
         payload.staff_id = uuidv4();
 
-        const { email, password, role} = payload;
+        const { name, email, password, role} = payload;
         const hashedPassword = await bcrypt.hash(password, 10);
         payload.password = hashedPassword;
 
-        if (!email || !password || !role) {
+        if (!name || !email || !password || !role) {
             return res.status(400).json({
                 status: "Fail",
                 message: "Data tidak boleh kosong"
@@ -72,6 +72,7 @@ export const createStaff = async (req: Request, res: Response) => {
 
         const newStaff = await Staff.create({
             staff_id: uuidv4(),
+            name,
             email,
             password: hashedPassword,
             role: role
@@ -82,6 +83,7 @@ export const createStaff = async (req: Request, res: Response) => {
             message: "Staff berhasil di daftarkan",
             data: {
                 staff_id: newStaff.staff_id,
+                name: newStaff.name,
                 email: newStaff.email,
                 role: newStaff.role
             }
@@ -95,7 +97,8 @@ export const createStaff = async (req: Request, res: Response) => {
 export const updateStaff = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const {email} = req.body;
+        const {email, name} = req.body;
+        console.log("DATA DARI FRONTEND:", req.body);
         const staff = await Staff.findOne({
             where:{
                 staff_id: id,
@@ -112,11 +115,12 @@ export const updateStaff = async (req: Request, res: Response) => {
             })
         }
 
-        await staff.update({email});
+        const result = await staff.update({ email, name });
+        console.log("HASIL UPDATE DATABASE:", result.toJSON());
         return res.json({
             success: true,
             message: "Data Staff berhasil di update",
-            data: staff
+            data: result
         })
 
     } catch (error) {

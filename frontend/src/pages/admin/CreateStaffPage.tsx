@@ -7,13 +7,14 @@ import NavBar from './NavBarAdmin';
 export default function CreateStaffPage() {
     const navigate = useNavigate();
     const [form, setForm] = useState({
+        name: '',
         email: '',
         password: '',
         role: ''
     });
 
     const handleCreate = async () => {
-        if (!form.email || !form.password || !form.role) {
+        if (!form.name || !form.email || !form.password || !form.role) {
             alert("Tidak boleh kosong");
             return;
         }
@@ -51,6 +52,7 @@ export default function CreateStaffPage() {
 
                     {/* <form onSubmit={handleCreate}> */}
                         <Stack spacing={3}>
+                            <TextField label="Name" fullWidth required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                             <TextField label="Email Address" type="email" fullWidth required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
                             <TextField label="Password" type="password" fullWidth required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
                             <TextField
