@@ -111,4 +111,10 @@ export type UserInfo = {
     deletedAt?: string | null;
 };
 
+export type Category = {
+    category_id: string;
+    name: string;
+    sort_order: number;
+}
+
 export type FetchStatus = "idle" | "loading" | "success" | "error";
