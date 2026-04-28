@@ -112,7 +112,6 @@ export default function MenuList() {
             }}
         >
 
-            {/* 🔥 SIDEBAR */}
             <Box
                 sx={{
                     width: "140px",
@@ -145,7 +144,6 @@ export default function MenuList() {
                             },
                         }}
                     >
-                        {/* ICON */}
                         <Box
                             component="img"
                             src={`/icons/${cat}.png`}
@@ -166,7 +164,6 @@ export default function MenuList() {
                 ))}
             </Box>
 
-            {/* 🔥 CONTENT */}
             <Box sx={{ flex: 1 }}>
 
                 {category !== "All" && (
