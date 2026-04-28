@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { UserInfo } from '../types';
+import type { UserInfo } from "../type";
 
 export type AuthState = {
     userInfo?: UserInfo;

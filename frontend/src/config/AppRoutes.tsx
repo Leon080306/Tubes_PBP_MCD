@@ -14,6 +14,7 @@ const EditStaff = lazy(() => import('../pages/admin/EditStaffPage'));
 const CreateMenu = lazy(() => import('../pages/admin/CreateMenuPage'));
 const CashierPage = lazy(() => import('../pages/admin/CashierPage'));
 const FormResetPassword = lazy(() => import('../pages/admin/FormResetPassword'));
+const OrderMenu = lazy(() => import('../pages/customer/order/OrderMenu'));
 
 export const AppRoutes = () => {
     return (

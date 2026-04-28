@@ -1,13 +1,13 @@
 import { Box, Typography, Button, Container, Stack, IconButton, Dialog, DialogTitle, TextField, DialogContent, FormControl, InputLabel, Select, MenuItem, DialogActions } from "@mui/material";
 import { useEffect, useState } from "react";
-import type { MenuItemType } from "../../type"
+import type { Menu } from "../../type"
 import NavBar from "../admin/NavBarAdmin";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from "react-router";
 
 function MenuCardItem({ item }: {
-    item: MenuItemType;
+    item: Menu;
     // onClick: () => void;
 }) {
     return (
@@ -69,7 +69,7 @@ function MenuCardItem({ item }: {
 
 export default function CashierPage() {
     const navigate = useNavigate();
-    const [menu, setMenu] = useState<MenuItemType[]>([]);
+    const [menu, setMenu] = useState<Menu[]>([]);
     const [category, setCategory] = useState<string>("All");
 
     const fetchMenu = async () => {
@@ -92,7 +92,7 @@ export default function CashierPage() {
         }
         acc[item.kategori_menu].push(item);
         return acc;
-    }, {} as Record<string, MenuItemType[]>);
+    }, {} as Record<string, Menu[]>);
 
     return (
         <Box>

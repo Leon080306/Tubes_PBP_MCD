@@ -18,10 +18,10 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
-            kategori_menu: {
-                type: Sequelize.ENUM('Burger', 'Drinks', 'Dessert', 'Happy Meal', 'Camilan', 'Paket HeBat', 'PaMer', 'PaNas', 'Ayam'),
-                allowNull: false,
-            },
+            // kategori_menu: {
+            //     type: Sequelize.ENUM('Burger', 'Drinks', 'Dessert', 'Happy Meal', 'Camilan', 'Paket HeBat', 'PaMer', 'PaNas', 'Ayam'),
+            //     allowNull: false,
+            // },
             tipe_menu: {
                 type: Sequelize.ENUM('Ala Carte', 'Paket'),
                 allowNull: false,
@@ -52,9 +52,22 @@ module.exports = {
                 defaultValue: Sequelize.NOW,
             }
         });
+
+        await queryInterface.addColumn('Menu', 'category_id', {
+            type: Sequelize.UUID,
+            defaultValue: Sequelize.UUIDV4,
+            allowNull: false,
+            references: { 
+                model: 'Category',
+                key: 'category_id'
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE'
+        })
     },
 
     async down(queryInterface, Sequelize) {
+        await queryInterface.removeColumn('Category', 'category_id')
         await queryInterface.dropTable('Menu');
     }
 };

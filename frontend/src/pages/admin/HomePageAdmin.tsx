@@ -1,14 +1,14 @@
 import { Box, Typography, Button, Container, Stack, IconButton, Dialog, DialogTitle, TextField, DialogContent, FormControl, InputLabel, Select, MenuItem, DialogActions } from "@mui/material";
 import { useEffect, useState } from "react";
-import type { MenuItemType } from "../../type"
+import type { Menu } from "../../type"
 import NavBar from "../admin/NavBarAdmin";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from "react-router";
 
 function MenuCardItem({ item, onEdit, onDelete }: {
-    item: MenuItemType;
-    onEdit: (item: MenuItemType) => void;
+    item: Menu;
+    onEdit: (item: Menu) => void;
     onDelete: (id: string) => void;
     // onClick: () => void;
 }) {
@@ -99,7 +99,7 @@ function MenuCardItem({ item, onEdit, onDelete }: {
 
 export default function HomePageAdmin() {
     const navigate = useNavigate();
-    const [menu, setMenu] = useState<MenuItemType[]>([]);
+    const [menu, setMenu] = useState<Menu[]>([]);
     const [category, setCategory] = useState<string>("All");
 
     const [openEdit, setOpenEdit] = useState(false);
@@ -123,7 +123,7 @@ export default function HomePageAdmin() {
 
     useEffect(() => { fetchMenu(), [] })
 
-    const handleEdit = (data: MenuItemType) => {
+    const handleEdit = (data: Menu) => {
         setMenuId(data.menu_id);
         setNama(data.nama);
         setHarga(data.harga_awal);
@@ -192,7 +192,7 @@ export default function HomePageAdmin() {
     //         })
     // }, []);
 
-    let filtered: MenuItemType[];
+    let filtered: Menu[];
 
     if (category === "All") {
         filtered = menu;
@@ -210,9 +210,9 @@ export default function HomePageAdmin() {
         }
         acc[item.kategori_menu].push(item);
         return acc;
-    }, {} as Record<string, MenuItemType[]>);
+    }, {} as Record<string, Menu[]>);
 
-    const handleAdd = (item: MenuItemType) => {
+    const handleAdd = (item: Menu) => {
         console.log("Ditambah:", item);
 
         // code buat ke cart (leon)

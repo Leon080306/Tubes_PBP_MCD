@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import NavBar from "../admin/NavBarAdmin";
-import type { OrderType } from "../../type";
+import type { Order } from "../../type";
 import {
     Container, Typography, Box, Paper, Stack, Button,
     Chip, IconButton, Dialog, DialogTitle,
@@ -16,7 +16,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 export default function OrderListPage() {
-    const [orders, setOrders] = useState<Record<string, OrderType[]>>({});
+    const [orders, setOrders] = useState<Record<string, Order[]>>({});
     const [loading, setLoading] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
 
@@ -35,14 +35,14 @@ export default function OrderListPage() {
             const dataOrder = await response.json();
 
             if (response.status === 200) {
-                const grouped = dataOrder.reduce((acc: any, current: OrderType) => {
+                const grouped = dataOrder.reduce((acc: any, current: Order) => {
                     const date = current.waktu_pesanan.substring(0, 10);
                     if (!acc[date]) {
                         acc[date] = [];
                     }
                     acc[date].push(current);
                     return acc;
-                }, {} as Record<string, OrderType[]>);
+                }, {} as Record<string, Order[]>);
                 setOrders(grouped);
             } else {
                 console.error("Gagal memuat orderan")
@@ -60,7 +60,7 @@ export default function OrderListPage() {
         setDetailOrderId(detailOrderId === id ? null : id);
     }
 
-    const handleEdit = (order: OrderType) => {
+    const handleEdit = (order: Order) => {
         setSelectedOrderId(order.order_id);
         setOrderNo(order.order_no);
         setOrderType(order.order_type);

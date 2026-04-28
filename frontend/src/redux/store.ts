@@ -5,6 +5,7 @@ import { cartReducer } from "../store/cartSlice";
 
 export const store = configureStore({
         reducer: {
+                auth: authReducer,
                 menu: menuReducer,
                 cart: cartReducer
         }

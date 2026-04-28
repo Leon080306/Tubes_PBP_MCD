@@ -100,4 +100,15 @@ export type Payment = {
     order?: Order;
 };
 
+export type UserInfo = {
+    staff_id: string,
+    name: string,
+    email: string,
+    password: string,
+    role: "Admin" | "Cashier",
+    createdAt?: string;
+    updatedAt?: string;
+    deletedAt?: string | null;
+};
+
 export type FetchStatus = "idle" | "loading" | "success" | "error";

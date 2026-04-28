@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { isEmail } from "../../utils/isEmail";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import { authActions } from "../../redux/authSlice";
+import { authActions } from "../../store/authSlice";
 import "../../styles/LoginAdminStyles.css";
 import { useNavigate } from "react-router";
 import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material";

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { useAppSelector } from "../../hooks/useAppSelector";
-import { authActions } from "../../redux/authSlice";
+import { authActions } from "../../store/authSlice";
 import logoMcD from '../../assets/logo_mcd.png';
 import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
 import Cookies from "js-cookie";
