@@ -15,6 +15,9 @@ const CreateMenu = lazy(() => import('../pages/admin/CreateMenuPage'));
 const CashierPage = lazy(() => import('../pages/admin/CashierPage'));
 const FormResetPassword = lazy(() => import('../pages/admin/FormResetPassword'));
 const OrderMenu = lazy(() => import('../pages/customer/order/OrderMenu'));
+const CategoryPage = lazy(() => import('../pages/admin/CategoryPage'));
+const CreateCategory = lazy(() => import('../pages/admin/CreateCategoryPage'));
+const EditCategory = lazy(() => import('../pages/admin/EditCategoryPage'));
 
 export const AppRoutes = () => {
     return (
@@ -34,6 +37,10 @@ export const AppRoutes = () => {
                 <Route path='/staff/edit/:id' element={<EditStaff />} />
                 <Route path='/cashier' element={<CashierPage />} />
                 <Route path='/reset' element={<FormResetPassword />} />
+                <Route path='/category' element={<CategoryPage />} />
+                <Route path='/category/create' element={<CreateCategory />} />
+                <Route path='/category/edit/:category_id' element={<EditCategory />} />
+
             </Routes>
         </Suspense>
     );

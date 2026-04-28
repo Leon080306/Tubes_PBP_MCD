@@ -102,6 +102,19 @@ export default function NavBar() {
                                         transform: 'translateY(-5px)',
                                         boxShadow: 6,
                                     }
+                                }}
+                                    onClick={() => navigate('/category')}>
+                                    List Category
+                                </Button>
+                                <Button sx={{
+                                    backgroundColor: "#FDC82F",
+                                    color: 'white',
+                                    boxShadow: 3,
+                                    '&:hover': {
+                                        backgroundColor: "#ffdb70",
+                                        transform: 'translateY(-5px)',
+                                        boxShadow: 6,
+                                    }
                                 }} onClick={() => navigate('/admin/orderList')}>
                                     List Order
                                 </Button>
