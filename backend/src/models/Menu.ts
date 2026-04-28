@@ -23,31 +23,31 @@ export class Menu extends Model {
         type: DataType.UUIDV4,
         allowNull: false,
     })
-    category_id!: string;
+    declare category_id: string;
 
     @Column({
         type: DataType.STRING,
         allowNull: false,
     })
-    nama!: string;
+    declare nama: string;
 
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
     })
-    harga_awal!: number;
+    declare harga_awal: number;
 
     @Column({
         type: DataType.ENUM('Ala Carte', 'Paket'),
         allowNull: false,
     })
-    tipe_menu!: 'Ala Carte' | 'Paket';
+    declare tipe_menu: 'Ala Carte' | 'Paket';
 
     @Column({
         type: DataType.STRING,
         allowNull: false,
     })
-    gambarUrl!: string;
+    declare gambarUrl: string;
 
     @Column({
         type: DataType.STRING,

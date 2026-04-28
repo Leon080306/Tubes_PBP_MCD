@@ -19,13 +19,13 @@ export class Category extends Model {
         type: DataType.STRING,
         allowNull: false,
     })
-    name!: string;
+    declare name: string;
 
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
     })
-    sort_order!: number;
+    declare sort_order: number;
 
     @CreatedAt
     declare createdAt: Date;

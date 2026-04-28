@@ -3,7 +3,6 @@ import { Route, Routes } from 'react-router';
 import Layout from '../components/Layout';
 
 const MenuList = lazy(() => import('../pages/customer/MenuList.tsx'));
-const HomePage = lazy(() => import('../pages/customer/HomePage'));
 //const NavBarAdmin = lazy(() => import('../pages/admin/NavBarAdmin'));
 const LoginAdmin = lazy(() => import('../pages/admin/LoginPageAdmin'));
 const HomePageAdmin = lazy(() => import('../pages/admin/HomePageAdmin'));

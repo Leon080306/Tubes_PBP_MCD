@@ -26,13 +26,13 @@ export class MenuVarian extends Model {
         type: DataType.STRING,
         allowNull: false,
     })
-    nama_varian!: string;
+    declare nama_varian: string;
 
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
     })
-    harga_tambahan!: number;
+    declare harga_tambahan: number;
 
     @CreatedAt
     declare createdAt: Date;

@@ -26,13 +26,13 @@ export class MenuOption extends Model {
         type: DataType.STRING,
         allowNull: false,
     })
-    nama_option!: string;
+    declare nama_option: string;
 
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
     })
-    tambahan_harga!: number;
+    declare tambahan_harga: number;
 
     @CreatedAt
     declare createdAt: Date;
