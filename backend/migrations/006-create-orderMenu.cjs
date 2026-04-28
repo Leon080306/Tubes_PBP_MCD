@@ -13,11 +13,11 @@ module.exports = {
             quantity: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-            },  
+            },
             harga_awal: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-            },  
+            },
             createdAt: {
                 type: Sequelize.DATE,
                 allowNull: false,
@@ -40,7 +40,7 @@ module.exports = {
             type: Sequelize.UUID,
             defaultValue: Sequelize.UUIDV4,
             allowNull: false,
-            references: { 
+            references: {
                 model: 'Order',
                 key: 'order_id'
             },
@@ -52,7 +52,7 @@ module.exports = {
             type: Sequelize.UUID,
             defaultValue: Sequelize.UUIDV4,
             allowNull: false,
-            references: { 
+            references: {
                 model: 'Menu',
                 key: 'menu_id'
             },
@@ -64,7 +64,7 @@ module.exports = {
             type: Sequelize.UUID,
             defaultValue: Sequelize.UUIDV4,
             allowNull: false,
-            references: { 
+            references: {
                 model: 'MenuVarian',
                 key: 'mv_id'
             },
@@ -76,7 +76,7 @@ module.exports = {
             type: Sequelize.UUID,
             defaultValue: Sequelize.UUIDV4,
             allowNull: false,
-            references: { 
+            references: {
                 model: 'MenuOption',
                 key: 'mo_id'
             },
@@ -86,10 +86,10 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-         await queryInterface.removeColumn('OrderMenu', 'order_id')
-         await queryInterface.removeColumn('OrderMenu', 'menu_id')
-         await queryInterface.removeColumn('OrderMenu', 'mv_id')
-         await queryInterface.removeColumn('OrderMenu', 'mo_id')
+        await queryInterface.removeColumn('OrderMenu', 'order_id')
+        await queryInterface.removeColumn('OrderMenu', 'menu_id')
+        await queryInterface.removeColumn('OrderMenu', 'mv_id')
+        await queryInterface.removeColumn('OrderMenu', 'mo_id')
         await queryInterface.dropTable('OrderMenu');
     }
 };

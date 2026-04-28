@@ -1,16 +1,13 @@
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-
-type MenuItemType = {
-    menu_id: string;
-    nama: string;
-    harga_awal: number;
-    gambarUrl: string;
-    kategori_menu: string;
-};
+import { useNavigate } from "react-router";
+import type { AppDispatch } from "../../redux/store";
+import { useDispatch } from "react-redux";
+import type { Menu } from "../../type";
+import { cartActions } from "../../store/cartSlice";
 
 function MenuCardItem({ item, onClick }: {
-    item: MenuItemType;
+    item: Menu;
     onClick: () => void;
 }) {
     return (
@@ -41,7 +38,11 @@ function MenuCardItem({ item, onClick }: {
                 }}
             />
 
-            <Typography fontWeight="bold" mt={1} fontSize="14px">
+            <Typography sx={{
+                fontWeight: "bold",
+                mt: 1,
+                fontSize: "14px",
+            }}>
                 {item.nama}
             </Typography>
 
@@ -60,20 +61,23 @@ function MenuCardItem({ item, onClick }: {
 }
 
 export default function MenuList() {
-    const [menu, setMenu] = useState<MenuItemType[]>([]);
+    const [menu, setMenu] = useState<Menu[]>([]);
     const [category, setCategory] = useState<string>("All");
+    const dispatch = useDispatch<AppDispatch>()
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetch("http://localhost:3000/menu")
             .then((res) => res.json())
             .then((data) => {
-                console.log(menu)
                 setMenu(data.records);
+                console.log(data.records)
             })
             .catch((err) => console.error("Fetch error:", err));
     }, []);
 
-    let filtered: MenuItemType[];
+    let filtered: Menu[];
 
     if (category === "All") {
         filtered = menu;
@@ -91,12 +95,19 @@ export default function MenuList() {
         }
         acc[item.kategori_menu].push(item);
         return acc;
-    }, {} as Record<string, MenuItemType[]>);
+    }, {} as Record<string, Menu[]>);
 
-    const handleAdd = (item: MenuItemType) => {
-        console.log("Ditambah:", item);
-
-        // code buat ke cart (leon)
+    const handleMenuClick = (menu: Menu) => {
+        const cartItemId = crypto.randomUUID();
+        dispatch(cartActions.addToCart({
+            cartItemId: cartItemId,
+            menu: menu,
+            quantity: 1,
+            selectedVariants: [],
+            selectedOptions: [],
+            price: menu.harga_awal
+        }))
+        navigate("/order/" + cartItemId)
     };
 
     const categories = ["All", ...new Set(menu.map((item) => item.kategori_menu))];

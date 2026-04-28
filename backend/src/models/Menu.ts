@@ -1,8 +1,9 @@
-import { Table, Column, Model, DataType, PrimaryKey, CreatedAt, UpdatedAt, DeletedAt, HasMany } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, CreatedAt, UpdatedAt, DeletedAt, HasMany, BelongsTo } from 'sequelize-typescript';
 import { MenuVarian } from './MenuVarian';
 import { MenuOption } from './MenuOption';
 import { PaketItem } from './PaketItem';
 import { OrderMenu } from './OrderMenu';
+import { Category } from './Category';
 
 @Table({
     tableName: 'Menu',
@@ -19,6 +20,12 @@ export class Menu extends Model {
     declare menu_id: string;
 
     @Column({
+        type: DataType.UUIDV4,
+        allowNull: false,
+    })
+    category_id!: string;
+
+    @Column({
         type: DataType.STRING,
         allowNull: false,
     })
@@ -29,12 +36,6 @@ export class Menu extends Model {
         allowNull: false,
     })
     harga_awal!: number;
-
-    @Column({
-        type: DataType.ENUM('Burger', 'Drinks', 'Dessert', 'Happy Meal', 'Camilan', 'Paket HeBat', 'PaMer', 'PaNas', 'Ayam'),
-        allowNull: false,
-    })
-    kategori_menu!: 'Burger' | 'Drinks' | 'Dessert' | 'Happy Meal' | 'Camilan' | 'Paket HeBat' | 'PaMer' | 'PaNas'  | 'Ayam';
 
     @Column({
         type: DataType.ENUM('Ala Carte', 'Paket'),
@@ -52,7 +53,7 @@ export class Menu extends Model {
         type: DataType.STRING,
         allowNull: true,
     })
-    isAvailable!: string;
+    declare isAvailable: string;
 
     @CreatedAt
     declare createdAt: Date;
@@ -74,4 +75,7 @@ export class Menu extends Model {
 
     @HasMany(() => OrderMenu, 'menu_id')
     orderMenus!: OrderMenu[];
+
+    @BelongsTo(() => Category, 'category_id')
+    category!: Category;
 }
