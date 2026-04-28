@@ -107,7 +107,6 @@ export default function NumberSpinner({
                     render={(props, state) => (
                         <OutlinedInput
                             inputRef={props.ref}
-                            value={state.inputValue}
                             onBlur={props.onBlur}
                             onChange={props.onChange}
                             onKeyUp={props.onKeyUp}

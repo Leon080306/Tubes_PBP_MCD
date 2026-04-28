@@ -1,6 +1,12 @@
 import { Box, Button, Typography } from "@mui/material";
 import NumberSpinner from './../../../components/NumberSpinner';
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
+import { useEffect } from "react";
+import { useGetMenu } from "../../../hooks/useGetMenu";
+import FormatPrice from "../../../utils/FormatPrice";
+import type { AppDispatch, RootState } from "../../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { cartActions } from "../../../store/cartSlice";
 
 type PackageSelectionProps = {
     onNext: (step: string) => void;
@@ -8,6 +14,24 @@ type PackageSelectionProps = {
 
 export default function SetQuantity({ onNext }: PackageSelectionProps) {
     const navigate = useNavigate();
+    const { menu, reload } = useGetMenu();
+    const { cartItemId } = useParams();
+    const dispatch = useDispatch<AppDispatch>()
+    const cartItems = useSelector((state: RootState) => state.cart.cartItems)
+
+    const cartItem = cartItems.find(item => item.cartItemId === cartItemId)
+
+    useEffect(() => {
+        if (!cartItemId || cartItems.find(item => item.cartItemId === cartItemId) === undefined) {
+            navigate("/");
+        }
+    }, [cartItemId, cartItems, navigate]);
+
+    useEffect(() => {
+        if (cartItemId) {
+            reload(cartItemId);
+        }
+    }, [cartItemId]);
 
     return <Box sx={{
         padding: "24px",
@@ -37,7 +61,10 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
                 gap: "8px"
             }}>
                 <img
-                    src="/public/ayam ala carte/ayam krispy.webp"
+                    src={menu?.gambarUrl}
+                    onError={(e) => {
+                        e.currentTarget.src = "https://blocks.astratic.com/img/general-img-landscape.png";
+                    }}
                     alt=""
                     style={{
                         width: "50%",
@@ -47,10 +74,10 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
                 <Typography component={"h1"} sx={{
                     fontWeight: "bold",
                     fontSize: "20px"
-                }}>1pc Ayam Krispy</Typography>
+                }}>{menu?.nama}</Typography>
                 <Typography sx={{
                     fontSize: "14px"
-                }}>Rp23,000</Typography>
+                }}>{FormatPrice(menu?.harga_awal ?? 0)}</Typography>
             </Box>
 
             <Box sx={{
@@ -64,7 +91,17 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
                     height: "50px"
                 }}>Modifikasi</Button>
 
-                <NumberSpinner min={1} max={100} defaultValue={1} />
+                <NumberSpinner
+                    min={1}
+                    max={100}
+                    value={cartItem?.quantity ?? 1}
+                    onValueChange={(value) => {
+                        dispatch(cartActions.setQuantity({
+                            cartItemId: cartItemId ?? "",
+                            quantity: value ?? 1
+                        }));
+                    }}
+                />
             </Box>
 
             <Box sx={{

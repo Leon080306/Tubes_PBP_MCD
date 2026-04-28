@@ -1,10 +1,32 @@
 import { Box, Button, Paper, Typography } from "@mui/material";
+import { useNavigate, useParams } from "react-router";
+import { useGetMenu } from "../../../hooks/useGetMenu";
+import { useEffect } from "react";
+import FormatPrice from "../../../utils/FormatPrice";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../redux/store";
 
 type PackageSelectionProps = {
     onNext: (step: string) => void;
 };
 
 export default function PackageSelection({ onNext }: PackageSelectionProps) {
+    const { menu, reload } = useGetMenu();
+    const { cartItemId } = useParams();
+    const cartItems = useSelector((state: RootState) => state.cart.cartItems)
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!cartItemId || cartItems.find(item => item.cartItemId === cartItemId) === undefined) {
+            navigate("/");
+        }
+    }, [cartItemId, cartItems, navigate]);
+
+    useEffect(() => {
+        if (cartItemId) {
+            reload(cartItemId);
+        }
+    }, [cartItemId, reload]);
 
     const handleSelect = (type: string) => {
         if (type === "package") {
@@ -33,7 +55,7 @@ export default function PackageSelection({ onNext }: PackageSelectionProps) {
             <Typography variant="h4" sx={{
                 fontSize: "14px",
                 fontWeight: "bold"
-            }}>1pc Ayam Krispy</Typography>
+            }}>{menu?.nama}</Typography>
         </Box>
         <Box sx={{
             display: "flex",
@@ -66,8 +88,11 @@ export default function PackageSelection({ onNext }: PackageSelectionProps) {
                     onClick={() => handleSelect("package")}
                 >
                     <img
-                        src="/public/PaNas/PaNas 1.webp"
+                        src={menu?.gambarUrl}
                         alt=""
+                        onError={(e) => {
+                            e.currentTarget.src = "https://blocks.astratic.com/img/general-img-landscape.png";
+                        }}
                         style={{
                             width: "100%",
                             objectFit: "cover"
@@ -94,8 +119,11 @@ export default function PackageSelection({ onNext }: PackageSelectionProps) {
                     onClick={() => handleSelect("a la carte")}
                 >
                     <img
-                        src="/public/ayam ala carte/ayam krispy.webp"
+                        src={menu?.gambarUrl ?? "https://blocks.astratic.com/img/general-img-landscape.png"}
                         alt=""
+                        onError={(e) => {
+                            e.currentTarget.src = "https://blocks.astratic.com/img/general-img-landscape.png";
+                        }}
                         style={{
                             width: "100%",
                             objectFit: "cover"
@@ -107,10 +135,10 @@ export default function PackageSelection({ onNext }: PackageSelectionProps) {
                     }}>Tidak, satuan saja</Typography>
                     <Typography sx={{
 
-                    }}>Rp23,000</Typography>
+                    }}>{FormatPrice(menu?.harga_awal ?? 0)}</Typography>
                 </Paper>
             </Box>
-            <Button variant="outlined" sx={{
+            <Button variant="outlined" onClick={() => navigate(-1)} sx={{
                 color: "black",
                 borderColor: "black"
             }}>Batal</Button>

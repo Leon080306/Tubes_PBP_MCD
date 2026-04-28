@@ -72,7 +72,11 @@ export default function Recomendation({ onNext }: PackageSelectionProps) {
                     onNext("checkout");
                 }}
             >
-                <img src={item.image} alt="" style={{ width: "100px", height: "100px" }} />
+                <img src={item.image} alt="" style={{ width: "100px", height: "100px" }}
+                    onError={(e) => {
+                        e.currentTarget.src = "https://blocks.astratic.com/img/general-img-landscape.png";
+                    }}
+                />
                 <Box sx={{
                     width: "100%",
                     display: "flex",

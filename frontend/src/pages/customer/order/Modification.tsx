@@ -1,13 +1,34 @@
 import { Box, Button, Checkbox, Divider, FormControlLabel, IconButton, Paper, Typography } from "@mui/material";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import { useGetMenu } from "../../../hooks/useGetMenu";
+import { useNavigate, useParams } from "react-router";
+import FormatPrice from "../../../utils/FormatPrice";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../redux/store";
 type PackageSelectionProps = {
     onNext: (step: string) => void;
 };
 
 export default function Modification({ onNext }: PackageSelectionProps) {
+    const { menu, reload } = useGetMenu();
+    const { cartItemId } = useParams();
+    const cartItems = useSelector((state: RootState) => state.cart.cartItems)
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!cartItemId || cartItems.find(item => item.cartItemId === cartItemId) === undefined) {
+            navigate("/");
+        }
+    }, [cartItemId, cartItems, navigate]);
+
+    useEffect(() => {
+        if (cartItemId) {
+            reload(cartItemId);
+        }
+    }, [cartItemId, reload]);
+
     const [ingredients, setIngredients] = useState([
         { id: 1, name: "Beef Patty", qty: 1, image: "/public/camilan/chicken snack wrap.webp" },
         { id: 2, name: "Cheese Slice", qty: 1, image: "/public/camilan/chicken snack wrap.webp" },
@@ -49,16 +70,19 @@ export default function Modification({ onNext }: PackageSelectionProps) {
             <Paper elevation={3} sx={{ width: "100%", padding: "12px" }}>
                 <Box sx={{ display: "flex", gap: "4px", width: "100%", height: "80px" }}>
                     <img
-                        src="/public/ayam ala carte/ayam krispy.webp"
+                        src={menu?.gambarUrl}
+                        onError={(e) => {
+                            e.currentTarget.src = "https://blocks.astratic.com/img/general-img-landscape.png";
+                        }}
                         alt=""
                         style={{ height: "100%", objectFit: "cover" }}
                     />
                     <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1 }}>
                         <Typography component={"h1"} sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                            Ayam Krispy
+                            {menu?.nama}
                         </Typography>
                         <Typography component={"h1"} sx={{ fontWeight: "400", fontSize: "12px" }}>
-                            Rp. {(10000).toLocaleString("de-DE")}
+                            {FormatPrice(menu?.harga_awal ?? 0)}
                         </Typography>
                     </Box>
                 </Box>

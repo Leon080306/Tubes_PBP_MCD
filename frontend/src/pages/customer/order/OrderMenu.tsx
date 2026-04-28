@@ -7,6 +7,11 @@ import Cart from "./Cart";
 
 export default function OrderMenu() {
     const [step, setStep] = useState("package");
+    // const { menuId } = useParams();
+
+    // if (stepParam) {
+    //     setStep(stepParam);
+    // }
 
     return (
         <>

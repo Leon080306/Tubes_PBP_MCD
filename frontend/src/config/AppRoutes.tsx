@@ -11,7 +11,7 @@ export const AppRoutes = () => {
             <Routes>
                 <Route element={<Layout />}>
                     <Route path="/" element={<MenuList />} />
-                    <Route path="/order/:id" element={<OrderMenu />} />
+                    <Route path="/order/:cartItemId" element={<OrderMenu />} />
                 </Route>
             </Routes>
         </Suspense>
