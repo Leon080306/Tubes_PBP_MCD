@@ -1,6 +1,5 @@
 'use strict';
 
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
         await queryInterface.createTable('Menu', {
@@ -18,10 +17,6 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
-            // kategori_menu: {
-            //     type: Sequelize.ENUM('Burger', 'Drinks', 'Dessert', 'Happy Meal', 'Camilan', 'Paket HeBat', 'PaMer', 'PaNas', 'Ayam'),
-            //     allowNull: false,
-            // },
             tipe_menu: {
                 type: Sequelize.ENUM('Ala Carte', 'Paket'),
                 allowNull: false,
@@ -34,40 +29,36 @@ module.exports = {
                 type: Sequelize.BOOLEAN,
                 allowNull: true,
             },
-            
+            // ✅ FK inside createTable, no defaultValue
+            category_id: {
+                type: Sequelize.UUID,
+                allowNull: false,
+                references: {
+                    model: 'Category',
+                    key: 'category_id',
+                },
+                onUpdate: 'CASCADE',
+                onDelete: 'CASCADE',
+            },
             createdAt: {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.NOW,
             },
-
-            deletedAt: {
-                type: Sequelize.DATE,
-                allowNull: true,
-            },
-
             updatedAt: {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.NOW,
-            }
-        });
-
-        await queryInterface.addColumn('Menu', 'category_id', {
-            type: Sequelize.UUID,
-            defaultValue: Sequelize.UUIDV4,
-            allowNull: false,
-            references: { 
-                model: 'Category',
-                key: 'category_id'
             },
-            onUpdate: 'CASCADE',
-            onDelete: 'CASCADE'
-        })
+            deletedAt: {
+                type: Sequelize.DATE,
+                allowNull: true,
+            },
+        });
     },
 
-    async down(queryInterface, Sequelize) {
-        await queryInterface.removeColumn('Category', 'category_id')
+    // ✅ Fixed: just dropTable is enough
+    async down(queryInterface) {
         await queryInterface.dropTable('Menu');
-    }
+    },
 };

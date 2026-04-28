@@ -1,6 +1,5 @@
 'use strict';
 
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
         await queryInterface.createTable('Order', {
@@ -11,14 +10,14 @@ module.exports = {
                 primaryKey: true,
             },
             waktu_pesanan: {
-                type: Sequelize.DATE, //masukin dropdownnya di ui small, medium, large, hot or ice
+                type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.NOW,
             },
             total_harga: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-            },  
+            },
             order_type: {
                 type: Sequelize.ENUM('Dine-in', 'Takeaway'),
                 allowNull: false,
@@ -26,31 +25,29 @@ module.exports = {
             order_no: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-            }, 
+            },
             status: {
                 type: Sequelize.ENUM('Cart', 'Paid', 'Process', 'Done', 'Canceled'),
                 allowNull: false,
-            },       
+            },
             createdAt: {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.NOW,
             },
-
-            deletedAt: {
-                type: Sequelize.DATE,
-                allowNull: true,
-            },
-
             updatedAt: {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.NOW,
-            }
+            },
+            deletedAt: {
+                type: Sequelize.DATE,
+                allowNull: true,
+            },
         });
     },
 
-    async down(queryInterface, Sequelize) {
+    async down(queryInterface) {
         await queryInterface.dropTable('Order');
-    }
+    },
 };

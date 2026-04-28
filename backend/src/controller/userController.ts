@@ -13,7 +13,7 @@ export const getAllUser = async (req: Request, res: Response) => {
     }
 }
 
-export const getOneUser = async (req: Request, res:Response) => {
+export const getOneUser = async (req: Request, res: Response) => {
     try {
         const staffData = (req as any).user;
         if (!staffData) {
@@ -23,8 +23,8 @@ export const getOneUser = async (req: Request, res:Response) => {
         }
 
         res.status(200).json({
-            message:"succes",
-            user:staffData
+            message: "succes",
+            user: staffData
         })
     } catch (error) {
         console.error(error);
@@ -60,7 +60,7 @@ export const loginUser = async (req: Request, res: Response) => {
                 email: staff.getDataValue("email"),
                 role: staff.getDataValue("role"),
             },
-            process.env.JWT_SECRET, 
+            process.env.JWT_SECRET,
             { expiresIn: "1d" }
         )
 
@@ -75,9 +75,9 @@ export const loginUser = async (req: Request, res: Response) => {
     }
 }
 
-export const forgotPassword = async (req: Request, res:Response) => {
+export const forgotPassword = async (req: Request, res: Response) => {
     try {
-        
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Forgot Password error" });
