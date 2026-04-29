@@ -11,6 +11,7 @@ import ListIcon from '@mui/icons-material/List';
 import "../../styles/StaffStyles.css";
 import type { Category } from "../../type";
 import NavBar from "./NavBarAdmin";
+import Cookies from 'js-cookie';
 
 export default function CategoryPage() {
     const navigate = useNavigate();
@@ -20,8 +21,12 @@ export default function CategoryPage() {
     const fetchCategories = async () => {
         setLoading(true);
         try {
+            const token = Cookies.get('token');
             const response = await fetch("/api/category/", {
-                method: "GET"
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             });
             const data = await response.json();
             if (Array.isArray(data)) {
@@ -38,8 +43,12 @@ export default function CategoryPage() {
 
     const handleDelete = async (category_id: string) => {
         if (window.confirm("Apakah akan menghapus category ini?")) {
+            const token = Cookies.get('token');
             await fetch(`/api/category/${category_id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}` 
+                }
             });
             fetchCategories();
         }
@@ -59,7 +68,7 @@ export default function CategoryPage() {
                             className="add-btn"
                             onClick={() => navigate("/category/create")}
                         >
-                           Add Category
+                            Add Category
                         </Button>
                     </Box>
 

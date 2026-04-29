@@ -3,6 +3,7 @@ import { Container, Typography, TextField, Button, Paper, Stack, MenuItem, Box }
 import { useNavigate } from "react-router";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NavBar from './NavBarAdmin';
+import Cookies from 'js-cookie';
 
 export default function CreateCategoryPage() {
     const navigate = useNavigate();
@@ -18,9 +19,13 @@ export default function CreateCategoryPage() {
         }
 
         try {
+            const token = Cookies.get('token');
+
             const response = await fetch('/api/category/create', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                 },
                 body: JSON.stringify(form)
             });
 

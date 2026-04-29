@@ -12,6 +12,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import "../../styles/StaffStyles.css";
 import type { UserInfo } from "../../type";
 import NavBar from "./NavBarAdmin";
+import Cookies from 'js-cookie';
 
 export default function StaffPage() {
     const navigate = useNavigate();
@@ -21,8 +22,14 @@ export default function StaffPage() {
     const fetchStaff = async () => {
         setLoading(true);
         try {
+            const token = Cookies.get('token');
             const response = await fetch("/api/staff/", {
-                method: "GET"
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+
             });
             const data = await response.json();
             if (Array.isArray(data)) {
@@ -38,9 +45,14 @@ export default function StaffPage() {
     useEffect(() => { fetchStaff(); }, []);
 
     const handleDelete = async (id: string) => {
+        const token = Cookies.get('token');
         if (window.confirm("Apakah akan menghapus staff ini?")) {
             await fetch(`/api/staff/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
             });
             fetchStaff();
         }

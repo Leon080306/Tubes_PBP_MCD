@@ -3,6 +3,7 @@ import { Container, Typography, TextField, Button, Paper, Stack, MenuItem, Box }
 import { useNavigate } from "react-router";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NavBar from './NavBarAdmin';
+import Cookies from 'js-cookie';
 
 export default function CreateMenuPage() {
     const [image, setImage] = useState<File | null>(null);

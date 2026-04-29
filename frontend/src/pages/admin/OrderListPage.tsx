@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import NavBar from "../admin/NavBarAdmin";
-import type { Order } from "../../type";
+import type { Order, MenuVarian, MenuOption } from "../../type";
 import {
     Container, Typography, Box, Paper, Stack, Button,
     Chip, IconButton, Dialog, DialogTitle,
@@ -14,6 +14,7 @@ import PaidIcon from '@mui/icons-material/Paid';
 import "../../styles/OrderListStyles.css";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import Cookies from 'js-cookie';
 
 export default function OrderListPage() {
     const [orders, setOrders] = useState<Record<string, Order[]>>({});
@@ -29,8 +30,13 @@ export default function OrderListPage() {
 
     const fetchOrders = async () => {
         try {
+            const token = Cookies.get('token');
             const response = await fetch("/api/order/", {
-                method: "GET"
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
             });
             const dataOrder = await response.json();
 
@@ -71,16 +77,17 @@ export default function OrderListPage() {
 
     const handleSave = async () => {
         try {
+            const token = Cookies.get('token');
             console.log("ID yang mau diupdate:", selectedOrderId);
             const response = await fetch(`/api/order/${selectedOrderId}`, {
                 method: "PUT",
                 headers: {
-                    "content-type": "application/json"
+                    "content-type": "application/json",
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     order_no: orderNo,
                     order_type: orderType,
-                    total_harga: totalHarga,
                     status: status
                 })
             });
@@ -217,17 +224,27 @@ export default function OrderListPage() {
                                                     </Typography>
 
                                                     <Stack spacing={1.5}>
-                                                        {order.orderMenus?.map((item, id) => {
-                                                            const hargaVariantMenu = item.mvs?.harga_tambahan || 0;
-                                                            const hargaOptionMenu = item.mod?.tambahan_harga || 0;
-                                                            const totalHarga = item.harga_awal + hargaVariantMenu + hargaOptionMenu;
+                                                        {order.orderMenus?.map((item: any, id) => {
+                                                            const menuData = item.menus;
+                                                            const variantData = item.mvs;
+
+                                                            let totalHargaAllOptions = 0;
+                                                            item.options?.forEach((opts: any) => {
+                                                                totalHargaAllOptions += (opts.menuOption?.tambahan_harga || 0);
+                                                            });
+
+                                                            const hargaVariantMenu = variantData?.harga_tambahan || 0;
+                                                            const totalHargaSatuan = item.harga_awal + hargaVariantMenu + totalHargaAllOptions;
+
+                                                            const quantity = item.quantity || 1;
+                                                            const totalHarga = totalHargaSatuan * quantity;
 
                                                             return (
 
-                                                                <Box key={id} sx={{ display: 'flex', justifyContent: 'space-between', flexDirection:'column' }}>
-                                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width:'100%', mb:0.5 }}>
+                                                                <Box key={id} sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'column' }}>
+                                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: 0.5 }}>
                                                                         <Typography sx={{ fontWeight: 'bold', fontSize: '14px' }}>
-                                                                            {item.menus?.nama}
+                                                                            {menuData?.nama} {quantity > 1 ? `(x${quantity})` : ''}
                                                                         </Typography>
 
                                                                         <Typography sx={{ fontWeight: 'bold', color: '#D52B1E' }}>
@@ -235,26 +252,38 @@ export default function OrderListPage() {
                                                                         </Typography>
                                                                     </Box>
 
-                                                                    <Box sx={{ pl: 1, mt: 0.5, borderLeft: '2px solid #e0e0e0', display:'flex', flexDirection: 'column', gap: 0.5 }}>
+                                                                    <Box sx={{ pl: 1, mt: 0.5, borderLeft: '2px solid #e0e0e0', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                                                                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                                                             <Typography variant="caption" color="textSecondary">Harga Awal</Typography>
                                                                             <Typography variant="caption" color="textSecondary">Rp {item.harga_awal.toLocaleString()}</Typography>
                                                                         </Box>
 
 
-                                                                        {item.mvs && (
+                                                                        {variantData && (
                                                                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                                <Typography variant="caption" color="textSecondary">+ {item.mvs.nama_varian}</Typography>
-                                                                                <Typography variant="caption" color="textSecondary">Rp {item.mvs.harga_tambahan.toLocaleString()}</Typography>
+                                                                                <Typography variant="caption" color="textSecondary">+ {variantData?.nama_varian}</Typography>
+                                                                                <Typography variant="caption" color="textSecondary">Rp {hargaVariantMenu.toLocaleString()}</Typography>
                                                                             </Box>
                                                                         )}
 
-                                                                        {item.mod && (
-                                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                                <Typography variant="caption" color="textSecondary">+ {item.mod.nama_option}</Typography>
-                                                                                <Typography variant="caption" color="textSecondary">Rp {item.mod.tambahan_harga.toLocaleString()}</Typography>
+                                                                        {item.options?.map((opt: any, index: number) => (
+                                                                            <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                                <Typography variant="caption" color="textSecondary">
+                                                                                    {/* PASTIKAN INI opt.menuOption (Sesuai as di backend) */}
+                                                                                    + {opt.menuOption?.nama_option}
+                                                                                </Typography>
+                                                                                <Typography variant="caption">
+                                                                                    {/* PASTIKAN INI tambahan_harga (Pakai 'an') */}
+                                                                                    Rp {opt.menuOption?.tambahan_harga?.toLocaleString()}
+                                                                                </Typography>
                                                                             </Box>
-                                                                        )}
+                                                                        ))}
+                                                                        {/* {item.mod && (
+                                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                                <Typography variant="caption" color="textSecondary">+ {optionData?.nama_option}</Typography>
+                                                                                <Typography variant="caption" color="textSecondary">Rp {hargaOptionMenu.toLocaleString()}</Typography>
+                                                                            </Box>
+                                                                        )} */}
                                                                     </Box>
 
                                                                 </Box>
@@ -288,8 +317,6 @@ export default function OrderListPage() {
                                 <MenuItem value="Takeaway">Takeaway</MenuItem>
                             </Select>
                         </FormControl>
-
-                        <TextField label="Total Harga" type="number" fullWidth value={totalHarga} onChange={(e) => setTotalHarga(Number(e.target.value))} />
 
                         <FormControl fullWidth>
                             <InputLabel>Status</InputLabel>

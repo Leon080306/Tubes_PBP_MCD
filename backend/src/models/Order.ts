@@ -21,31 +21,31 @@ export class Order extends Model {
         type: DataType.DATE,
         allowNull: false,
     })
-    waktu_pesanan!: Date;
+    declare waktu_pesanan: Date;
 
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
     })
-    total_harga!: number;
+    declare total_harga: number;
 
     @Column({
         type: DataType.ENUM('Dine-in', 'Takeaway'),
         allowNull: false,
     })
-    order_type!: 'Dine-in' | 'Takeaway';
+    declare order_type: 'Dine-in' | 'Takeaway';
 
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
     })
-    order_no!: number;
+    declare order_no: number;
 
     @Column({
         type: DataType.ENUM('Cart', 'Paid', 'Process', 'Done', 'Canceled'),
         allowNull: false,
     })
-    status!: 'Cart' | 'Paid' | 'Process' | 'Done' | 'Canceled';
+    declare status: 'Cart' | 'Paid' | 'Process' | 'Done' | 'Canceled';
 
     @CreatedAt
     declare createdAt: Date;

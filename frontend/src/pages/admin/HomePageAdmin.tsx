@@ -5,6 +5,7 @@ import NavBar from "../admin/NavBarAdmin";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from "react-router";
+import Cookies from 'js-cookie';
 
 function MenuCardItem({ item, onEdit, onDelete }: {
     item: Menu;

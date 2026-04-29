@@ -10,6 +10,8 @@ import CategoryRoutes from "./CategoryRoutes"
 const router: Router = Router();
 
 router.use("/user", UserRoutes);
+
+router.use(authMiddleware);
 router.use("/staff", StaffRoutes)
 router.use("/menu", MenuAdminRoutes);
 router.use("/order", OrderRoutes);

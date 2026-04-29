@@ -10,17 +10,33 @@ export const getAllOrder = async (req: Request, res: Response) => {
     try {
         const order = await Order.findAll({
             order: [['order_no', 'ASC']],
-            include: [{
-                model: OrderMenu,
-                include: [
-                    { model: Menu },
-                    { model: MenuVarian },
-                    {
-                        model: OrderMenuOption,
-                        include: [{ model: MenuOption }]
-                    },
-                ]
-            }]
+            include: [
+                {
+                    model: OrderMenu,
+                    as: 'orderMenus',
+                    attributes: ['om_id', 'order_id', 'menu_id', 'mv_id', 'harga_awal', 'quantity'],
+                    include: [
+                        {
+                            model: Menu,
+                            as: 'menus',
+                        },
+                        {
+                            model: MenuVarian,
+                            as: 'mvs',
+                        },
+                        {
+                            model: OrderMenuOption,
+                            as: 'options',
+                            include: [
+                                {
+                                    model: MenuOption,
+                                    as: 'menuOption',
+                                },
+                            ],
+                        },
+                    ]
+                }
+            ],
         });
         res.json(order);
     } catch (error) {
@@ -34,17 +50,33 @@ export const getTOrderById = async (req: Request, res: Response) => {
         const { order_id } = req.params;
         const order = await Order.findOne({
             where: { order_id },
-            include: [{
-                model: OrderMenu,
-                include: [
-                    { model: Menu },
-                    { model: MenuVarian },
-                    {
-                        model: OrderMenuOption,
-                        include: [{ model: MenuOption }]
-                    },
-                ]
-            }]
+            include: [
+                {
+                    model: OrderMenu,
+                    as: 'orderMenus',
+                    attributes: ['om_id', 'order_id', 'menu_id', 'mv_id', 'harga_awal', 'quantity'],
+                    include: [
+                        {
+                            model: Menu,
+                            as: 'menus',
+                        },
+                        {
+                            model: MenuVarian,
+                            as: 'mvs',
+                        },
+                        {
+                            model: OrderMenuOption,
+                            as: 'options',
+                            include: [
+                                {
+                                    model: MenuOption,
+                                    as: 'menuOption',
+                                },
+                            ],
+                        },
+                    ]
+                }
+            ],
         });
 
         if (!order) {
@@ -69,7 +101,7 @@ export const updateOrder = async (req: Request, res: Response) => {
     try {
         const { order_id } = req.params;
 
-        const { total_harga, order_type, order_no, status } = req.body;
+        const { order_type, order_no, status } = req.body;
 
         const order = await Order.findOne({
             where: { order_id }
@@ -82,7 +114,7 @@ export const updateOrder = async (req: Request, res: Response) => {
             })
         }
 
-        await order.update({ total_harga, order_type, order_no, status });
+        await order.update({ order_type, order_no, status });
         return res.json({
             success: true,
             message: "Data Order berhasil di update",
