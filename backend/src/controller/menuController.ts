@@ -4,6 +4,8 @@ import { MenuVarian } from '../models/MenuVarian';
 import { MenuOption } from '../models/MenuOption';
 import { Category } from '../models/Category';
 import sequelize from "../../config/database";
+import { OrderMenu } from '../models/OrderMenu';
+import { Op, fn, col, literal } from 'sequelize';
 // import { sequelize } from "../../config/database";
 
 export class menuController {
@@ -40,5 +42,55 @@ export class menuController {
         res.json({
             record: menu
         });
+    }
+
+    static async getRecommendation(req: Request, res: Response) {
+        try {
+            const { menu_id } = req.params;
+            const limit = parseInt(req.query.limit as string) || 5;
+
+            // Step 1: Cari order_id yang mengandung menu_id ini
+            const ordersWithMenu = await OrderMenu.findAll({
+                where: { menu_id },
+                attributes: ['order_id'],
+                raw: true,
+            });
+
+            const orderIds = [...new Set(ordersWithMenu.map(o => o.order_id))];
+
+            if (orderIds.length === 0) {
+                return res.status(200).json([]);
+            }
+
+            // Step 2: Hitung menu lain yang muncul di order tersebut
+            const recommendations = await OrderMenu.findAll({
+                where: {
+                    order_id: { [Op.in]: orderIds },
+                    menu_id: { [Op.ne]: menu_id },  // exclude menu itu sendiri
+                },
+                attributes: [
+                    'menu_id',
+                    [fn('COUNT', col('OrderMenu.menu_id')), 'bought_together_count'],
+                ],
+                include: [
+                    {
+                        model: Menu,
+                        as: 'menus',
+                        required: true,
+                        attributes: ['menu_id', 'nama', 'harga_awal', 'gambarUrl', 'tipe_menu', 'isAvailable', 'category_id'],
+                    },
+                ],
+                group: ['OrderMenu.menu_id', 'menus.menu_id'],
+                order: [[literal('bought_together_count'), 'DESC']],
+                limit,
+                subQuery: false,
+            });
+
+            res.status(200).json(recommendations);
+        } catch (error) {
+            console.error('getRecommendations error:', error);
+            res.status(500).json({ message: 'Failed to fetch recommendations' });
+        }
+
     }
 }

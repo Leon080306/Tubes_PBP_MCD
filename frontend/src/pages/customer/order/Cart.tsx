@@ -1,45 +1,76 @@
 import { Box, Button, Divider, IconButton, Typography } from "@mui/material";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
-import { useState } from "react";
+import EditIcon from "@mui/icons-material/Edit";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
+import { cartActions } from "../../../store/cartSlice";
+import type { RootState } from "../../../redux/store";
+import FormatPrice from "../../../utils/FormatPrice";
+import { useCreateOrder } from "../../../hooks/useCreateOrder"; // ✅ adjust path
 
-type CartItem = {
-    id: number;
-    name: string;
-    price: number;
-    qty: number;
-    image: string;
-};
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 type PackageSelectionProps = {
     onNext: (step: string) => void;
 };
 
 export default function Cart({ onNext }: PackageSelectionProps) {
-    const [cartItems, setCartItems] = useState<CartItem[]>([
-        {
-            id: 1,
-            name: "Small Ice Cream Cone",
-            price: 11000,
-            qty: 2,
-            image: "/public/camilan/chicken snack wrap.webp",
-        },
-    ]);
-
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const cartItems = useSelector((state: RootState) => state.cart.cartItems);
 
-    const handleIncrement = (id: number) =>
-        setCartItems(prev => prev.map(i => i.id === id ? { ...i, qty: i.qty + 1 } : i));
+    // ✅ Hook untuk create order
+    const { state: createOrderState, createOrder } = useCreateOrder();
+    const isSubmitting = createOrderState === "loading";
 
-    const handleDecrement = (id: number) =>
-        setCartItems(prev => prev.map(i => i.id === id ? { ...i, qty: Math.max(0, i.qty - 1) } : i));
+    const handleIncrement = (cartItemId: string) =>
+        dispatch(cartActions.increaseQuantity(cartItemId));
 
-    const handleRemove = (id: number) =>
-        setCartItems(prev => prev.filter(i => i.id !== id));
+    const handleDecrement = (cartItemId: string) =>
+        dispatch(cartActions.decreaseQuantity(cartItemId));
 
-    const subtotal = cartItems.reduce((sum, i) => sum + i.price * i.qty, 0);
+    const handleRemove = (cartItemId: string) =>
+        dispatch(cartActions.removeFromCart(cartItemId));
+
+    const handleClearCart = () =>
+        dispatch(cartActions.clearCart());
+
+    // ✅ Handler untuk edit cart item
+    const handleEdit = (cartItemId: string) => {
+        navigate(`/order/${cartItemId}`);
+        onNext("modification");
+    };
+
+    const subtotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
     const total = subtotal;
+
+    // ✅ Handler untuk Selesaikan Pesanan
+    const handleCheckout = async () => {
+        if (cartItems.length === 0) return;
+
+        const payload = {
+            order_type: "Dine-in" as const, // TODO: ambil dari step sebelumnya kalau ada pilihan
+            total_harga: total,
+            items: cartItems.map((item) => ({
+                menu_id: item.menu.menu_id,
+                mv_id: item.selectedVariants[0]?.mv_id,
+                harga_awal: item.price,
+                quantity: item.quantity,
+                selectedOptions: item.selectedOptions.map((o) => ({ mo_id: o.mo_id })),
+            })),
+        };
+
+        const result = await createOrder(payload);
+
+        if (result) {
+            // Simpan order_id untuk step selanjutnya (checkout/payment)
+            sessionStorage.setItem("current_order_id", result.order_id);
+
+            dispatch(cartActions.clearCart());
+            onNext("checkout");
+        }
+    };
 
     return (
         <Box sx={{
@@ -52,114 +83,181 @@ export default function Cart({ onNext }: PackageSelectionProps) {
             padding: "24px"
         }}>
             {/* Header */}
-            <Box sx={{ display: "flex", alignItems: "flex-end", gap: "12px" }}>
-                <img src="/src/assets/logo_mcd.png" alt="" style={{ width: "32px", height: "32px" }} />
-                <Typography variant="h4" sx={{ fontSize: "24px", fontWeight: "bold" }}>
-                    Pesanan Anda
-                </Typography>
+            <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+                <Box sx={{ display: "flex", alignItems: "flex-end", gap: "12px" }}>
+                    <img src="/src/assets/logo_mcd.png" alt="" style={{ width: "32px", height: "32px" }} />
+                    <Typography variant="h4" sx={{ fontSize: "24px", fontWeight: "bold" }}>
+                        Pesanan Anda
+                    </Typography>
+                </Box>
+                <Button
+                    variant="outlined"
+                    onClick={handleClearCart}
+                    disabled={cartItems.length === 0}
+                    sx={{
+                        color: "#d32f2f",
+                        borderColor: "#d32f2f",
+                        textTransform: "none",
+                        fontSize: "13px",
+                        "&:hover": { borderColor: "#b71c1c", backgroundColor: "rgba(211,47,47,0.04)" },
+                        "&.Mui-disabled": { borderColor: "rgba(0,0,0,0.15)" }
+                    }}
+                >
+                    Hapus Semua
+                </Button>
             </Box>
 
-            {/* ✅ Cart Items */}
+            {/* Cart Items */}
             <Box sx={{
                 flex: 1,
                 overflow: "auto",
                 "&::-webkit-scrollbar": { display: "none" },
                 scrollbarWidth: "none",
             }}>
-                {cartItems.map((item, index) => (
-                    <Box key={item.id}>
-                        <Box sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "12px",
-                            py: "12px",
-                        }}>
-                            {/* Hapus Button */}
-                            <Button
-                                variant="outlined"
-                                size="small"
-                                onClick={() => handleRemove(item.id)}
-                                sx={{
-                                    color: "black",
-                                    borderColor: "rgba(0,0,0,0.3)",
-                                    textTransform: "none",
-                                    fontSize: "12px",
-                                    minWidth: "56px",
-                                    px: "8px",
-                                    py: "4px",
-                                    flexShrink: 0,
-                                }}
-                            >
-                                Hapus
-                            </Button>
-
-                            {/* Image with red badge */}
-                            <Box sx={{ position: "relative", flexShrink: 0 }}>
-                                <img
-                                    src={item.image}
-                                    alt={item.name}
-                                    style={{ width: "56px", height: "56px", objectFit: "contain" }}
-                                />
-                                <Box sx={{
-                                    position: "absolute",
-                                    bottom: 0,
-                                    left: 0,
-                                    width: "18px",
-                                    height: "18px",
-                                    backgroundColor: "#d32f2f",
-                                    borderRadius: "50%",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}>
-                                    <Typography sx={{ color: "white", fontSize: "10px", fontWeight: "bold" }}>
-                                        {item.qty}
-                                    </Typography>
-                                </Box>
-                            </Box>
-
-                            {/* Item Name */}
-                            <Typography sx={{ fontSize: "14px", fontWeight: "bold", flex: 1 }}>
-                                {item.name}
-                            </Typography>
-
-                            {/* Qty Stepper */}
+                {cartItems.length === 0 ? (
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+                        <Typography sx={{ color: "text.secondary", fontSize: "14px" }}>
+                            Belum ada pesanan
+                        </Typography>
+                    </Box>
+                ) : (
+                    cartItems.map((item, index) => (
+                        <Box key={item.cartItemId}>
                             <Box sx={{
                                 display: "flex",
                                 alignItems: "center",
-                                border: "1px solid",
-                                borderColor: "divider",
-                                borderRadius: "4px",
-                                flexShrink: 0,
+                                gap: "8px",
+                                py: "12px",
                             }}>
-                                <IconButton
+                                {/* Hapus Button */}
+                                <Button
+                                    variant="outlined"
                                     size="small"
-                                    sx={{ borderRadius: 0, px: "8px" }}
-                                    onClick={() => handleDecrement(item.id)}
+                                    onClick={() => handleRemove(item.cartItemId)}
+                                    sx={{
+                                        color: "black",
+                                        borderColor: "rgba(0,0,0,0.3)",
+                                        textTransform: "none",
+                                        fontSize: "12px",
+                                        minWidth: "56px",
+                                        px: "8px",
+                                        py: "4px",
+                                        flexShrink: 0,
+                                    }}
                                 >
-                                    <RemoveIcon sx={{ fontSize: "16px" }} />
-                                </IconButton>
-                                <Typography sx={{ fontSize: "16px", minWidth: "28px", textAlign: "center", userSelect: "none" }}>
-                                    {item.qty}
+                                    Hapus
+                                </Button>
+
+                                {/* ✅ Edit Button */}
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => handleEdit(item.cartItemId)}
+                                    startIcon={<EditIcon sx={{ fontSize: "14px !important" }} />}
+                                    sx={{
+                                        color: "#ffbc0d",
+                                        borderColor: "#ffbc0d",
+                                        textTransform: "none",
+                                        fontSize: "12px",
+                                        minWidth: "56px",
+                                        px: "8px",
+                                        py: "4px",
+                                        flexShrink: 0,
+                                        "&:hover": {
+                                            borderColor: "#e6a800",
+                                            backgroundColor: "rgba(255, 188, 13, 0.04)",
+                                        },
+                                        "& .MuiButton-startIcon": {
+                                            marginRight: "4px",
+                                        },
+                                    }}
+                                >
+                                    Edit
+                                </Button>
+
+                                {/* Image with red badge */}
+                                <Box sx={{ position: "relative", flexShrink: 0 }}>
+                                    <img
+                                        src={`${BASE_URL}/uploads/${item.menu.gambarUrl}`}
+                                        alt={item.menu.nama}
+                                        onError={(e) => {
+                                            e.currentTarget.src = "https://blocks.astratic.com/img/general-img-landscape.png";
+                                        }}
+                                        style={{ width: "56px", height: "56px", objectFit: "contain" }}
+                                    />
+                                    <Box sx={{
+                                        position: "absolute",
+                                        bottom: 0,
+                                        left: 0,
+                                        width: "18px",
+                                        height: "18px",
+                                        backgroundColor: "#d32f2f",
+                                        borderRadius: "50%",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                    }}>
+                                        <Typography sx={{ color: "white", fontSize: "10px", fontWeight: "bold" }}>
+                                            {item.quantity}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+
+                                {/* Item Name + variant/options */}
+                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                    <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>
+                                        {item.menu.nama}
+                                    </Typography>
+                                    {item.selectedVariants.length > 0 && (
+                                        <Typography sx={{ fontSize: "11px", color: "text.secondary" }}>
+                                            {item.selectedVariants.map(v => v.nama_varian).join(", ")}
+                                        </Typography>
+                                    )}
+                                    {item.selectedOptions.length > 0 && (
+                                        <Typography sx={{ fontSize: "11px", color: "text.secondary" }}>
+                                            {item.selectedOptions.map(o => o.nama_option).join(", ")}
+                                        </Typography>
+                                    )}
+                                </Box>
+
+                                {/* Qty Stepper */}
+                                <Box sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    border: "1px solid",
+                                    borderColor: "divider",
+                                    borderRadius: "4px",
+                                    flexShrink: 0,
+                                }}>
+                                    <IconButton
+                                        size="small"
+                                        sx={{ borderRadius: 0, px: "8px" }}
+                                        onClick={() => handleDecrement(item.cartItemId)}
+                                    >
+                                        <RemoveIcon sx={{ fontSize: "16px" }} />
+                                    </IconButton>
+                                    <Typography sx={{ fontSize: "16px", minWidth: "28px", textAlign: "center", userSelect: "none" }}>
+                                        {item.quantity}
+                                    </Typography>
+                                    <IconButton
+                                        size="small"
+                                        sx={{ borderRadius: 0, px: "8px" }}
+                                        onClick={() => handleIncrement(item.cartItemId)}
+                                    >
+                                        <AddIcon sx={{ fontSize: "16px" }} />
+                                    </IconButton>
+                                </Box>
+
+                                {/* Price */}
+                                <Typography sx={{ fontSize: "14px", fontWeight: "500", minWidth: "72px", textAlign: "right", flexShrink: 0 }}>
+                                    {FormatPrice(item.price * item.quantity)}
                                 </Typography>
-                                <IconButton
-                                    size="small"
-                                    sx={{ borderRadius: 0, px: "8px" }}
-                                    onClick={() => handleIncrement(item.id)}
-                                >
-                                    <AddIcon sx={{ fontSize: "16px" }} />
-                                </IconButton>
                             </Box>
 
-                            {/* Price */}
-                            <Typography sx={{ fontSize: "14px", fontWeight: "500", minWidth: "72px", textAlign: "right", flexShrink: 0 }}>
-                                Rp{(item.price * item.qty).toLocaleString("de-DE")}
-                            </Typography>
+                            {index < cartItems.length - 1 && <Divider />}
                         </Box>
-
-                        {index < cartItems.length - 1 && <Divider />}
-                    </Box>
-                ))}
+                    ))
+                )}
             </Box>
 
             {/* Bottom: Totals + Buttons */}
@@ -167,7 +265,7 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                     <Typography sx={{ fontSize: "14px", color: "text.secondary" }}>Sub total</Typography>
                     <Typography sx={{ fontSize: "14px", color: "text.secondary" }}>
-                        Rp{subtotal.toLocaleString("de-DE")}
+                        {FormatPrice(subtotal)}
                     </Typography>
                 </Box>
 
@@ -176,14 +274,22 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                     <Typography sx={{ fontSize: "22px", fontWeight: "bold" }}>Total</Typography>
                     <Typography sx={{ fontSize: "22px", fontWeight: "bold", color: "#ffbc0d" }}>
-                        Rp{total.toLocaleString("de-DE")}
+                        {FormatPrice(total)}
                     </Typography>
                 </Box>
+
+                {/* ✅ Error message */}
+                {createOrderState === "error" && (
+                    <Typography sx={{ color: "#d32f2f", fontSize: "13px", textAlign: "center" }}>
+                        Gagal membuat pesanan. Silakan coba lagi.
+                    </Typography>
+                )}
 
                 <Box sx={{ display: "flex", gap: "12px", mt: "8px" }}>
                     <Button
                         variant="outlined"
                         onClick={() => navigate("/")}
+                        disabled={isSubmitting}
                         sx={{
                             flex: 1,
                             color: "black",
@@ -201,7 +307,8 @@ export default function Cart({ onNext }: PackageSelectionProps) {
 
                     <Button
                         variant="contained"
-                        onClick={() => onNext("checkout")}
+                        onClick={handleCheckout}                                    // ✅ changed
+                        disabled={cartItems.length === 0 || isSubmitting}           // ✅ changed
                         disableElevation
                         sx={{
                             flex: 2,
@@ -213,9 +320,10 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                             py: "14px",
                             borderRadius: "8px",
                             "&:hover": { backgroundColor: "#e6a800" },
+                            "&.Mui-disabled": { backgroundColor: "rgba(0,0,0,0.12)" }
                         }}
                     >
-                        Selesaikan Pesanan
+                        {isSubmitting ? "Memproses..." : "Selesaikan Pesanan"}     {/* ✅ */}
                     </Button>
                 </Box>
             </Box>

@@ -70,8 +70,8 @@ export class Menu extends Model {
     @HasMany(() => MenuOption, 'menu_id')
     mos!: MenuOption[];
 
-    @HasMany(() => PaketItem, 'menu_id')
-    pakets!: PaketItem[];
+    // @HasMany(() => PaketItem, 'menu_id')
+    // pakets!: PaketItem[];
 
     @HasMany(() => OrderMenu, 'menu_id')
     orderMenus!: OrderMenu[];

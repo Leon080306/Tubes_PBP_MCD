@@ -1,12 +1,12 @@
-import { Box, Button, Checkbox, Divider, FormControlLabel, IconButton, Paper, Typography } from "@mui/material";
-import RemoveIcon from "@mui/icons-material/Remove";
-import AddIcon from "@mui/icons-material/Add";
+import { Box, Button, Checkbox, FormControlLabel, Paper, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useGetMenu } from "../../../hooks/useGetMenu";
 import { useNavigate, useParams } from "react-router";
 import FormatPrice from "../../../utils/FormatPrice";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../../../redux/store";
+import { cartActions } from "../../../store/cartSlice";
+import type { MenuVarian, MenuOption } from "../../../type";
 type PackageSelectionProps = {
     onNext: (step: string) => void;
 };
@@ -14,14 +14,24 @@ type PackageSelectionProps = {
 export default function Modification({ onNext }: PackageSelectionProps) {
     const { menu, reload } = useGetMenu();
     const { cartItemId } = useParams();
-    const cartItems = useSelector((state: RootState) => state.cart.cartItems)
+    const cartItems = useSelector((state: RootState) => state.cart.cartItems);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const cartItem = cartItems.find(item => item.cartItemId === cartItemId);
+
+    const [selectedVariant, setSelectedVariant] = useState<MenuVarian | null>(
+        cartItem?.selectedVariants?.[0] ?? null
+    );
+    const [selectedOptions, setSelectedOptions] = useState<MenuOption[]>(
+        cartItem?.selectedOptions ?? []
+    );
 
     useEffect(() => {
-        if (!cartItemId || cartItems.find(item => item.cartItemId === cartItemId) === undefined) {
+        if (!cartItemId || cartItem === undefined) {
             navigate("/");
         }
-    }, [cartItemId, cartItems, navigate]);
+    }, [cartItemId, cartItem, navigate]);
 
     useEffect(() => {
         if (cartItemId) {
@@ -29,35 +39,38 @@ export default function Modification({ onNext }: PackageSelectionProps) {
         }
     }, [cartItemId, reload]);
 
-    const [ingredients, setIngredients] = useState([
-        { id: 1, name: "Beef Patty", qty: 1, image: "/public/camilan/chicken snack wrap.webp" },
-        { id: 2, name: "Cheese Slice", qty: 1, image: "/public/camilan/chicken snack wrap.webp" },
-        { id: 3, name: "Pickle", qty: 1, image: "/public/camilan/chicken snack wrap.webp" },
-        { id: 4, name: "Bawang Bombay", qty: 1, image: "/public/camilan/chicken snack wrap.webp" },
-    ]);
+    const handleVariantToggle = (varian: MenuVarian) => {
+        const next = selectedVariant?.mv_id === varian.mv_id ? null : varian;
+        setSelectedVariant(next);
+        dispatch(cartActions.setSelectedVariants({
+            cartItemId: cartItemId!,
+            variants: next ? [next] : []
+        }));
+    };
 
-    const [specialRequests, setSpecialRequests] = useState([
-        { id: 1, label: "Sayap", checked: false },
-        { id: 2, label: "Paha Bawah", checked: false },
-        { id: 3, label: "Dada Mentok", checked: false },
-        { id: 4, label: "Dada Tulang", checked: false },
-        { id: 5, label: "Paha Atas", checked: false },
-    ]);
+    const handleOptionToggle = (option: MenuOption) => {
+        const exists = selectedOptions.some(o => o.mo_id === option.mo_id);
+        const next = exists
+            ? selectedOptions.filter(o => o.mo_id !== option.mo_id)
+            : [...selectedOptions, option];
+        setSelectedOptions(next);
+        dispatch(cartActions.setSelectedOptions({
+            cartItemId: cartItemId!,
+            options: next
+        }));
+    };
 
-    const handleIncrement = (id: number) =>
-        setIngredients(prev => prev.map(i => i.id === id ? { ...i, qty: i.qty + 1 } : i));
-
-    const handleDecrement = (id: number) =>
-        setIngredients(prev => prev.map(i => i.id === id ? { ...i, qty: Math.max(0, i.qty - 1) } : i));
-
-    const handleCheckbox = (id: number) =>
-        setSpecialRequests(prev => prev.map(r => r.id === id ? { ...r, checked: !r.checked } : r));
+    const handleHapusPerubahan = () => {
+        setSelectedVariant(null);
+        setSelectedOptions([]);
+        dispatch(cartActions.setSelectedVariants({ cartItemId: cartItemId!, variants: [] }));
+        dispatch(cartActions.setSelectedOptions({ cartItemId: cartItemId!, options: [] }));
+    };
 
     return (
         <Box sx={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
             gap: "24px",
             alignItems: "center",
             height: "100%",
@@ -67,8 +80,9 @@ export default function Modification({ onNext }: PackageSelectionProps) {
                 Modifikasi
             </Typography>
 
+            {/* Menu info */}
             <Paper elevation={3} sx={{ width: "100%", padding: "12px" }}>
-                <Box sx={{ display: "flex", gap: "4px", width: "100%", height: "80px" }}>
+                <Box sx={{ display: "flex", gap: "4px", width: "100%", height: "80px", mb: "12px" }}>
                     <img
                         src={menu?.gambarUrl}
                         onError={(e) => {
@@ -78,118 +92,123 @@ export default function Modification({ onNext }: PackageSelectionProps) {
                         style={{ height: "100%", objectFit: "cover" }}
                     />
                     <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1 }}>
-                        <Typography component={"h1"} sx={{ fontSize: "14px", fontWeight: "bold" }}>
+                        <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>
                             {menu?.nama}
                         </Typography>
-                        <Typography component={"h1"} sx={{ fontWeight: "400", fontSize: "12px" }}>
+                        <Typography sx={{ fontWeight: "400", fontSize: "12px" }}>
                             {FormatPrice(menu?.harga_awal ?? 0)}
                         </Typography>
                     </Box>
                 </Box>
                 <Button
                     variant="outlined"
-                    onClick={() => onNext("modification")}
-                    sx={{ color: "black", borderColor: "black", height: "36px", textTransform: "none", width: "100%" }}
+                    onClick={() => {
+                        handleHapusPerubahan();
+                    }}
+                    sx={{ color: "black", border: "1px solid rgba(0,0,0,0.2)", flex: 1, borderRadius: "0px", textTransform: "none", width: "100%" }}
                 >
-                    Hapus Perubahan
+                    Batalkan Perubahan
                 </Button>
             </Paper>
 
-            {/* Ingredients list */}
-            <Paper elevation={3} sx={{
-                width: "100%",
-                padding: "12px",
-                flex: 1,
-                overflow: "auto",
-                "&::-webkit-scrollbar": { display: "none" },
-                scrollbarWidth: "none",
-            }}>
-                <Typography sx={{ fontSize: "16px", fontWeight: "bold", mb: 1 }}>
-                    Tersedia dengan
-                </Typography>
-
-                {ingredients.map((item, index) => (
-                    <Box key={item.id}>
-                        <Box sx={{
-                            display: "grid",
-                            gridTemplateColumns: "80px 1fr auto",
-                            alignItems: "center",
-                            gap: "8px",
-                            py: "10px",
-                        }}>
-                            <img
-                                src={item.image}
-                                alt={item.name}
-                                style={{ width: "80px", height: "64px", objectFit: "contain" }}
+            {/* Pilih Varian */}
+            {menu?.mvs && menu.mvs.length > 0 && (
+                <Paper elevation={3} sx={{ width: "100%", padding: "12px" }}>
+                    <Typography sx={{ fontSize: "16px", fontWeight: "bold", mb: 1.5 }}>
+                        Pilih Varian
+                    </Typography>
+                    <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px" }}>
+                        {menu.mvs.map((varian: MenuVarian) => (
+                            <FormControlLabel
+                                key={varian.mv_id}
+                                control={
+                                    <Checkbox
+                                        checked={selectedVariant?.mv_id === varian.mv_id}
+                                        onChange={() => handleVariantToggle(varian)}
+                                        sx={{
+                                            color: "rgba(0,0,0,0.4)",
+                                            "&.Mui-checked": { color: "#ffbc0d" },
+                                            p: "4px",
+                                        }}
+                                    />
+                                }
+                                label={
+                                    <Box>
+                                        <Typography sx={{ fontSize: "14px" }}>{varian.nama_varian}</Typography>
+                                        {varian.harga_tambahan > 0 && (
+                                            <Typography sx={{ fontSize: "11px", color: "text.secondary" }}>
+                                                +{FormatPrice(varian.harga_tambahan)}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                }
+                                sx={{
+                                    border: "1px solid",
+                                    borderColor: selectedVariant?.mv_id === varian.mv_id ? "#ffbc0d" : "rgba(0,0,0,0.15)",
+                                    borderRadius: "4px",
+                                    margin: 0,
+                                    padding: "6px 10px",
+                                    alignItems: "center",
+                                }}
                             />
-                            <Typography sx={{ fontSize: "16px" }}>{item.name}</Typography>
-                            <Box sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                border: "1px solid",
-                                borderColor: "divider",
-                                borderRadius: "4px",
-                            }}>
-                                <IconButton size="medium" sx={{ borderRadius: 0, px: "10px" }} onClick={() => handleDecrement(item.id)}>
-                                    <RemoveIcon sx={{ fontSize: "20px" }} />
-                                </IconButton>
-                                <Typography sx={{ fontSize: "18px", minWidth: "36px", textAlign: "center", userSelect: "none" }}>
-                                    {item.qty}
-                                </Typography>
-                                <IconButton size="medium" sx={{ borderRadius: 0, px: "10px" }} onClick={() => handleIncrement(item.id)}>
-                                    <AddIcon sx={{ fontSize: "20px" }} />
-                                </IconButton>
-                            </Box>
-                        </Box>
-                        {index < ingredients.length - 1 && <Divider />}
+                        ))}
                     </Box>
-                ))}
-            </Paper>
+                </Paper>
+            )}
 
-            {/* ✅ Permintaan Khusus Block */}
-            <Paper elevation={3} sx={{ width: "100%", padding: "12px" }}>
-                <Typography sx={{ fontSize: "16px", fontWeight: "bold", mb: 1.5 }}>
-                    Permintaan Khusus
-                </Typography>
-                <Box sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(3, 1fr)",
-                    gap: "8px",
-                }}>
-                    {specialRequests.map((request) => (
-                        <FormControlLabel
-                            key={request.id}
-                            control={
-                                <Checkbox
-                                    checked={request.checked}
-                                    onChange={() => handleCheckbox(request.id)}
-                                    sx={{
-                                        color: "rgba(0,0,0,0.4)",
-                                        "&.Mui-checked": { color: "#ffbc0d" },
-                                        p: "4px",
-                                    }}
-                                />
-                            }
-                            label={
-                                <Typography sx={{ fontSize: "14px" }}>{request.label}</Typography>
-                            }
-                            sx={{
-                                border: "1px solid rgba(0,0,0,0.15)",
-                                borderRadius: "4px",
-                                margin: 0,
-                                padding: "6px 10px",
-                                alignItems: "center",
-                            }}
-                        />
-                    ))}
-                </Box>
-            </Paper>
+            {/* Permintaan Khusus */}
+            {menu?.mos && menu.mos.length > 0 && (
+                <Paper elevation={3} sx={{ width: "100%", padding: "12px" }}>
+                    <Typography sx={{ fontSize: "16px", fontWeight: "bold", mb: 1.5 }}>
+                        Permintaan Khusus
+                    </Typography>
+                    <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px" }}>
+                        {menu.mos.map((option: MenuOption) => (
+                            <FormControlLabel
+                                key={option.mo_id}
+                                control={
+                                    <Checkbox
+                                        checked={selectedOptions.some(o => o.mo_id === option.mo_id)}
+                                        onChange={() => handleOptionToggle(option)}
+                                        sx={{
+                                            color: "rgba(0,0,0,0.4)",
+                                            "&.Mui-checked": { color: "#ffbc0d" },
+                                            p: "4px",
+                                        }}
+                                    />
+                                }
+                                label={
+                                    <Box>
+                                        <Typography sx={{ fontSize: "14px" }}>{option.nama_option}</Typography>
+                                        {option.tambahan_harga > 0 && (
+                                            <Typography sx={{ fontSize: "11px", color: "text.secondary" }}>
+                                                +{FormatPrice(option.tambahan_harga)}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                }
+                                sx={{
+                                    border: "1px solid",
+                                    borderColor: selectedOptions.some(o => o.mo_id === option.mo_id) ? "#ffbc0d" : "rgba(0,0,0,0.15)",
+                                    borderRadius: "4px",
+                                    margin: 0,
+                                    padding: "6px 10px",
+                                    alignItems: "center",
+                                }}
+                            />
+                        ))}
+                    </Box>
+                </Paper>
+            )}
 
             {/* Bottom action buttons */}
             <Paper elevation={3} sx={{ width: "100%", padding: "0", flex: 0.15, display: "flex" }}>
                 <Button
                     variant="outlined"
-                    onClick={() => onNext("quantity")}
+                    onClick={() => {
+                        handleHapusPerubahan();
+                        onNext("quantity");
+                    }}
                     sx={{ color: "black", border: "1px solid rgba(0,0,0,0.2)", flex: 1, borderRadius: "0px", textTransform: "none" }}
                 >
                     Batalkan Perubahan

@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
 import NumberSpinner from './../../../components/NumberSpinner';
 import { useNavigate, useParams } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGetMenu } from "../../../hooks/useGetMenu";
 import FormatPrice from "../../../utils/FormatPrice";
 import type { AppDispatch, RootState } from "../../../redux/store";
@@ -18,6 +18,8 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
     const { cartItemId } = useParams();
     const dispatch = useDispatch<AppDispatch>()
     const cartItems = useSelector((state: RootState) => state.cart.cartItems)
+    const [hasOptions, setHasOptions] = useState(false);
+    const [hasVariants, setHasVariants] = useState(false);
 
     const cartItem = cartItems.find(item => item.cartItemId === cartItemId)
 
@@ -32,6 +34,11 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
             reload(cartItemId);
         }
     }, [cartItemId]);
+
+    useEffect(() => {
+        setHasOptions((menu?.mos?.length ?? 0) > 0);
+        setHasVariants((menu?.mvs?.length ?? 0) > 0);
+    }, [menu]);
 
     return <Box sx={{
         padding: "24px",
@@ -85,11 +92,13 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
                 flexDirection: "column",
                 width: "100%",
             }}>
-                <Button variant="outlined" onClick={() => onNext("modification")} sx={{
-                    color: "black",
-                    borderColor: "black",
-                    height: "50px"
-                }}>Modifikasi</Button>
+                {hasOptions && hasVariants && (
+                    <Button variant="outlined" onClick={() => onNext("modification")} sx={{
+                        color: "black",
+                        borderColor: "black",
+                        height: "50px"
+                    }}>Modifikasi</Button>
+                )}
 
                 <NumberSpinner
                     min={1}
@@ -108,7 +117,10 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
                 width: '100%',
                 display: "flex"
             }}>
-                <Button variant="outlined" onClick={() => navigate("/")} sx={{
+                <Button variant="outlined" onClick={() => {
+                    dispatch(cartActions.removeFromCart(cartItemId ?? ""));
+                    navigate("/")
+                }} sx={{
                     color: "black",
                     border: "1px solid rgba(0,0,0,0.2)",
                     height: "50px",

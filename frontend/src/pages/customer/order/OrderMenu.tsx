@@ -1,9 +1,10 @@
 import { useState } from "react";
-import PackageSelection from "./PackageSelection";
+import PackageSelection from "./MakePackage";
 import SetQuantity from "./SetQuantity";
 import Recommendation from "./Recommendation";
 import Modification from "./Modification";
 import Cart from "./Cart";
+import PackageList from "./PackageList";
 
 export default function OrderMenu() {
     const [step, setStep] = useState("package");
@@ -17,6 +18,11 @@ export default function OrderMenu() {
         <>
             {step === "package" && (
                 <PackageSelection
+                    onNext={(nextStep: string) => setStep(nextStep)}
+                />
+            )}
+            {step === "package-list" && (
+                <PackageList
                     onNext={(nextStep: string) => setStep(nextStep)}
                 />
             )}
