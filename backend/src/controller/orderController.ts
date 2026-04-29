@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Order } from "../models/Order";
 import { OrderMenu } from "../models/OrderMenu";
+import { OrderMenuOption } from "../models/OrderMenuOption";
 import { Menu } from "../models/Menu";
 import { MenuVarian } from "../models/MenuVarian";
 import { MenuOption } from "../models/MenuOption";
@@ -10,11 +11,14 @@ export const getAllOrder = async (req: Request, res: Response) => {
         const order = await Order.findAll({
             order: [['order_no', 'ASC']],
             include: [{
-                model:OrderMenu,
+                model: OrderMenu,
                 include: [
-                    { model: Menu},
-                    { model: MenuVarian},
-                    { model: MenuOption},
+                    { model: Menu },
+                    { model: MenuVarian },
+                    {
+                        model: OrderMenuOption,
+                        include: [{ model: MenuOption }]
+                    },
                 ]
             }]
         });
@@ -29,15 +33,16 @@ export const getTOrderById = async (req: Request, res: Response) => {
     try {
         const { order_id } = req.params;
         const order = await Order.findOne({
-            where: {
-                order_id: order_id
-            },
+            where: { order_id },
             include: [{
                 model: OrderMenu,
                 include: [
-                    {model: Menu},
-                    {model: MenuVarian},
-                    {model: MenuOption}
+                    { model: Menu },
+                    { model: MenuVarian },
+                    {
+                        model: OrderMenuOption,
+                        include: [{ model: MenuOption }]
+                    },
                 ]
             }]
         });
@@ -60,17 +65,14 @@ export const getTOrderById = async (req: Request, res: Response) => {
     }
 }
 
-
 export const updateOrder = async (req: Request, res: Response) => {
     try {
         const { order_id } = req.params;
-        
+
         const { total_harga, order_type, order_no, status } = req.body;
 
         const order = await Order.findOne({
-            where: {
-                order_id: order_id
-            }
+            where: { order_id }
         });
 
         if (!order) {

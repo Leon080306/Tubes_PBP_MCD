@@ -89,7 +89,16 @@ export default function MenuList() {
     }, {} as Record<string, Menu[]>);
 
     const handleMenuClick = (menu: Menu) => {
-        // yg leon
+        const cartItemId = crypto.randomUUID();
+        dispatch(cartActions.addToCart({
+            cartItemId: cartItemId,
+            menu: menu,
+            quantity: 1,
+            selectedVariants: [],
+            selectedOptions: [],
+            price: menu.harga_awal
+        }))
+        navigate("/order/" + cartItemId)
     };
 
     return (

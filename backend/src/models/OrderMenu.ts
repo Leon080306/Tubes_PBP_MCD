@@ -1,8 +1,8 @@
-import { Table, Column, Model, DataType, PrimaryKey, BelongsTo, CreatedAt, UpdatedAt, DeletedAt } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, BelongsTo, HasMany, CreatedAt, UpdatedAt, DeletedAt } from 'sequelize-typescript';
 import { Menu } from './Menu.js'
 import { Order } from './Order.js'
 import { MenuVarian } from './MenuVarian.js'
-import { MenuOption } from './MenuOption.js'
+import { OrderMenuOption } from './OrderMenuOption.js'
 
 @Table({
     tableName: 'OrderMenu',
@@ -38,13 +38,6 @@ export class OrderMenu extends Model {
     declare mv_id: string;
 
     @Column({
-        type: DataType.UUIDV4,
-        allowNull: false,
-    })
-    declare mo_id: string;
-
-
-    @Column({
         type: DataType.INTEGER,
         allowNull: false,
     })
@@ -65,11 +58,9 @@ export class OrderMenu extends Model {
     @BelongsTo(() => MenuVarian, 'mv_id')
     mvs!: MenuVarian;
 
-    @BelongsTo(() => MenuOption, 'mo_id')
-    mod!: MenuOption;
-
     @BelongsTo(() => Order, 'order_id')
     orders!: Order;
 
-
+    @HasMany(() => OrderMenuOption, 'om_id')
+    options!: OrderMenuOption[];
 }
