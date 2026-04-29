@@ -6,7 +6,9 @@ console.log("MODELS:", sequelize.models);
 import "reflect-metadata";
 import cors from 'cors';
 import menuRouter from "./routes/menuRoutes";
+import Catego from "./routes/menuRoutes";
 import fileUpload from "express-fileupload";
+import pakeRouter from "./roots/PaketRoutes";
 
 const app = express();
 
@@ -27,7 +29,7 @@ app.get("/api/test", (req, res) => {
 });
 
 app.use("/menu", menuRouter)
-
+app.use("/paket", pakeRouter)
 
 async function start() {
     try {

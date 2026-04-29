@@ -35,7 +35,7 @@ export class OrderMenu extends Model {
         type: DataType.UUIDV4,
         allowNull: true,
     })
-    declare mv_id: string;
+    declare mv_id: string | null;
 
     @Column({
         type: DataType.INTEGER,

@@ -58,7 +58,6 @@ export default function MenuList() {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
-    // 🔥 GET MENU
     useEffect(() => {
         fetch("http://localhost:3000/menu")
             .then((res) => res.json())

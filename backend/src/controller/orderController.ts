@@ -97,6 +97,110 @@ export const getTOrderById = async (req: Request, res: Response) => {
     }
 }
 
+export const createOrder = async (req: Request, res: Response) => {
+    try {
+        const { total_harga, order_type, items } = req.body;
+
+        if (!order_type || !['Dine-in', 'Takeaway'].includes(order_type)) {
+            return res.status(400).json({
+                status: "Fail",
+                message: "order_type tidak valid"
+            })
+        }
+
+        if (!Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({
+                status: "Fail",
+                message: "Items pesanan kosong"
+            })
+        }
+
+        // Validate each item
+        for (const [idx, item] of items.entries()) {
+            if (!item.menu_id) {
+                return res.status(400).json({
+                    status: "Fail",
+                    message: `Item ke-${idx + 1}: menu_id wajib diisi`
+                })
+            }
+            if (typeof item.harga_awal !== 'number') {
+                return res.status(400).json({
+                    status: "Fail",
+                    message: `Item ke-${idx + 1}: harga_awal tidak valid`
+                })
+            }
+            if (typeof item.quantity !== 'number' || item.quantity < 1) {
+                return res.status(400).json({
+                    status: "Fail",
+                    message: `Item ke-${idx + 1}: quantity tidak valid`
+                })
+            }
+        }
+
+        // Generate order_no (auto increment)
+        const lastOrder = await Order.findOne({
+            order: [['order_no', 'DESC']]
+        });
+        const nextOrderNo = (lastOrder?.order_no ?? 0) + 1;
+
+        // Create Order
+        const order = await Order.create({
+            waktu_pesanan: new Date(),
+            total_harga,
+            order_type,
+            order_no: nextOrderNo,
+            status: 'Cart',
+        });
+
+        // Create OrderMenu (1 row per cart item) + OrderMenuOption
+        for (const item of items) {
+            const orderMenu = await OrderMenu.create({
+                order_id: order.order_id,
+                menu_id: item.menu_id,
+                mv_id: item.mv_id ?? null,
+                harga_awal: item.harga_awal,
+                quantity: item.quantity,
+            });
+
+            if (Array.isArray(item.selectedOptions) && item.selectedOptions.length > 0) {
+                for (const opt of item.selectedOptions) {
+                    if (!opt.mo_id) continue;
+                    await OrderMenuOption.create({
+                        om_id: orderMenu.om_id,
+                        mo_id: opt.mo_id,
+                    });
+                }
+            }
+        }
+
+        // Get full order with relations
+        const newOrder = await Order.findOne({
+            where: { order_id: order.order_id },
+            include: [{
+                model: OrderMenu,
+                include: [
+                    { model: Menu },
+                    { model: MenuVarian },
+                    {
+                        model: OrderMenuOption,
+                        include: [{ model: MenuOption }]
+                    },
+                ]
+            }]
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Data Order berhasil dibuat",
+            data: newOrder
+        })
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Create Order error" })
+    }
+}
+
 export const updateOrder = async (req: Request, res: Response) => {
     try {
         const { order_id } = req.params;
