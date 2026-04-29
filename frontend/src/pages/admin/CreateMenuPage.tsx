@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Typography, TextField, Button, Paper, Stack, MenuItem, Box } from "@mui/material";
 import { useNavigate } from "react-router";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -10,12 +10,19 @@ export default function CreateMenuPage() {
     const navigate = useNavigate();
     const [form, setForm] = useState({
         nama: "",
-        harga_awal: 0,
-        kategori_menu: "",
+        harga_awal: '' as any,
+        category_id: "",
         tipe_menu: "Ala Carte",
         gambarUrl: "",
-        isAvailable: "true"
+        isAvailable: true
     });
+    const [variants, setVariants] = useState([
+        { name: "", price: '' as any }
+    ]);
+
+    const [options, setOptions] = useState([
+        { name: "", price: '' as any }
+    ]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -29,8 +36,16 @@ export default function CreateMenuPage() {
         // formData.append("image", image);
     }
 
+    const [categories, setCategories] = useState<any[]>([]);
+
+    useEffect(() => {
+        fetch("/api/category")
+            .then(res => res.json())
+            .then(data => setCategories(data));
+    }, []);
+
     const handleCreate = async () => {
-        if (!form.nama || !form.harga_awal || !form.kategori_menu || !form.tipe_menu || !image) {
+        if (!form.nama || !form.harga_awal || !form.category_id || !form.tipe_menu || !image) {
             console.log(form)
             alert("Tidak boleh kosong");
             return;
@@ -39,10 +54,12 @@ export default function CreateMenuPage() {
         const formData = new FormData();
         formData.append("nama", form.nama);
         formData.append("harga_awal", form.harga_awal.toString());
-        formData.append("kategori_menu", form.kategori_menu);
+        formData.append("category_id", form.category_id);
         formData.append("tipe_menu", form.tipe_menu);
-        formData.append("isAvailable", form.isAvailable);
+        formData.append("isAvailable", String(form.isAvailable));
         formData.append("image", image);
+        formData.append("variants", JSON.stringify(variants));
+        formData.append("options", JSON.stringify(options));
 
         try {
             const response = await fetch('/api/menu/', {
@@ -59,6 +76,34 @@ export default function CreateMenuPage() {
         }
 
     }
+
+    const addVariant = () => {
+        setVariants([...variants, { name: "", price: '' as any }]);
+    };
+
+    const removeVariant = (index: number) => {
+        setVariants(variants.filter((_, i) => i !== index));
+    };
+
+    const handleVariantChange = (index: number, field: string, value: any) => {
+        const updated = [...variants];
+        updated[index][field] = value;
+        setVariants(updated);
+    };
+
+    const addOption = () => {
+        setOptions([...options, { name: "", price: '' as any }]);
+    };
+
+    const removeOption = (index: number) => {
+        setOptions(options.filter((_, i) => i !== index));
+    };
+
+    const handleOptionChange = (index: number, field: string, value: any) => {
+        const updated = [...options];
+        updated[index][field] = value;
+        setOptions(updated);
+    };
 
     return (
         <Box>
@@ -82,23 +127,22 @@ export default function CreateMenuPage() {
 
                         <input type="file" accept="image/*" onChange={handleChange} />
 
-                        <img src={preview} alt="" />
+                        {preview && <img src={preview} alt="preview" />}
+                        
                         <Stack direction="row" spacing={2}>
-
                             <TextField
                                 select
                                 label="Select Category"
                                 fullWidth
                                 required
-                                value={form.kategori_menu}
-                                onChange={(e) => setForm({ ...form, kategori_menu: e.target.value })}
+                                value={form.category_id}
+                                onChange={(e) => setForm({ ...form, category_id: e.target.value })}
                             >
-                                <MenuItem value="Burger">Burger</MenuItem>
-                                <MenuItem value="Drinks">Drinks</MenuItem>
-                                <MenuItem value="Dessert">Dessert</MenuItem>
-                                <MenuItem value="Happy Meal">Happy Meal</MenuItem>
-                                <MenuItem value="Camilan">Camilan</MenuItem>
-                                <MenuItem value="Ayam">Ayam</MenuItem>
+                                {categories.map((cat) => (
+                                    <MenuItem key={cat.category_id} value={cat.category_id}>
+                                        {cat.name}
+                                    </MenuItem>
+                                ))}
                             </TextField>
                             <TextField
                                 select
@@ -113,6 +157,57 @@ export default function CreateMenuPage() {
                             </TextField>
                         </Stack>
 
+                        <Button onClick={addVariant}>+ Add Variant</Button>
+
+                        {variants.map((v, i) => (
+                            <Paper key={i} sx={{ p: 0.5 }}>
+                                <Stack direction="row" spacing={0.1}>
+                                    <TextField
+                                        label="Variant Name"
+                                        value={v.name}
+                                        onChange={(e) => handleVariantChange(i, "name", e.target.value)}
+                                    />
+
+                                    <TextField
+                                        label="Price"
+                                        type="number"
+                                        value={v.price}
+                                        onChange={(e) => handleVariantChange(i, "price", Number(e.target.value))}
+                                    />
+
+                                    <Button color="error" onClick={() => removeVariant(i)}>
+                                        Remove
+                                    </Button>
+                                </Stack>
+                            </Paper>
+                        ))}
+
+
+                        <Button onClick={addOption}>+ Add Option</Button>
+
+                        {options.map((o, i) => (
+                            <Paper key={i} sx={{ p: 0.5 }}>
+                                <Stack direction="row" spacing={0.1}>
+                                    <TextField
+                                        label="Option Name"
+                                        value={o.name}
+                                        onChange={(e) => handleOptionChange(i, "name", e.target.value)}
+                                    />
+
+                                    <TextField
+                                        label="Price"
+                                        type="number"
+                                        value={o.price}
+                                        onChange={(e) => handleOptionChange(i, "price", Number(e.target.value))}
+                                    />
+
+                                    <Button color="error" onClick={() => removeOption(i)}>
+                                        Remove
+                                    </Button>
+                                </Stack>
+                            </Paper>
+                        ))}
+
                         <TextField
                             select
                             label="Is Available"
@@ -121,15 +216,16 @@ export default function CreateMenuPage() {
                             value={form.isAvailable}
                             onChange={(e) => setForm({ ...form, isAvailable: e.target.value })}
                         >
-                            <MenuItem value="true">Available</MenuItem>
-                            <MenuItem value="false">Unavailable</MenuItem>
+                            <MenuItem value={true}>Available</MenuItem>
+                            <MenuItem value={false}>Unavailable</MenuItem>
                         </TextField>
+
 
                         <Button onClick={handleCreate} variant="contained" size="large" sx={{
                             bgcolor: '#D52B1E',
                             color: 'white',
                             fontWeight: 'bold',
-                            py: 1.5,
+                            py: 0.5,
                             borderRadius: 2,
                             '&:hover': {
                                 bgcolor: '#b32419',
