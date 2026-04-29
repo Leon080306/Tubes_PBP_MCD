@@ -92,7 +92,7 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
                 flexDirection: "column",
                 width: "100%",
             }}>
-                {hasOptions && hasVariants && (
+                {(hasOptions || hasVariants) && (
                     <Button variant="outlined" onClick={() => onNext("modification")} sx={{
                         color: "black",
                         borderColor: "black",
