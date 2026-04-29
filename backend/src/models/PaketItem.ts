@@ -44,4 +44,3 @@ export class PaketItem extends Model {
     @BelongsTo(() => Menu, 'item_menu_id')
     items!: Menu;
 }
-

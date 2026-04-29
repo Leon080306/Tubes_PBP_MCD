@@ -12,7 +12,7 @@ export type Menu = {
     Category: Category;
     tipe_menu: 'Ala Carte' | 'Paket';
     gambarUrl: string;
-    isAvailable?: string | null;
+    isAvailable?: boolean;
     createdAt?: string;
     updatedAt?: string;
     deletedAt?: string | null;
@@ -108,6 +108,6 @@ export type UserInfo = {
     deletedAt?: string | null;
 };
 
-
+export type PaketMenu = Menu;
 
 export type FetchStatus = "idle" | "loading" | "success" | "error";

@@ -3,6 +3,7 @@ import { Menu } from './Menu.js'
 import { Order } from './Order.js'
 import { MenuVarian } from './MenuVarian.js'
 import { OrderMenuOption } from './OrderMenuOption.js'
+import { MenuOption } from './MenuOption.js';
 
 @Table({
     tableName: 'OrderMenu',
@@ -33,15 +34,21 @@ export class OrderMenu extends Model {
 
     @Column({
         type: DataType.UUIDV4,
-        allowNull: false,
+        allowNull: true,
     })
-    declare mv_id: string;
+    declare mv_id: string | null;
 
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
     })
-    harga_awal!: number;
+    declare harga_awal: number;
+
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: false,
+    })
+    declare quantity: number;
 
     @CreatedAt
     declare createdAt: Date;
