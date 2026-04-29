@@ -109,10 +109,31 @@ export const updateMenu = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "Menu not found" });
         }
 
-        await menu.update(req.body);
+        const {
+            nama,
+            harga_awal,
+            tipe_menu,
+            category_id,
+            isAvailable
+        } = req.body;
 
-        return res.json(menu);
+        console.log("UPDATE BODY:", req.body);
+
+        await menu.update({
+            nama,
+            harga_awal,
+            tipe_menu,
+            category_id,
+            isAvailable
+        });
+
+        return res.json({
+            success: true,
+            data: menu
+        });
+
     } catch (error: any) {
+        console.error(error);
         return res.status(500).json({ message: error.message });
     }
 };

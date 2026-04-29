@@ -104,12 +104,17 @@ export default function HomePageAdmin() {
 
     const [openEdit, setOpenEdit] = useState(false);
     const [menuId, setMenuId] = useState("");
+
     const [nama, setNama] = useState("");
     const [harga, setHarga] = useState<number>(0);
-    const [kategoriMenu, setKategoriMenu] = useState("");
+
+    const [categoryId, setCategoryId] = useState("");
     const [tipeMenu, setTipeMenu] = useState("");
+
     const [gambarUrl, setGambarUrl] = useState("");
-    const [isAvailable, setAvailable] = useState("");
+    const [isAvailable, setAvailable] = useState(true);
+
+    const [categories, setCategories] = useState<any[]>([]);
 
     const fetchMenu = async () => {
         try {
@@ -129,7 +134,7 @@ export default function HomePageAdmin() {
         setMenuId(data.menu_id);
         setNama(data.nama);
         setHarga(data.harga_awal);
-        setKategoriMenu(data.category_id);
+        setCategoryId(data.category_id);
         setTipeMenu(data.tipe_menu);
         setGambarUrl(data.gambarUrl);
         setAvailable(data.isAvailable || "true");
@@ -163,7 +168,7 @@ export default function HomePageAdmin() {
                 body: JSON.stringify({
                     nama,
                     harga_awal: harga,
-                    kategori_menu: kategoriMenu,
+                    category_id: categoryId,
                     tipe_menu: tipeMenu,
                     gambarUrl,
                     isAvailable
@@ -194,6 +199,11 @@ export default function HomePageAdmin() {
             })
     }, []);
 
+    useEffect(() => {
+        fetch("/api/category")
+            .then(res => res.json())
+            .then(data => setCategories(data));
+    }, []);
 
     const filtered =
         category === "All"
@@ -312,13 +322,15 @@ export default function HomePageAdmin() {
 
                         <FormControl fullWidth>
                             <InputLabel>Kategori Menu</InputLabel>
-                            <Select value={kategoriMenu} label="Kategori Menu" onChange={(e) => setKategoriMenu(e.target.value)}>
-                                <MenuItem value="Burger">Burger</MenuItem>
-                                <MenuItem value="Drinks">Drinks</MenuItem>
-                                <MenuItem value="Dessert">Dessert</MenuItem>
-                                <MenuItem value="Happy Meal">Happy Meal</MenuItem>
-                                <MenuItem value="Camilan">Camilan</MenuItem>
-                                <MenuItem value="Ayam">Ayam</MenuItem>
+                            <Select
+                                value={categoryId}
+                                onChange={(e) => setCategoryId(e.target.value)}
+                            >
+                                {categories.map((cat) => (
+                                    <MenuItem key={cat.category_id} value={cat.category_id}>
+                                        {cat.name}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
 
