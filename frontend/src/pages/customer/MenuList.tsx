@@ -60,7 +60,7 @@ export default function MenuList() {
 
     // 🔥 GET MENU
     useEffect(() => {
-        fetch("http://localhost:3000/api/menu")
+        fetch("http://localhost:3000/menu")
             .then((res) => res.json())
             .then((data) => setMenu(data.records))
             .catch((err) => console.error(err));
@@ -90,7 +90,16 @@ export default function MenuList() {
     }, {} as Record<string, Menu[]>);
 
     const handleMenuClick = (menu: Menu) => {
-        // yg leon
+        const cartItemId = crypto.randomUUID();
+        dispatch(cartActions.addToCart({
+            cartItemId: cartItemId,
+            menu: menu,
+            quantity: 1,
+            selectedVariants: [],
+            selectedOptions: [],
+            price: menu.harga_awal
+        }))
+        navigate("/order/" + cartItemId)
     };
 
     return (
