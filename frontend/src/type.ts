@@ -1,18 +1,15 @@
+export type Category = {
+    category_id: string;
+    name: string;
+    sort_order: number;
+}
+
 export type Menu = {
     menu_id: string;
     nama: string;
     harga_awal: number;
-
-    kategori_menu:
-    | 'Burger'
-    | 'Drinks'
-    | 'Dessert'
-    | 'Happy Meal'
-    | 'Camilan'
-    | 'Paket HeBat'
-    | 'PaMer'
-    | 'PaNas'
-    | 'Ayam';
+    category_id: string;
+    Category: Category;
     tipe_menu: 'Ala Carte' | 'Paket';
     gambarUrl: string;
     isAvailable?: string | null;
@@ -99,5 +96,18 @@ export type Payment = {
     deletedAt?: string | null;
     order?: Order;
 };
+
+export type UserInfo = {
+    staff_id: string,
+    name: string,
+    email: string,
+    password: string,
+    role: "Admin" | "Cashier",
+    createdAt?: string;
+    updatedAt?: string;
+    deletedAt?: string | null;
+};
+
+
 
 export type FetchStatus = "idle" | "loading" | "success" | "error";

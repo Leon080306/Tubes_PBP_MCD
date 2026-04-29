@@ -1,28 +1,18 @@
-import { Sequelize } from 'sequelize-typescript';
-import { appConfig } from '../src/appConfig';
+import { Sequelize } from "sequelize-typescript";
+import dotenv from "dotenv";
+import path from "path";
 
-import { Menu } from '../src/models/Menu';
-import { MenuVarian } from '../src/models/MenuVarian';
-import { MenuOption } from '../src/models/MenuOption';
-import { PaketItem } from '../src/models/PaketItem';
-import { Order } from '../src/models/Order';
-import { OrderMenu } from '../src/models/OrderMenu';
-import { Payment } from '../src/models/Payment';
+dotenv.config();
 
-export const sequelize = new Sequelize({
-    username: appConfig.database.DBUsername,
-    password: appConfig.database.DBPassword,
-    database: appConfig.database.DBName,
-    host: appConfig.database.DBHost,
-    port: Number(appConfig.database.DBPort),
-    dialect: appConfig.database.DBDialect,
-    models: [
-        Menu,
-        MenuVarian,
-        MenuOption,
-        PaketItem,
-        Order,
-        OrderMenu,
-        Payment
-    ]
+const sequelize = new Sequelize({
+    dialect: "postgres",
+    host: process.env.DB_HOST as string,
+    port: Number(process.env.DB_PORT),
+    username: process.env.DB_USERNAME as string,
+    password: process.env.DB_PASSWORD as string,
+    database: process.env.DB_NAME as string,
+    models: [path.join(__dirname, "../src/models")],
+    logging: false,
 });
+
+export default sequelize;
