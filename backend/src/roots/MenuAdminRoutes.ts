@@ -1,16 +1,17 @@
 import { Router } from "express";
-import { createMenu, getMenus, getMenuById, updateMenu, deleteMenu } from "../controller/menuCRUD";
+import { createMenu, getMenus, getMenuById, updateMenu, deleteMenu } from "../controller/menuCRUDController";
+import { uploadMiddleware } from "../middlewares/imageUploadMiddleware";
 
-const router = Router();
+const menuAdminRouter: Router = Router();
 
-router.get("/", getMenus);
-router.get("/:id", getMenuById);
+menuAdminRouter.get("/", getMenus);
+menuAdminRouter.get("/:id", getMenuById);
 
-router.post("/create", createMenu);
+menuAdminRouter.post("/", uploadMiddleware, createMenu);
 
-router.put("/:id", updateMenu);
+menuAdminRouter.put("/:id", updateMenu);
 
-router.delete("/:id", deleteMenu);
+menuAdminRouter.delete("/:id", deleteMenu);
 
 
-export default router;
+export default menuAdminRouter;
