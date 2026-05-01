@@ -36,48 +36,40 @@ export const cartSlice = createSlice({
             )
         },
 
-        setQuantity: (state, action: PayloadAction<{ cartItemId: string, quantity: number }>) => {
-            const item = state.cartItems.find(
-                item => item.cartItemId === action.payload.cartItemId
-            )
-            if (item) {
-                item.quantity = action.payload.quantity
-            }
-        },
-
         increaseQuantity: (state, action: PayloadAction<string>) => {
             const item = state.cartItems.find(
                 item => item.cartItemId === action.payload
             )
-            if (item) {
-                item.quantity += 1
-            }
+            if (item) item.quantity += 1
         },
 
         decreaseQuantity: (state, action: PayloadAction<string>) => {
             const item = state.cartItems.find(
                 item => item.cartItemId === action.payload
             )
-            if (item && item.quantity > 1) {
-                item.quantity -= 1
-            }
+            if (item && item.quantity > 1) item.quantity -= 1
         },
 
         setSelectedVariants: (state, action: PayloadAction<{ cartItemId: string, variants: MenuVarian[] }>) => {
             const item = state.cartItems.find(
                 item => item.cartItemId === action.payload.cartItemId
             )
-            if (item) {
-                item.selectedVariants = action.payload.variants
-            }
+            if (item) item.selectedVariants = action.payload.variants
         },
 
         setSelectedOptions: (state, action: PayloadAction<{ cartItemId: string, options: MenuOption[] }>) => {
             const item = state.cartItems.find(
                 item => item.cartItemId === action.payload.cartItemId
             )
-            if (item) {
-                item.selectedOptions = action.payload.options
+            if (item) item.selectedOptions = action.payload.options
+        },
+
+        updateItem: (state, action: PayloadAction<CartItem>) => {
+            const index = state.cartItems.findIndex(
+                item => item.cartItemId === action.payload.cartItemId
+            )
+            if (index !== -1) {
+                state.cartItems[index] = action.payload
             }
         },
 
