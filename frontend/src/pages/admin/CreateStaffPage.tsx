@@ -22,6 +22,10 @@ export default function CreateStaffPage() {
 
         try {
             const token = Cookies.get('token');
+            if (!token) {
+                navigate("/admin/login");
+                return;
+            }
             const response = await fetch('/api/staff/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json',

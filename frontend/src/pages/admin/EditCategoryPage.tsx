@@ -24,6 +24,10 @@ export default function EditCategoryPage() {
         const fetchCategoryDetail = async () => {
             try {
                 const token = Cookies.get('token');
+                if (!token) {
+                    navigate("/admin/login");
+                    return;
+                }
                 const response = await fetch(`/api/category/${category_id}`, {
                     method: "GET",
                     headers: {
@@ -61,9 +65,10 @@ export default function EditCategoryPage() {
             const token = Cookies.get('token');
             const response = await fetch(`/api/category/${category_id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json',
+                headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
-                 },
+                },
                 body: JSON.stringify({ name: form.name, sort_order: form.sort_order, })
             });
 

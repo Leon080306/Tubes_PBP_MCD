@@ -119,7 +119,14 @@ export default function HomePageAdmin() {
 
     const fetchMenu = async () => {
         try {
-            const res = await fetch("/api/menu/");
+            const token = Cookies.get('token');
+            if (!token) {
+                navigate("/admin/login");
+                return;
+            }
+            const res = await fetch("/api/menu/", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             const data = await res.json();
             setMenu(data.records || data || []);
         } catch (error) {
@@ -138,15 +145,17 @@ export default function HomePageAdmin() {
         setCategoryId(data.category_id);
         setTipeMenu(data.tipe_menu);
         setGambarUrl(data.gambarUrl);
-        setAvailable(data.isAvailable || "true");
+        setAvailable(data.isAvailable ?? true);
         setOpenEdit(true);
     }
 
     const handleDelete = async (id: string) => {
         if (window.confirm("Yakin ingin menghapus menu ini?")) {
             try {
+                const token = Cookies.get('token');
                 const response = await fetch(`/api/menu/${id}`, {
                     method: "DELETE",
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (response.ok) {
@@ -161,10 +170,12 @@ export default function HomePageAdmin() {
 
     const handleUpdate = async () => {
         try {
+            const token = Cookies.get('token');
             const response = await fetch(`/api/menu/${menuId}`, {
                 method: 'PUT',
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     nama,
@@ -187,7 +198,12 @@ export default function HomePageAdmin() {
     }
 
     useEffect(() => {
-        fetch("/api/menu/")
+        const token = Cookies.get('token');
+        fetch("/api/menu/", {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
             .then((res) => res.json())
             .then((data) => {
                 console.log(menu)
@@ -201,7 +217,10 @@ export default function HomePageAdmin() {
     }, []);
 
     useEffect(() => {
-        fetch("/api/category")
+        const token = Cookies.get('token');
+        fetch("/api/category", {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
             .then(res => res.json())
             .then(data => setCategories(data));
     }, []);
@@ -326,6 +345,7 @@ export default function HomePageAdmin() {
                             <Select
                                 value={categoryId}
                                 onChange={(e) => setCategoryId(e.target.value)}
+                                label="Kategori Menu"
                             >
                                 {categories.map((cat) => (
                                     <MenuItem key={cat.category_id} value={cat.category_id}>
@@ -338,7 +358,7 @@ export default function HomePageAdmin() {
                         <FormControl fullWidth>
                             <InputLabel>Tipe Menu</InputLabel>
                             <Select value={tipeMenu} label="Tipe Menu" onChange={(e) => setTipeMenu(e.target.value)}>
-                                <MenuItem value="Ala Carte">"Ala Carte</MenuItem>
+                                <MenuItem value="Ala Carte">Ala Carte</MenuItem>
                                 <MenuItem value="Paket">Paket</MenuItem>
                             </Select>
                         </FormControl>
@@ -346,9 +366,9 @@ export default function HomePageAdmin() {
 
                     <FormControl fullWidth>
                         <InputLabel>is Available</InputLabel>
-                        <Select value={isAvailable} label="Ketersediaan" onChange={(e) => setAvailable(e.target.value)}>
-                            <MenuItem value="true">Available</MenuItem>
-                            <MenuItem value="false">Non Available</MenuItem>
+                        <Select value={isAvailable} label="Ketersediaan" onChange={(e) => setAvailable(e.target.value === 'true' || e.target.value === true)}>
+                            <MenuItem value={true as any}>Available</MenuItem>
+                            <MenuItem value={false as any}>Non Available</MenuItem>
                         </Select>
                     </FormControl>
 

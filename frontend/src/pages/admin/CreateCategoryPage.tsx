@@ -20,7 +20,11 @@ export default function CreateCategoryPage() {
 
         try {
             const token = Cookies.get('token');
-
+            if (!token) {
+                navigate("/admin/login");
+                return;
+            }
+            
             const response = await fetch('/api/category/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json',

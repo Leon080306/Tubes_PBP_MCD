@@ -40,7 +40,14 @@ export default function CreateMenuPage() {
     const [categories, setCategories] = useState<any[]>([]);
 
     useEffect(() => {
-        fetch("/api/category")
+        const token = Cookies.get('token');
+        if (!token) {
+            navigate("/admin/login");
+            return;
+        }
+        fetch("/api/category", {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
             .then(res => res.json())
             .then(data => setCategories(data));
     }, []);
@@ -52,6 +59,7 @@ export default function CreateMenuPage() {
             return;
         }
 
+        const token = Cookies.get('token');
         const formData = new FormData();
         formData.append("nama", form.nama);
         formData.append("harga_awal", form.harga_awal.toString());
@@ -65,6 +73,7 @@ export default function CreateMenuPage() {
         try {
             const response = await fetch('/api/menu/', {
                 method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
             });
 
@@ -88,7 +97,7 @@ export default function CreateMenuPage() {
 
     const handleVariantChange = (index: number, field: string, value: any) => {
         const updated = [...variants];
-        updated[index][field] = value;
+        (updated[index] as any)[field] = value;
         setVariants(updated);
     };
 
@@ -102,7 +111,7 @@ export default function CreateMenuPage() {
 
     const handleOptionChange = (index: number, field: string, value: any) => {
         const updated = [...options];
-        updated[index][field] = value;
+        (updated[index] as any)[field] = value;
         setOptions(updated);
     };
 
@@ -129,7 +138,7 @@ export default function CreateMenuPage() {
                         <input type="file" accept="image/*" onChange={handleChange} />
 
                         {preview && <img src={preview} alt="preview" />}
-                        
+
                         <Stack direction="row" spacing={2}>
                             <TextField
                                 select
@@ -215,10 +224,10 @@ export default function CreateMenuPage() {
                             fullWidth
                             required
                             value={form.isAvailable}
-                            onChange={(e) => setForm({ ...form, isAvailable: e.target.value })}
+                            onChange={(e) => setForm({ ...form, isAvailable: e.target.value === 'true' || (e.target.value as any) === true })}
                         >
-                            <MenuItem value={true}>Available</MenuItem>
-                            <MenuItem value={false}>Unavailable</MenuItem>
+                            <MenuItem value={true as any}>Available</MenuItem>
+                            <MenuItem value={false as any}>Unavailable</MenuItem>
                         </TextField>
 
 

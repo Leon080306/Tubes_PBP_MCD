@@ -9,7 +9,7 @@ export type Menu = {
     nama: string;
     harga_awal: number;
     category_id: string;
-    Category: Category;
+    category: Category;
     tipe_menu: 'Ala Carte' | 'Paket';
     gambarUrl: string;
     isAvailable?: boolean;

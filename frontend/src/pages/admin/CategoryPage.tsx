@@ -22,6 +22,10 @@ export default function CategoryPage() {
         setLoading(true);
         try {
             const token = Cookies.get('token');
+            if (!token) {
+                navigate("/admin/login");
+                return;
+            }
             const response = await fetch("/api/category/", {
                 method: "GET",
                 headers: {
@@ -47,7 +51,7 @@ export default function CategoryPage() {
             await fetch(`/api/category/${category_id}`, {
                 method: 'DELETE',
                 headers: {
-                    "Authorization": `Bearer ${token}` 
+                    "Authorization": `Bearer ${token}`
                 }
             });
             fetchCategories();

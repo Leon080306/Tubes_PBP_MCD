@@ -23,6 +23,10 @@ export default function StaffPage() {
         setLoading(true);
         try {
             const token = Cookies.get('token');
+            if (!token) {
+                navigate("/admin/login");
+                return;
+            }
             const response = await fetch("/api/staff/", {
                 method: "GET",
                 headers: {

@@ -15,8 +15,10 @@ import "../../styles/OrderListStyles.css";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Cookies from 'js-cookie';
+import { useNavigate } from "react-router";
 
 export default function OrderListPage() {
+    const navigate = useNavigate();
     const [orders, setOrders] = useState<Record<string, Order[]>>({});
     const [loading, setLoading] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
@@ -31,6 +33,10 @@ export default function OrderListPage() {
     const fetchOrders = async () => {
         try {
             const token = Cookies.get('token');
+            if (!token) {
+                navigate("/admin/login");
+                return;
+            }
             const response = await fetch("/api/order/", {
                 method: "GET",
                 headers: {

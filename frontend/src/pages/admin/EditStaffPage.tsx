@@ -25,6 +25,10 @@ export default function EditStaffPage() {
         const fetchStaffDetail = async () => {
             try {
                 const token = Cookies.get('token');
+                if (!token) {
+                    navigate("/admin/login");
+                    return;
+                }
                 const response = await fetch(`/api/staff/${id}`, {
                     method: "GET",
                     headers: {
@@ -63,9 +67,10 @@ export default function EditStaffPage() {
             const token = Cookies.get('token');
             const response = await fetch(`/api/staff/${id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json',
+                headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
-                 },
+                },
                 body: JSON.stringify({ email: form.email, name: form.name })
             });
 
