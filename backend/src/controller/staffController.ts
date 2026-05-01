@@ -1,9 +1,9 @@
-import { Request, Response } from "express";
+import e, { NextFunction, Request, Response } from "express";
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from "bcrypt";
 import { Staff } from "../models/Staff";
 
-export const getAllStaff = async (req: Request, res: Response) => {
+export const getAllStaff = async (req: Request, res: Response,  next: NextFunction) => {
     try {
         const staff = await Staff.findAll({
             attributes: {
@@ -12,12 +12,11 @@ export const getAllStaff = async (req: Request, res: Response) => {
         })
         res.json(staff);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Get All Staff error" });
+        next(error)
     }
 }
 
-export const getStaffById = async (req: Request, res: Response) => {
+export const getStaffById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
         const staff = await Staff.findOne({
@@ -41,12 +40,11 @@ export const getStaffById = async (req: Request, res: Response) => {
             data: staff
         })
     } catch (error: any) {
-        console.error("DEBUG ERROR GET BY ID:", error.message);
-        res.status(500).json({ message: "Get staff by ID error", detail: error.message });
+        next(error)
     }
 }
 
-export const createStaff = async (req: Request, res: Response) => {
+export const createStaff = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const payload = req.body;
         payload.staff_id = uuidv4();
@@ -89,12 +87,11 @@ export const createStaff = async (req: Request, res: Response) => {
             }
         })
     } catch (error: any) {
-        console.error(error);
-        res.status(500).json({ message: "Gagal Create Staff", detail: error.message })
+        next(error)
     }
 }
 
-export const updateStaff = async (req: Request, res: Response) => {
+export const updateStaff = async (req: Request, res: Response,  next: NextFunction) => {
     try {
         const { id } = req.params;
         const {email, name} = req.body;
@@ -124,12 +121,11 @@ export const updateStaff = async (req: Request, res: Response) => {
         })
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Get Staff by ID error" })
+        next(error)
     }
 }
 
-export const deleteStaff = async (req: Request, res: Response) => {
+export const deleteStaff = async (req: Request, res: Response,  next: NextFunction) => {
     try {
         const { id } = req.params;
         const staff = await Staff.findOne({
@@ -157,7 +153,6 @@ export const deleteStaff = async (req: Request, res: Response) => {
         })
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Get Staff by ID error" })
+        next(error)
     }
 }

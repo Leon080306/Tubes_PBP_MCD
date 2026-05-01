@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from "express";
 import { Menu } from '../models/Menu';
 import { MenuVarian } from '../models/MenuVarian';
 import { MenuOption } from '../models/MenuOption';
@@ -9,7 +9,7 @@ import { Op, fn, col, literal } from 'sequelize';
 // import { sequelize } from "../../config/database";
 
 export class menuController {
-    static async getAll(req: Request, res: Response) {
+    static async getAll(req: Request, res: Response, next: NextFunction) {
         try {
             const menus = await Menu.findAll({
                 where: { isAvailable: true },
@@ -27,8 +27,7 @@ export class menuController {
             });
 
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: "Get All Menu error" });
+            next(error)
         }
     }
 
@@ -44,7 +43,7 @@ export class menuController {
         });
     }
 
-    static async getRecommendation(req: Request, res: Response) {
+    static async getRecommendation(req: Request, res: Response,  next: NextFunction) {
         try {
             const { menu_id } = req.params;
             const limit = parseInt(req.query.limit as string) || 5;
@@ -88,8 +87,7 @@ export class menuController {
 
             res.status(200).json(recommendations);
         } catch (error) {
-            console.error('getRecommendations error:', error);
-            res.status(500).json({ message: 'Failed to fetch recommendations' });
+           next(error)
         }
 
     }

@@ -1,19 +1,18 @@
 import { Staff } from "../models/Staff";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-export const getAllUser = async (req: Request, res: Response) => {
+export const getAllUser = async (req: Request, res: Response,  next: NextFunction) => {
     try {
         const staff = await Staff.findAll();
         res.json(staff);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "data error" });
+        next(error)
     }
 }
 
-export const getOneUser = async (req: Request, res: Response) => {
+export const getOneUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const staffData = (req as any).user;
         if (!staffData) {
@@ -27,11 +26,10 @@ export const getOneUser = async (req: Request, res: Response) => {
             user: staffData
         })
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "data tidak ditemukan" });
+        next(error)
     }
 }
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password } = req.body;
 
@@ -70,16 +68,14 @@ export const loginUser = async (req: Request, res: Response) => {
         })
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Login error" });
+        next(error)
     }
 }
 
-export const forgotPassword = async (req: Request, res: Response) => {
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Forgot Password error" });
+        next(error)
     }
 }
