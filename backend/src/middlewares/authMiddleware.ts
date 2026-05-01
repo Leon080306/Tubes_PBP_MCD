@@ -6,7 +6,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     const authHeader = req.headers.authorization; //buat ambil header yg bearer di postman trs di simpen ke authHeader
 
     if (!authHeader) { //kalau ga ada berarti tokennya ga dapet
-      return res.status(401).json({ message: "No token" });
+      return res.redirect('http://localhost:5173/admin/login');
     }
 
     const token = authHeader.split(" ")[1] as string; //split tokennya ambil yg array ke 1
@@ -21,6 +21,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Invalid token" });
+    return res.redirect('http://localhost:5173/admin/login');
   }
 };

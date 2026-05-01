@@ -7,6 +7,7 @@ import { useNavigate, useParams } from "react-router";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import NavBar from "./NavBarAdmin";
+import Cookies from 'js-cookie';
 
 export default function EditCategoryPage() {
     const navigate = useNavigate();
@@ -22,8 +23,17 @@ export default function EditCategoryPage() {
     useEffect(() => {
         const fetchCategoryDetail = async () => {
             try {
-                const response = await fetch(`/api/category/${category_id}`,{
-                    method: "GET"
+                const token = Cookies.get('token');
+                if (!token) {
+                    navigate("/admin/login");
+                    return;
+                }
+                const response = await fetch(`/api/category/${category_id}`, {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                 });
                 const result = await response.json();
                 console.log("Isi Paket dari Backend:", result);
@@ -52,11 +62,14 @@ export default function EditCategoryPage() {
             return;
         }
         try {
-            
+            const token = Cookies.get('token');
             const response = await fetch(`/api/category/${category_id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: form.name, sort_order: form.sort_order,  })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ name: form.name, sort_order: form.sort_order, })
             });
 
             const result = await response.json();
@@ -136,8 +149,8 @@ export default function EditCategoryPage() {
                                 size="large"
                                 fullWidth
                                 startIcon={<SaveIcon />}
-                                sx={{ 
-                                    bgcolor: '#D52B1E', 
+                                sx={{
+                                    bgcolor: '#D52B1E',
                                     py: 1.5,
                                     fontWeight: 'bold',
                                     borderRadius: 2,

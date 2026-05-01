@@ -4,7 +4,7 @@ import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { authActions } from "../../store/authSlice";
 import "../../styles/LoginAdminStyles.css";
 import { useNavigate } from "react-router";
-import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material";
 import NavBar from "../admin/NavBarAdmin";
 import Cookies from "js-cookie";
 import type { UserInfo } from "../../type";
@@ -141,7 +141,7 @@ export default function LoginPageAdmin() {
                     }
                 }}
             >
-                <DialogTitle sx={{ fontWeight: '800', color: '#D52B1E', textAlign:'center' }}>
+                <DialogTitle sx={{ fontWeight: '800', color: '#D52B1E', textAlign: 'center' }}>
                     Reset Password
                 </DialogTitle>
                 <DialogContent>

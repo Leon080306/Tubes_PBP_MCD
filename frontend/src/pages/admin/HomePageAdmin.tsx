@@ -5,6 +5,7 @@ import NavBar from "../admin/NavBarAdmin";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from "react-router";
+import Cookies from 'js-cookie';
 
 function MenuCardItem({ item, onEdit, onDelete }: {
     item: Menu;
@@ -104,255 +105,342 @@ export default function HomePageAdmin() {
 
     const [openEdit, setOpenEdit] = useState(false);
     const [menuId, setMenuId] = useState("");
+
     const [nama, setNama] = useState("");
     const [harga, setHarga] = useState<number>(0);
-    const [kategoriMenu, setKategoriMenu] = useState("");
+
+    const [categoryId, setCategoryId] = useState("");
     const [tipeMenu, setTipeMenu] = useState("");
+
     const [gambarUrl, setGambarUrl] = useState("");
-    const [isAvailable, setAvailable] = useState("");
+    const [isAvailable, setAvailable] = useState(true);
 
-    // const fetchMenu = async () => {
-    //     try {
-    //         const res = await fetch("/api/menu/");
-    //         const data = await res.json();
-    //         setMenu(data.records || data || []);
-    //     } catch (error) {
-    //         console.error("Error: ", error)
-    //     }
-    // }
+    const [newImage, setNewImage] = useState<File | null>(null);
+    const [newImagePreview, setNewImagePreview] = useState<string>("");
 
-    // useEffect(() => { fetchMenu(), [] })
+    const [categories, setCategories] = useState<any[]>([]);
 
-    // const handleEdit = (data: Menu) => {
-    //     setMenuId(data.menu_id);
-    //     setNama(data.nama);
-    //     setHarga(data.harga_awal);
-    //     setKategoriMenu(data.kategori_menu);
-    //     setTipeMenu(data.tipe_menu);
-    //     setGambarUrl(data.gambarUrl);
-    //     setAvailable(data.isAvailable || "true");
-    //     setOpenEdit(true);
-    // }
+    const fetchMenu = async () => {
+        try {
+            const token = Cookies.get('token');
 
-    // const handleDelete = async (id: string) => {
-    //     if (window.confirm("Yakin ingin menghapus menu ini?")) {
-    //         try {
-    //             const response = await fetch(`/api/menu/${id}`, {
-    //                 method: "DELETE",
-    //             });
+            console.log(token);
+            if (!token) {
+                navigate("/admin/login");
+                return;
+            }
+            const res = await fetch("/api/menu/", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            setMenu(data.records || data || []);
+        } catch (error) {
+            console.error("Error: ", error)
+        }
+    }
 
-    //             if (response.ok) {
-    //                 alert("Menu Berhasil Dihapus");
-    //                 setMenu((prev) => prev.filter((item) => item.menu_id !== id))
-    //             }
-    //         } catch (error) {
-    //             console.error("Error hapus menu:", error);
-    //         }
-    //     }
-    // }
+    // useEffect(() => {
+    //     fetchMenu();
+    // }, []);
 
-    // const handleUpdate = async () => {
-    //     try {
-    //         const response = await fetch(`/api/menu/${menuId}`, {
-    //             method: 'PUT',
-    //             headers: {
-    //                 "Content-Type": "application/json"
-    //             },
-    //             body: JSON.stringify({
-    //                 nama,
-    //                 harga_awal: harga,
-    //                 kategori_menu: kategoriMenu,
-    //                 tipe_menu: tipeMenu,
-    //                 gambarUrl,
-    //                 isAvailable
-    //             })
-    //         })
+    const handleEdit = (data: Menu) => {
+        setMenuId(data.menu_id);
+        setNama(data.nama);
+        setHarga(data.harga_awal);
+        setCategoryId(data.category_id);
+        setTipeMenu(data.tipe_menu);
+        setGambarUrl(data.gambarUrl);
+        setAvailable(data.isAvailable ?? true);
+        setOpenEdit(true);
+    }
 
-    //         if (response.ok) {
-    //             alert("Menu berhasil di update");
-    //             setOpenEdit(false);
-    //             fetchMenu();
-    //         }
-    //     } catch (error) {
-    //         console.error("Gagal Update Menu: ", error)
-    //     }
-    // }
+    const handleOpenEdit = (menu: Menu) => {
+        setNama(menu.nama);
+        setHarga(menu.harga_awal);
+        setGambarUrl(menu.gambarUrl);
+        setCategoryId(menu.category_id);
+        setTipeMenu(menu.tipe_menu);
+        setAvailable(menu.isAvailable ?? true);
+        setNewImage(null);
+        setNewImagePreview("");
+        setOpenEdit(true);
+    };
 
-    // // useEffect(() => {
-    // //     fetch("/api/menu/")
-    // //         .then((res) => res.json())
-    // //         .then((data) => {
-    // //             console.log(menu)
-    // //             const menuData = data.records || data || [];
-    // //             setMenu(menuData)
-    // //         })
-    // //         .catch((err) => {
-    // //             console.error("Fetch error:", err);
-    // //             setMenu([])
-    // //         })
-    // // }, []);
+    const handleDelete = async (id: string) => {
+        if (window.confirm("Yakin ingin menghapus menu ini?")) {
+            try {
+                const token = Cookies.get('token');
+                const response = await fetch(`/api/menu/${id}`, {
+                    method: "DELETE",
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
 
-    // let filtered: Menu[];
+                if (response.ok) {
+                    alert("Menu Berhasil Dihapus");
+                    setMenu((prev) => prev.filter((item) => item.menu_id !== id))
+                }
+            } catch (error) {
+                console.error("Error hapus menu:", error);
+            }
+        }
+    }
 
-    // if (category === "All") {
-    //     filtered = menu;
-    // } else {
-    //     filtered = menu.filter((item) => item.kategori_menu === category);
-    // }
+    const handleUpdate = async () => {
+        const token = Cookies.get('token');
+        const formData = new FormData();
+        formData.append("nama", nama);
+        formData.append("harga_awal", harga.toString());
+        formData.append("category_id", categoryId);
+        formData.append("tipe_menu", tipeMenu);
+        formData.append("isAvailable", String(isAvailable));
+        if (newImage) {
+            formData.append("image", newImage);
+        }
 
-    // const sortedMenu = [...filtered].sort((a, b) =>
-    //     a.kategori_menu.localeCompare(b.kategori_menu)
-    // );
+        try {
+            const response = await fetch(`/api/menu/${menuId}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData,
+            });
 
-    // const groupedMenu = sortedMenu.reduce((acc, item) => {
-    //     if (!acc[item.kategori_menu]) {
-    //         acc[item.kategori_menu] = [];
-    //     }
-    //     acc[item.kategori_menu].push(item);
-    //     return acc;
-    // }, {} as Record<string, Menu[]>);
+            if (response.ok) {
+                setOpenEdit(false);
+                setNewImage(null);
+                setNewImagePreview("");
+                await fetchMenu();   // 👈 refresh list
+            }
+        } catch (error) {
+            console.error("Error: ", error);
+        }
+    };
 
-    // const handleAdd = (item: Menu) => {
-    //     console.log("Ditambah:", item);
+    useEffect(() => {
+        const token = Cookies.get('token');
+        fetch("/api/menu/", {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(menu)
+                const menuData = data.records || data || [];
+                setMenu(menuData)
+            })
+            .catch((err) => {
+                console.error("Fetch error:", err);
+                setMenu([])
+            })
+    }, []);
 
-    //     // code buat ke cart (leon)
-    // };
+    useEffect(() => {
+        const token = Cookies.get('token');
+        if (!token) navigate("/admin/login");
+        fetch("/api/category", {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+            .then(res => res.json())
+            .then(data => setCategories(data));
+    }, []);
 
-    // return (
-    //     <Box>
-    //         <NavBar />
-    //         <Container maxWidth="lg" sx={{ py: 5 }}>
-    //             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-    //                 <Button
-    //                     variant="contained"
-    //                     onClick={() => navigate("/admin/addMenu")}
-    //                     sx={{
-    //                         bgcolor: "#D52B1E",
-    //                         fontWeight: "bold",
-    //                         '&:hover': { bgcolor: '#b32419' }
-    //                     }}
-    //                 >
-    //                     + Add Menu
-    //                 </Button>
-    //             </Box>
-    //             {/* TITLE */}
-    //             {category !== "All" && (
-    //                 <Typography sx={{ variant: "h6", fontWeight: "bold", mb: 2 }}>
-    //                     {category}
-    //                 </Typography>
-    //             )}
-    //             {/* GRID */}
+    const filtered =
+        category === "All"
+            ? menu
+            : menu.filter((item) => item.category.name === category);
 
-    //             {sortedMenu.length > 0 ? (
-    //                 <Box>
-    //                     {Object.entries(groupedMenu).map(([kategori, items], index) => (
-    //                         <Box key={kategori} sx={{ mb: 6 }}>
+    const sortedMenu = [...filtered].sort((a, b) =>
+        a.category.name.localeCompare(b.category.name)
+    );
 
-    //                             <Box
-    //                                 sx={{
-    //                                     borderTop: index === 0 ? "none" : "2px solid #eee",
-    //                                     pt: 2,
-    //                                     mb: 2,
-    //                                 }}
-    //                             >
-    //                                 <Typography
-    //                                     sx={{
-    //                                         fontWeight: "900",
-    //                                         fontSize: "18px",
-    //                                         borderLeft: "6px solid #ffcc00",
-    //                                         pl: 1.5,
-    //                                         textTransform: "uppercase",
-    //                                         letterSpacing: "0.5px"
-    //                                     }}
-    //                                 >
-    //                                     {kategori}
-    //                                 </Typography>
-    //                             </Box>
+    const groupedMenu = sortedMenu.reduce((acc, item) => {
+        const cat = item.category.name;
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(item);
+        return acc;
+    }, {} as Record<string, Menu[]>);
 
-    //                             <Box
-    //                                 sx={{
-    //                                     display: "grid",
-    //                                     gridTemplateColumns: {
-    //                                         md: "repeat(4, 1fr)",
-    //                                         sm: "repeat(3, 1fr)",
-    //                                         xs: "repeat(2, 1fr)",
-    //                                     },
-    //                                     gap: 3,
-    //                                 }}
-    //                             >
-    //                                 {items.map((item) => (
-    //                                     <MenuCardItem key={item.menu_id} item={item} onEdit={handleEdit} onDelete={handleDelete} />
-    //                                 ))}
-    //                             </Box>
-    //                         </Box>
-    //                     ))}
-    //                 </Box>
-    //             ) : (
-    //                 <Typography sx={{
-    //                     mt: 4,
-    //                     textAlign: "center"
-    //                 }}>
-    //                     Menu tidak ditemukan
-    //                 </Typography>
-    //             )}
-    //         </Container>
+    const handleAdd = (item: Menu) => {
+        console.log("Ditambah:", item);
 
-    //         <Dialog open={openEdit} onClose={() => setOpenEdit(false)} sx={{
-    //             "& .MuiDialog-paper": {
-    //                 borderRadius: 4,
-    //                 p: 1
-    //             }
-    //         }}>
-    //             <DialogTitle sx={{ fontWeight: 'bold' }}>Update Detail Menu</DialogTitle>
-    //             <DialogContent sx={{ minWidth: 350, pt: 3, display: 'flex', flexDirection: 'column', gap: 3, overflow: 'visible' }}>
-    //                 <TextField label="Nama Menu" fullWidth value={nama} onChange={(e) => setNama(e.target.value)} variant="outlined" sx={{ mt: 1 }} />
-    //                 <TextField label="Harga" type="number" fullWidth value={harga} onChange={(e) => setHarga(Number(e.target.value))} />
-    //                 <TextField label="Url Gambar" fullWidth value={gambarUrl} onChange={(e) => setGambarUrl(e.target.value)} />
+        // code buat ke cart (leon)
+    };
 
-    //                 <Stack direction="row" spacing={2}>
+    return (
+        <Box>
+            <NavBar />
+            <Container maxWidth="lg" sx={{ py: 5 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                    <Button
+                        variant="contained"
+                        onClick={() => navigate("/admin/addMenu")}
+                        sx={{
+                            bgcolor: "#D52B1E",
+                            fontWeight: "bold",
+                            '&:hover': { bgcolor: '#b32419' }
+                        }}
+                    >
+                        + Add Menu
+                    </Button>
+                </Box>
+                {/* TITLE */}
+                {category !== "All" && (
+                    <Typography sx={{ variant: "h6", fontWeight: "bold", mb: 2 }}>
+                        {category}
+                    </Typography>
+                )}
+                {/* GRID */}
 
-    //                     <FormControl fullWidth>
-    //                         <InputLabel>Kategori Menu</InputLabel>
-    //                         <Select value={kategoriMenu} label="Kategori Menu" onChange={(e) => setKategoriMenu(e.target.value)}>
-    //                             <MenuItem value="Burger">Burger</MenuItem>
-    //                             <MenuItem value="Drinks">Drinks</MenuItem>
-    //                             <MenuItem value="Dessert">Dessert</MenuItem>
-    //                             <MenuItem value="Happy Meal">Happy Meal</MenuItem>
-    //                             <MenuItem value="Camilan">Camilan</MenuItem>
-    //                             <MenuItem value="Ayam">Ayam</MenuItem>
-    //                         </Select>
-    //                     </FormControl>
+                {sortedMenu.length > 0 ? (
+                    <Box>
+                        {Object.entries(groupedMenu).map(([kategori, items], index) => (
+                            <Box key={kategori} sx={{ mb: 6 }}>
 
-    //                     <FormControl fullWidth>
-    //                         <InputLabel>Tipe Menu</InputLabel>
-    //                         <Select value={tipeMenu} label="Tipe Menu" onChange={(e) => setTipeMenu(e.target.value)}>
-    //                             <MenuItem value="Ala Carte">"Ala Carte</MenuItem>
-    //                             <MenuItem value="Paket">Paket</MenuItem>
-    //                         </Select>
-    //                     </FormControl>
-    //                 </Stack>
+                                <Box
+                                    sx={{
+                                        borderTop: index === 0 ? "none" : "2px solid #eee",
+                                        pt: 2,
+                                        mb: 2,
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{
+                                            fontWeight: "900",
+                                            fontSize: "18px",
+                                            borderLeft: "6px solid #ffcc00",
+                                            pl: 1.5,
+                                            textTransform: "uppercase",
+                                            letterSpacing: "0.5px"
+                                        }}
+                                    >
+                                        {kategori}
+                                    </Typography>
+                                </Box>
 
-    //                 <FormControl fullWidth>
-    //                     <InputLabel>is Available</InputLabel>
-    //                     <Select value={isAvailable} label="Ketersediaan" onChange={(e) => setAvailable(e.target.value)}>
-    //                         <MenuItem value="true">Available</MenuItem>
-    //                         <MenuItem value="false">Non Available</MenuItem>
-    //                     </Select>
-    //                 </FormControl>
+                                <Box
+                                    sx={{
+                                        display: "grid",
+                                        gridTemplateColumns: {
+                                            md: "repeat(4, 1fr)",
+                                            sm: "repeat(3, 1fr)",
+                                            xs: "repeat(2, 1fr)",
+                                        },
+                                        gap: 3,
+                                    }}
+                                >
+                                    {items.map((item) => (
+                                        <MenuCardItem key={item.menu_id} item={item} onEdit={handleEdit} onDelete={handleDelete} />
+                                    ))}
+                                </Box>
+                            </Box>
+                        ))}
+                    </Box>
+                ) : (
+                    <Typography sx={{
+                        mt: 4,
+                        textAlign: "center"
+                    }}>
+                        Menu tidak ditemukan
+                    </Typography>
+                )}
+            </Container>
 
+            <Dialog open={openEdit} onClose={() => setOpenEdit(false)} sx={{
+                "& .MuiDialog-paper": {
+                    borderRadius: 4,
+                    p: 1
+                }
+            }}>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>Update Detail Menu</DialogTitle>
+                <DialogContent sx={{ minWidth: 350, pt: 3, display: 'flex', flexDirection: 'column', gap: 3, overflow: 'visible' }}>
+                    <TextField label="Nama Menu" fullWidth value={nama} onChange={(e) => setNama(e.target.value)} variant="outlined" sx={{ mt: 1 }} />
+                    <TextField label="Harga" type="number" fullWidth value={harga} onChange={(e) => setHarga(Number(e.target.value))} />
 
-    //             </DialogContent>
-    //             <DialogActions sx={{ p: 3 }}>
-    //                 <Button onClick={() => setOpenEdit(false)} color="inherit">Cancel</Button>
-    //                 <Button onClick={handleUpdate} variant="contained" sx={{ bgcolor: '#D52B1E', borderRadius: 2, px: 4 }}>
-    //                     Update Menu
-    //                 </Button>
-    //             </DialogActions>
-    //         </Dialog>
-    //     </Box>
-    // );
+                    {/* Image preview + upload */}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Typography sx={{ fontSize: 14, fontWeight: 500 }}>Gambar Menu</Typography>
+                        {(newImagePreview || gambarUrl) && (
+                            <Box
+                                component="img"
+                                src={newImagePreview || `/api/${gambarUrl}`}
+                                alt="preview"
+                                onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).src =
+                                        "https://blocks.astratic.com/img/general-img-landscape.png";
+                                }}
+                                sx={{
+                                    width: '100%',
+                                    height: 160,
+                                    objectFit: 'cover',
+                                    borderRadius: 2,
+                                    border: '1px solid #eee',
+                                }}
+                            />
+                        )}
+                        <Button
+                            component="label"
+                            variant="outlined"
+                            sx={{ textTransform: 'none', borderColor: '#ccc', color: 'black' }}
+                        >
+                            {newImage ? `Change Image (${newImage.name})` : 'Upload New Image'}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                hidden
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    setNewImage(file);
+                                    setNewImagePreview(URL.createObjectURL(file));
+                                }}
+                            />
+                        </Button>
+                    </Box>
 
-    return(
+                    <Stack direction="row" spacing={2}>
+                        <FormControl fullWidth>
+                            <InputLabel>Kategori Menu</InputLabel>
+                            <Select
+                                value={categoryId}
+                                onChange={(e) => setCategoryId(e.target.value)}
+                                label="Kategori Menu"
+                            >
+                                {categories.map((cat) => (
+                                    <MenuItem key={cat.category_id} value={cat.category_id}>
+                                        {cat.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        <FormControl fullWidth>
+                            <InputLabel>Tipe Menu</InputLabel>
+                            <Select value={tipeMenu} label="Tipe Menu" onChange={(e) => setTipeMenu(e.target.value)}>
+                                <MenuItem value="Ala Carte">Ala Carte</MenuItem>
+                                <MenuItem value="Paket">Paket</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Stack>
+
+                    <FormControl fullWidth>
+                        <InputLabel>is Available</InputLabel>
+                        <Select value={isAvailable} label="Ketersediaan" onChange={(e) => setAvailable(e.target.value === 'true' || e.target.value === true)}>
+                            <MenuItem value={true as any}>Available</MenuItem>
+                            <MenuItem value={false as any}>Non Available</MenuItem>
+                        </Select>
+                    </FormControl>
+                </DialogContent>
+                <DialogActions sx={{ p: 3 }}>
+                    <Button onClick={() => setOpenEdit(false)} color="inherit">Cancel</Button>
+                    <Button onClick={handleUpdate} variant="contained" sx={{ bgcolor: '#D52B1E', borderRadius: 2, px: 4 }}>
+                        Update Menu
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
+    );
+
+    return (
         <Box>
             <NavBar />
         </Box>

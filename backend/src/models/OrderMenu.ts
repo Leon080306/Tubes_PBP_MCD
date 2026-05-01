@@ -14,8 +14,7 @@ import { MenuOption } from './MenuOption.js';
 export class OrderMenu extends Model {
     @PrimaryKey
     @Column({
-        type: DataType.UUID,
-        defaultValue: DataType.UUIDV4,
+        type: DataType.UUIDV4,
         allowNull: false,
     })
     declare om_id: string;
