@@ -8,7 +8,7 @@ export function useGetPakets() {
     const reload = useCallback(async (menu_id: string) => {
         setState("loading");
         try {
-            const response = await fetch(`http://localhost:3000/paket/${menu_id}`, {
+            const response = await fetch(`/api/paket/${menu_id}`, {
                 method: "GET",
                 headers: {
                     "content-type": "application/json",

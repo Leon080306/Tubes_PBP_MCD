@@ -33,8 +33,7 @@ export default function Cart({ onNext }: PackageSelectionProps) {
     const handleRemove = (cartItemId: string) =>
         dispatch(cartActions.removeFromCart(cartItemId));
 
-    const handleClearCart = () =>
-        dispatch(cartActions.clearCart());
+    const handleClearCart = () => dispatch(cartActions.clearCart());
 
     // ✅ Handler untuk edit cart item
     const handleEdit = (cartItemId: string) => {
@@ -50,11 +49,11 @@ export default function Cart({ onNext }: PackageSelectionProps) {
         if (cartItems.length === 0) return;
 
         const payload = {
-            order_type: "Dine-in" as const, // TODO: ambil dari step sebelumnya kalau ada pilihan
+            order_type: "Dine-in" as const,
             total_harga: total,
             items: cartItems.map((item) => ({
                 menu_id: item.menu.menu_id,
-                mv_id: item.selectedVariants[0]?.mv_id,
+                mv_id: item.selectedVariant?.mv_id,
                 harga_awal: item.price,
                 quantity: item.quantity,
                 selectedOptions: item.selectedOptions.map((o) => ({ mo_id: o.mo_id })),
@@ -208,9 +207,9 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                                     <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>
                                         {item.menu.nama}
                                     </Typography>
-                                    {item.selectedVariants.length > 0 && (
+                                    {item.selectedVariant && (
                                         <Typography sx={{ fontSize: "11px", color: "text.secondary" }}>
-                                            {item.selectedVariants.map(v => v.nama_varian).join(", ")}
+                                            {item.selectedVariant.nama_varian}
                                         </Typography>
                                     )}
                                     {item.selectedOptions.length > 0 && (

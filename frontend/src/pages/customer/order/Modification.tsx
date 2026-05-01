@@ -21,7 +21,7 @@ export default function Modification({ onNext }: PackageSelectionProps) {
     const cartItem = cartItems.find(item => item.cartItemId === cartItemId);
 
     const [selectedVariant, setSelectedVariant] = useState<MenuVarian | null>(
-        cartItem?.selectedVariants?.[0] ?? null
+        cartItem?.selectedVariant ?? null
     );
     const [selectedOptions, setSelectedOptions] = useState<MenuOption[]>(
         cartItem?.selectedOptions ?? []
@@ -42,9 +42,9 @@ export default function Modification({ onNext }: PackageSelectionProps) {
     const handleVariantToggle = (varian: MenuVarian) => {
         const next = selectedVariant?.mv_id === varian.mv_id ? null : varian;
         setSelectedVariant(next);
-        dispatch(cartActions.setSelectedVariants({
+        dispatch(cartActions.setSelectedVariant({
             cartItemId: cartItemId!,
-            variants: next ? [next] : []
+            variant: next,
         }));
     };
 
@@ -63,7 +63,7 @@ export default function Modification({ onNext }: PackageSelectionProps) {
     const handleHapusPerubahan = () => {
         setSelectedVariant(null);
         setSelectedOptions([]);
-        dispatch(cartActions.setSelectedVariants({ cartItemId: cartItemId!, variants: [] }));
+        dispatch(cartActions.setSelectedVariant({ cartItemId: cartItemId!, variant: null }));
         dispatch(cartActions.setSelectedOptions({ cartItemId: cartItemId!, options: [] }));
     };
 

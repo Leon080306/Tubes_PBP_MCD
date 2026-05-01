@@ -1,12 +1,14 @@
-import { Box, Button, CircularProgress, Paper, Typography } from "@mui/material";
+import { Box, Button, Paper, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { useGetMenu } from "../../../hooks/useGetMenu";
 import { useEffect, useMemo } from "react";
 import FormatPrice from "../../../utils/FormatPrice";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "../../../redux/store";
+import type { RootState } from "../../../redux/store";
 import { cartActions } from "../../../store/cartSlice";
 import { useGetPakets } from "../../../hooks/useGetPakets";
+import { useAppDispatch } from "../../../hooks/useAppDispatch";
+import { useAppSelector } from "../../../hooks/useAppSelector";
+import { LoadingScreen } from "../../../components/LoadingScreen";
 
 type PackageSelectionProps = {
     onNext: (step: string) => void;
@@ -15,39 +17,39 @@ type PackageSelectionProps = {
 export default function MakePackage({ onNext }: PackageSelectionProps) {
     const { menu, reload } = useGetMenu();
     const { cartItemId } = useParams();
-    const cartItems = useSelector((state: RootState) => state.cart.cartItems);
-    const navigate = useNavigate();
-    const dispatch = useDispatch<AppDispatch>();
     const { pakets, state: paketsState, reload: reloadPakets } = useGetPakets();
+    const cartItems = useAppSelector((state: RootState) => state.cart.cartItems);
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
 
-    // Load menu
+    // reload paket menus
     useEffect(() => {
         if (cartItemId) {
             reload(cartItemId);
         }
     }, [cartItemId, reload]);
 
-    // Validate cart item exists
+    // check if cart items exist
     useEffect(() => {
         if (!cartItemId || cartItems.find(item => item.cartItemId === cartItemId) === undefined) {
             navigate("/");
         }
     }, [cartItemId, cartItems, navigate]);
 
-    // Load pakets that contain this menu
+    // get pakets that contains this menu
     useEffect(() => {
         if (menu?.menu_id) {
             reloadPakets(menu.menu_id);
         }
     }, [menu?.menu_id, reloadPakets]);
 
-    // ✅ Filter paket yang available
+    // filter isAvailable
     const availablePakets = useMemo(
         () => pakets.filter((item) => item.pakets && item.pakets.isAvailable !== false),
         [pakets]
     );
 
-    // ✅ Auto skip ke "quantity" kalau tidak ada paket tersedia
+    // if there is no pakets with this menu, skip step to set quantity
     useEffect(() => {
         if (paketsState === "success" && availablePakets.length === 0) {
             onNext("quantity");
@@ -62,25 +64,14 @@ export default function MakePackage({ onNext }: PackageSelectionProps) {
         }
     };
 
-    // ✅ Tampilkan loading saat masih cek paket atau loading menu
     const isCheckingPakets = paketsState === "idle" || paketsState === "loading";
     if (!menu || isCheckingPakets) {
         return (
-            <Box sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100%",
-            }}>
-                <CircularProgress sx={{ color: "#ffbc0d" }} />
-            </Box>
+            <LoadingScreen />
         );
     }
 
-    // ✅ Kalau success tapi tidak ada paket, jangan render apapun (sedang transisi ke quantity)
-    if (paketsState === "success" && availablePakets.length === 0) {
-        return null;
-    }
+    if (paketsState === "success" && availablePakets.length === 0) return <LoadingScreen />;
 
     return (
         <Box sx={{
@@ -95,10 +86,12 @@ export default function MakePackage({ onNext }: PackageSelectionProps) {
                 alignItems: "center",
                 gap: "24px",
             }}>
+                {/* mcd logo on top left */}
                 <img src="/src/assets/logo_mcd.png" alt="" style={{
                     width: "32px",
                     height: "32px"
                 }} />
+                {/* menu name */}
                 <Typography variant="h4" sx={{
                     fontSize: "14px",
                     fontWeight: "bold"

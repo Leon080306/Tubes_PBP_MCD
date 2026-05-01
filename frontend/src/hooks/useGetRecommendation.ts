@@ -15,8 +15,7 @@ export function useGetRecommendations() {
     const reload = useCallback(async (menu_id: string, limit: number = 5) => {
         setState("loading");
         try {
-            const url = `http://localhost:3000/menu/${menu_id}/recommendations?limit=${limit}`;
-            console.log("🔵 Fetching:", url);  // ✅ DEBUG
+            const url = `/api/menu/${menu_id}/recommendations?limit=${limit}`;
 
             const response = await fetch(url, {
                 method: "GET",

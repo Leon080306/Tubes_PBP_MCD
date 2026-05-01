@@ -5,7 +5,7 @@ export type CartItem = {
     cartItemId: string;
     menu: Menu;
     quantity: number;
-    selectedVariants: MenuVarian[];
+    selectedVariant: MenuVarian | null;
     selectedOptions: MenuOption[];
     price: number;
 }
@@ -63,12 +63,12 @@ export const cartSlice = createSlice({
             }
         },
 
-        setSelectedVariants: (state, action: PayloadAction<{ cartItemId: string, variants: MenuVarian[] }>) => {
+        setSelectedVariant: (state, action: PayloadAction<{ cartItemId: string, variant: MenuVarian | null }>) => {
             const item = state.cartItems.find(
                 item => item.cartItemId === action.payload.cartItemId
             )
             if (item) {
-                item.selectedVariants = action.payload.variants
+                item.selectedVariant = action.payload.variant
             }
         },
 

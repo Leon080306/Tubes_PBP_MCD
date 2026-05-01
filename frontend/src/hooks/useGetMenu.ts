@@ -16,7 +16,7 @@ export function useGetMenu() {
 
             const menuId = item.menu.menu_id
 
-            const response = await fetch(`http://localhost:3000/menu/${menuId}`, {
+            const response = await fetch(`/api/menu/${menuId}`, {
                 method: "GET",
                 headers: {
                     "content-type": "application/json"
