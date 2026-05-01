@@ -6,6 +6,8 @@ import type { AppDispatch } from "../../redux/store";
 import { cartActions } from "../../store/cartSlice";
 import type { Menu, Category } from "../../type";
 
+const FALLBACK_IMAGE = "https://blocks.astratic.com/img/general-img-landscape.png";
+
 function MenuCardItem({
     item,
     onClick,
@@ -13,6 +15,9 @@ function MenuCardItem({
     item: Menu;
     onClick: () => void;
 }) {
+    if (item.nama === "spaggheti") {
+        console.log(item)
+    }
     return (
         <Box
             onClick={onClick}
@@ -29,8 +34,14 @@ function MenuCardItem({
         >
             <Box
                 component="img"
-                src={`/${item.gambarUrl}`}
+                src={item.gambarUrl ? `/api/${item.gambarUrl}` : FALLBACK_IMAGE}
                 alt={item.nama}
+                onError={(e) => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    if (img.src !== FALLBACK_IMAGE) {
+                        img.src = FALLBACK_IMAGE;
+                    }
+                }}
                 sx={{
                     width: "50%",
                     height: "80px",

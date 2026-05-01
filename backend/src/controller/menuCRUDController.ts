@@ -44,6 +44,7 @@ export const getMenuById = async (req: Request, res: Response) => {
 export const createMenu = async (req: Request, res: Response) => {
     try {
         console.log("BODY:", req.body);
+        const file = (req as any).file;
 
         const {
             nama,
@@ -53,7 +54,12 @@ export const createMenu = async (req: Request, res: Response) => {
             isAvailable
         } = req.body;
 
-        const gambarUrl = req.filePath;
+        let gambarUrl = null;
+
+        if (file) {
+            const folder = (req as any).uploadFolder ?? "menus";
+            gambarUrl = `uploads/${folder}/${file.filename}`;
+        }
 
         const menu = await Menu.create({
             nama,
@@ -67,7 +73,14 @@ export const createMenu = async (req: Request, res: Response) => {
         const variants = JSON.parse(req.body.variants || "[]");
         const options = JSON.parse(req.body.options || "[]");
 
-        for (const v of variants) {
+        const validVariants = variants.filter(
+            (v: any) => v.name?.trim() && v.price !== "" && v.price !== null
+        );
+        const validOptions = options.filter(
+            (o: any) => o.name?.trim() && o.price !== "" && o.price !== null
+        );
+
+        for (const v of validVariants) {
             await MenuVarian.create({
                 menu_id: menu.menu_id,
                 nama_varian: v.name,
@@ -75,7 +88,7 @@ export const createMenu = async (req: Request, res: Response) => {
             });
         }
 
-        for (const o of options) {
+        for (const o of validOptions) {
             await MenuOption.create({
                 menu_id: menu.menu_id,
                 nama_option: o.name,
@@ -98,6 +111,7 @@ export const createMenu = async (req: Request, res: Response) => {
 export const updateMenu = async (req: Request, res: Response) => {
     try {
         const id = req.params.id;
+        const file = (req as any).file;
 
         if (!id || Array.isArray(id)) {
             return res.status(400).json({ message: "Invalid ID" });
@@ -117,14 +131,20 @@ export const updateMenu = async (req: Request, res: Response) => {
             isAvailable
         } = req.body;
 
-        console.log("UPDATE BODY:", req.body);
+        let gambarUrl = null;
+
+        if (file) {
+            const folder = (req as any).uploadFolder ?? "menus";
+            gambarUrl = `uploads/${folder}/${file.filename}`;
+        }
 
         await menu.update({
             nama,
             harga_awal,
             tipe_menu,
             category_id,
-            isAvailable
+            isAvailable,
+            gambarUrl
         });
 
         return res.json({

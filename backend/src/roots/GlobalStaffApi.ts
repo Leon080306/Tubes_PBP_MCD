@@ -5,10 +5,12 @@ import MenuAdminRoutes from "./MenuAdminRoutes";
 import OrderRoutes from "./OrderRoutes"
 import UserRoutes from "./UserRoutes"
 import CategoryRoutes from "./CategoryRoutes"
+import { verifyResetToken } from "../controller/userController";
 
 
 const router: Router = Router();
 
+router.get("/user/verify-reset-token", verifyResetToken);
 router.use("/user", UserRoutes);
 
 router.use(authMiddleware);

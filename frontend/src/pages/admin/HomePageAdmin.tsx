@@ -115,11 +115,16 @@ export default function HomePageAdmin() {
     const [gambarUrl, setGambarUrl] = useState("");
     const [isAvailable, setAvailable] = useState(true);
 
+    const [newImage, setNewImage] = useState<File | null>(null);
+    const [newImagePreview, setNewImagePreview] = useState<string>("");
+
     const [categories, setCategories] = useState<any[]>([]);
 
     const fetchMenu = async () => {
         try {
             const token = Cookies.get('token');
+
+            console.log(token);
             if (!token) {
                 navigate("/admin/login");
                 return;
@@ -149,6 +154,18 @@ export default function HomePageAdmin() {
         setOpenEdit(true);
     }
 
+    const handleOpenEdit = (menu: Menu) => {
+        setNama(menu.nama);
+        setHarga(menu.harga_awal);
+        setGambarUrl(menu.gambarUrl);
+        setCategoryId(menu.category_id);
+        setTipeMenu(menu.tipe_menu);
+        setAvailable(menu.isAvailable ?? true);
+        setNewImage(null);
+        setNewImagePreview("");
+        setOpenEdit(true);
+    };
+
     const handleDelete = async (id: string) => {
         if (window.confirm("Yakin ingin menghapus menu ini?")) {
             try {
@@ -169,33 +186,34 @@ export default function HomePageAdmin() {
     }
 
     const handleUpdate = async () => {
+        const token = Cookies.get('token');
+        const formData = new FormData();
+        formData.append("nama", nama);
+        formData.append("harga_awal", harga.toString());
+        formData.append("category_id", categoryId);
+        formData.append("tipe_menu", tipeMenu);
+        formData.append("isAvailable", String(isAvailable));
+        if (newImage) {
+            formData.append("image", newImage);
+        }
+
         try {
-            const token = Cookies.get('token');
             const response = await fetch(`/api/menu/${menuId}`, {
                 method: 'PUT',
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    nama,
-                    harga_awal: harga,
-                    category_id: categoryId,
-                    tipe_menu: tipeMenu,
-                    gambarUrl,
-                    isAvailable
-                })
-            })
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData,
+            });
 
             if (response.ok) {
-                alert("Menu berhasil di update");
                 setOpenEdit(false);
-                fetchMenu();
+                setNewImage(null);
+                setNewImagePreview("");
+                await fetchMenu();   // 👈 refresh list
             }
         } catch (error) {
-            console.error("Gagal Update Menu: ", error)
+            console.error("Error: ", error);
         }
-    }
+    };
 
     useEffect(() => {
         const token = Cookies.get('token');
@@ -218,6 +236,7 @@ export default function HomePageAdmin() {
 
     useEffect(() => {
         const token = Cookies.get('token');
+        if (!token) navigate("/admin/login");
         fetch("/api/category", {
             headers: { 'Authorization': `Bearer ${token}` }
         })
@@ -336,10 +355,49 @@ export default function HomePageAdmin() {
                 <DialogContent sx={{ minWidth: 350, pt: 3, display: 'flex', flexDirection: 'column', gap: 3, overflow: 'visible' }}>
                     <TextField label="Nama Menu" fullWidth value={nama} onChange={(e) => setNama(e.target.value)} variant="outlined" sx={{ mt: 1 }} />
                     <TextField label="Harga" type="number" fullWidth value={harga} onChange={(e) => setHarga(Number(e.target.value))} />
-                    <TextField label="Url Gambar" fullWidth value={gambarUrl} onChange={(e) => setGambarUrl(e.target.value)} />
+
+                    {/* Image preview + upload */}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Typography sx={{ fontSize: 14, fontWeight: 500 }}>Gambar Menu</Typography>
+                        {(newImagePreview || gambarUrl) && (
+                            <Box
+                                component="img"
+                                src={newImagePreview || `/api/${gambarUrl}`}
+                                alt="preview"
+                                onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).src =
+                                        "https://blocks.astratic.com/img/general-img-landscape.png";
+                                }}
+                                sx={{
+                                    width: '100%',
+                                    height: 160,
+                                    objectFit: 'cover',
+                                    borderRadius: 2,
+                                    border: '1px solid #eee',
+                                }}
+                            />
+                        )}
+                        <Button
+                            component="label"
+                            variant="outlined"
+                            sx={{ textTransform: 'none', borderColor: '#ccc', color: 'black' }}
+                        >
+                            {newImage ? `Change Image (${newImage.name})` : 'Upload New Image'}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                hidden
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    setNewImage(file);
+                                    setNewImagePreview(URL.createObjectURL(file));
+                                }}
+                            />
+                        </Button>
+                    </Box>
 
                     <Stack direction="row" spacing={2}>
-
                         <FormControl fullWidth>
                             <InputLabel>Kategori Menu</InputLabel>
                             <Select
@@ -371,8 +429,6 @@ export default function HomePageAdmin() {
                             <MenuItem value={false as any}>Non Available</MenuItem>
                         </Select>
                     </FormControl>
-
-
                 </DialogContent>
                 <DialogActions sx={{ p: 3 }}>
                     <Button onClick={() => setOpenEdit(false)} color="inherit">Cancel</Button>

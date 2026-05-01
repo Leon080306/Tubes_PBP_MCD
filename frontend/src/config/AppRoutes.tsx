@@ -5,6 +5,7 @@ import Layout from '../components/Layout';
 const MenuList = lazy(() => import('../pages/customer/MenuList.tsx'));
 //const NavBarAdmin = lazy(() => import('../pages/admin/NavBarAdmin'));
 const LoginAdmin = lazy(() => import('../pages/admin/LoginPageAdmin'));
+const ResetPassword = lazy(() => import('../pages/admin/ResetPassword'));
 const HomePageAdmin = lazy(() => import('../pages/admin/HomePageAdmin'));
 const OrderList = lazy(() => import('../pages/admin/OrderListPage'));
 const ListStaff = lazy(() => import('../pages/admin/StaffPage'));
@@ -30,6 +31,7 @@ export const AppRoutes = () => {
                 <Route path='/admin' element={<HomePageAdmin />} />
                 <Route path='/admin/addMenu' element={<CreateMenu />} />
                 <Route path='/admin/login' element={<LoginAdmin />} />
+                <Route path='/admin/reset-password' element={<ResetPassword />} />
                 <Route path='/admin/orderList' element={<OrderList />} />
                 <Route path='/admin/staffList' element={<ListStaff />} />
                 <Route path='/staff/create' element={<CreateStaff />} />
@@ -39,7 +41,6 @@ export const AppRoutes = () => {
                 <Route path='/category' element={<CategoryPage />} />
                 <Route path='/category/create' element={<CreateCategory />} />
                 <Route path='/category/edit/:category_id' element={<EditCategory />} />
-
             </Routes>
         </Suspense>
     );

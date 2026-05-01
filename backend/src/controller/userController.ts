@@ -2,6 +2,9 @@ import { Staff } from "../models/Staff";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { createTransporter } from "../utils/mailer";
+import nodemailer from "nodemailer";
 
 export const getAllUser = async (req: Request, res: Response) => {
     try {
@@ -77,9 +80,84 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const forgotPassword = async (req: Request, res: Response) => {
     try {
+        const { email } = req.body;
 
+        const staff = await Staff.findOne({ where: { email } });
+        if (!staff) {
+            return res.json({ message: "If that email exists, a reset link has been sent." });
+        }
+
+        const token = crypto.randomBytes(32).toString("hex");
+        const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+        staff.reset_token = tokenHash;  // 👈 store the HASH
+        staff.reset_token_expiry = new Date(Date.now() + 1000 * 60 * 30);
+        await staff.save();
+
+        const resetLink = `http://localhost:5173/admin/reset-password?token=${token}`;
+
+        const { transporter } = await createTransporter();
+
+        const info = await transporter.sendMail({
+            from: '"Support" <support@yourapp.com>',
+            to: staff.email,
+            subject: "Password Reset Request",
+            html: `
+                    <p>Hi ${staff.name},</p>
+                    <p>Click the link below to reset your password. This link expires in 30 minutes.</p>
+                    <a href="${resetLink}">${resetLink}</a>
+                    <p>If you didn't request this, ignore this email.</p>
+                `,
+        });
+
+        console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
+
+        res.json({ message: "If that email exists, a reset link has been sent." });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Forgot Password error" });
+        res.status(500).json({ message: error });
+        throw error;
     }
 }
+
+export const resetPassword = async (req: Request, res: Response) => {
+    try {
+        const { token, newPassword } = req.body;
+        const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+        const staff = await Staff.findOne({ where: { reset_token: tokenHash } });
+
+        if (!staff || !staff.reset_token_expiry || staff.reset_token_expiry < new Date()) {
+            return res.status(400).json({ message: "Invalid or expired token" });
+        }
+
+        staff.password = await bcrypt.hash(newPassword, 10);
+        staff.reset_token = null!;
+        staff.reset_token_expiry = null!;
+        await staff.save();
+
+        res.json({ message: "Password reset successfully" });
+    } catch (error) {
+        res.status(500).json({ message: error });
+    }
+}
+
+export const verifyResetToken = async (req: Request, res: Response) => {
+    try {
+        const { token } = req.query;
+        if (!token || typeof token !== "string") {
+            return res.status(400).json({ valid: false, message: "Token required" });
+        }
+
+        const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+        const staff = await Staff.findOne({ where: { reset_token: tokenHash } });
+
+        if (!staff || !staff.reset_token_expiry || staff.reset_token_expiry < new Date()) {
+            return res.status(400).json({ valid: false, message: "Invalid or expired token" });
+        }
+
+        return res.json({ valid: true });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ valid: false, message: "Server error" });
+    }
+};

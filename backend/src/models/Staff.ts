@@ -18,25 +18,31 @@ export class Staff extends Model {
         type: DataType.STRING,
         allowNull: false,
     })
-    name!: string;
+    declare name: string;
 
     @Column({
         type: DataType.STRING,
         allowNull: false,
     })
-    email!: string;
+    declare email: string;
 
     @Column({
         type: DataType.STRING,
         allowNull: false,
     })
-    password!: string;
+    declare password: string;
 
     @Column({
         type: DataType.ENUM("Admin", "Cashier"),
         allowNull: false,
     })
-    role!: "Admin" | "Cashier";
+    declare role: "Admin" | "Cashier";
+
+    @Column({ type: DataType.STRING, allowNull: true })
+    declare reset_token: string | null;
+
+    @Column({ type: DataType.DATE, allowNull: true })
+    declare reset_token_expiry: Date | null;
 
     @CreatedAt
     declare createdAt: Date;
