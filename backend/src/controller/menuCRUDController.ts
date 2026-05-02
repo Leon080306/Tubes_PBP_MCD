@@ -43,7 +43,6 @@ export const getMenuById = async (req: Request, res: Response, next: NextFunctio
 
 export const createMenu = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        console.log("BODY:", req.body);
         const file = (req as any).file;
 
         const {

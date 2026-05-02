@@ -30,6 +30,7 @@ export const AppRoutes = () => {
     const dispatch = useAppDispatch();
     const [authReady, setAuthReady] = useState(false);
 
+    // hydration
     useEffect(() => {
         const token = Cookies.get('token');
 

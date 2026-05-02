@@ -24,18 +24,21 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
 
     const cartItem = cartItems.find(item => item.cartItemId === cartItemId)
 
+    // check if cart items exist
     useEffect(() => {
         if (!cartItemId || cartItems.find(item => item.cartItemId === cartItemId) === undefined) {
             navigate("/menu");
         }
     }, [cartItemId, cartItems, navigate]);
 
+    // reload menu item
     useEffect(() => {
         if (cartItemId) {
             reload(cartItemId);
         }
     }, [cartItemId]);
 
+    // set hasOptions and hasVariants
     useEffect(() => {
         setHasOptions((menu?.mos?.length ?? 0) > 0);
         setHasVariants((menu?.mvs?.length ?? 0) > 0);

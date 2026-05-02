@@ -23,7 +23,7 @@ export default function MakePackage({ onNext }: PackageSelectionProps) {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    // reload paket menus
+    // reload menu item
     useEffect(() => {
         if (cartItemId) {
             reload(cartItemId);

@@ -10,6 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
 import { cartActions } from "../../store/cartSlice";
 import { useCreateOrder } from "../../hooks/useCreateOrder";
+import type { order_type } from "../../type";
 
 export default function CartCashier() {
     const items = useSelector((state: any) => state.cart.cartItems);
@@ -24,9 +25,9 @@ export default function CartCashier() {
         (sum: number, item: any) => sum + item.price * item.quantity, 0
     );
 
-    const handleCheckout = async () => {
+    const handleCheckout = async (orderType: order_type) => {
         const payload = {
-            order_type: "Dine-in" as const,
+            order_type: orderType,
             total_harga: total,
             items: items.map((item: any) => ({
                 menu_id: item.menu.menu_id,
@@ -103,18 +104,27 @@ export default function CartCashier() {
                     ))}
                 </Box>
 
-                <Box sx={{ borderTop: "1px solid #eee", pt: 2 }}>
-                    <Typography sx={{ fontWeight: "bold" }}>
-                        Total: Rp {total.toLocaleString()}
-                    </Typography>
-
+                <Box sx={{
+                    borderTop: "1px solid #eee",
+                    pt: 2,
+                    display: "flex",
+                    gap: "12px"
+                }}>
                     <Button
                         variant="contained"
                         fullWidth
-                        onClick={handleCheckout}
-                        sx={{ mt: 2, background: "#ffbc0d", color: "#000" }}
+                        onClick={() => handleCheckout("Dine-in")}
+                        sx={{ mt: 2, background: "#ffbc0d", color: "#000", flex: 1 }}
                     >
-                        Checkout
+                        Dine In
+                    </Button>
+                    <Button
+                        variant="contained"
+                        fullWidth
+                        onClick={() => handleCheckout("Takeaway")}
+                        sx={{ mt: 2, background: "#ffbc0d", color: "#000", flex: 1 }}
+                    >
+                        Takeaway
                     </Button>
                 </Box>
             </Box>

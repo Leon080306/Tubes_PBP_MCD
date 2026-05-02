@@ -43,12 +43,11 @@ export class menuController {
         });
     }
 
-    static async getRecommendation(req: Request, res: Response,  next: NextFunction) {
+    static async getRecommendation(req: Request, res: Response, next: NextFunction) {
         try {
             const { menu_id } = req.params;
             const limit = parseInt(req.query.limit as string) || 5;
 
-            // Step 1: Cari order_id yang mengandung menu_id ini
             const ordersWithMenu = await OrderMenu.findAll({
                 where: { menu_id },
                 attributes: ['order_id'],
@@ -61,11 +60,10 @@ export class menuController {
                 return res.status(200).json([]);
             }
 
-            // Step 2: Hitung menu lain yang muncul di order tersebut
             const recommendations = await OrderMenu.findAll({
                 where: {
                     order_id: { [Op.in]: orderIds },
-                    menu_id: { [Op.ne]: menu_id },  // exclude menu itu sendiri
+                    menu_id: { [Op.ne]: menu_id },
                 },
                 attributes: [
                     'menu_id',
@@ -87,7 +85,7 @@ export class menuController {
 
             res.status(200).json(recommendations);
         } catch (error) {
-           next(error)
+            next(error)
         }
 
     }

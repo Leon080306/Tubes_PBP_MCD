@@ -24,16 +24,20 @@ export default function Cart() {
 
     const [successOpen, setSuccessOpen] = useState(false);
 
+    // redirect to home if cart is empty
     useEffect(() => {
         if (cartItems.length === 0 && !successOpen) navigate("/")
     }, [cartItems, successOpen])
 
+    // auto close success dialog
     useEffect(() => {
         if (!successOpen) return;
         const timer = setTimeout(() => handleSuccessClose(), 15000);
         return () => clearTimeout(timer);
     }, [successOpen]);
 
+
+    // handle success dialog
     const handleSuccessClose = () => {
         setSuccessOpen(false);
         dispatch(cartActions.clearCart());
@@ -41,6 +45,7 @@ export default function Cart() {
         navigate("/");
     };
 
+    // handle cart actions
     const handleIncrement = (cartItemId: string) =>
         dispatch(cartActions.increaseQuantity(cartItemId));
 
@@ -56,6 +61,7 @@ export default function Cart() {
         navigate(`/order/${cartItemId}`);
     };
 
+    // function to calculate menu price with variants and options
     const calculateMenuPrice = (cartItem: CartItem) => {
         const totalOptionsPrice = cartItem.selectedOptions?.reduce((sum, option) => sum + option.tambahan_harga, 0);
         const variantPrice = cartItem.selectedVariant?.harga_tambahan ?? 0;
@@ -64,9 +70,11 @@ export default function Cart() {
         return totalPrice;
     }
 
+    // calculate total
     const subtotal = cartItems.reduce((sum, i) => sum + calculateMenuPrice(i), 0);
     const total = subtotal;
 
+    // handle checkout
     const handleCheckout = async () => {
         if (cartItems.length === 0) return;
         if (!orderType) return;

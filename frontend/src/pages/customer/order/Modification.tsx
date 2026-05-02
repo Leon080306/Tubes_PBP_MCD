@@ -29,18 +29,21 @@ export default function Modification({ onNext }: PackageSelectionProps) {
         cartItem?.selectedOptions ?? []
     );
 
+    // check if cart items exist
     useEffect(() => {
         if (!cartItemId || cartItem === undefined) {
             navigate("/menu");
         }
     }, [cartItemId, cartItem, navigate]);
 
+    // reload menu item
     useEffect(() => {
         if (cartItemId) {
             reload(cartItemId);
         }
     }, [cartItemId, reload]);
 
+    // set selectedVariant
     const handleVariantToggle = (varian: MenuVarian) => {
         const next = selectedVariant?.mv_id === varian.mv_id ? null : varian;
         setSelectedVariant(next);
@@ -50,6 +53,7 @@ export default function Modification({ onNext }: PackageSelectionProps) {
         }));
     };
 
+    // set selectedOptions
     const handleOptionToggle = (option: MenuOption) => {
         const exists = selectedOptions.some(o => o.mo_id === option.mo_id);
         const next = exists
@@ -62,6 +66,7 @@ export default function Modification({ onNext }: PackageSelectionProps) {
         }));
     };
 
+    // reset selectedVariant and selectedOptions
     const handleHapusPerubahan = () => {
         setSelectedVariant(null);
         setSelectedOptions([]);

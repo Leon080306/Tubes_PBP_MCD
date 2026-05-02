@@ -21,24 +21,28 @@ export default function Recomendation({ onNext }: PackageSelectionProps) {
     const { menu, reload: reloadMenu } = useGetMenu();
     const { recommendations, state: recState, reload: reloadRecommendations } = useGetRecommendations();
 
+    // reload menu
     useEffect(() => {
         if (cartItemId) {
             reloadMenu(cartItemId);
         }
     }, [cartItemId, reloadMenu]);
 
+    // reload recommendations
     useEffect(() => {
         if (menu?.menu_id) {
             reloadRecommendations(menu.menu_id, 5);
         }
     }, [menu?.menu_id, reloadRecommendations]);
 
+    // redirect to cart if there is no recommendation
     useEffect(() => {
         if (recState === "success" && recommendations.length === 0) {
             navigate("/cart");
         }
     }, [recState, recommendations.length, onNext]);
 
+    // handle select recommendation
     const handleSelectRecommendation = (recommendedMenu: Menu) => {
         const newCartItemId = uuidv4();
         dispatch(cartActions.addToCart({

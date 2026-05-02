@@ -179,7 +179,7 @@ export default function Layout() {
                                             fontWeight: 600,
                                             fontSize: "14px"
                                         }}>
-                                            {item.quantity}× {item.menu.nama}
+                                            {item.quantity}x {item.menu.nama}
                                         </Typography>
                                         <Typography sx={{
                                             fontWeight: 600,
