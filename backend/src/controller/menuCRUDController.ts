@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { Menu } from "../models/Menu";
 import { Category } from "../models/Category";
 import { MenuVarian } from "../models/MenuVarian";
 import { MenuOption } from "../models/MenuOption";
 
 
-export const getMenus = async (_req: Request, res: Response) => {
+export const getMenus = async (_req: Request, res: Response,  next: NextFunction) => {
     try {
         const menus = await Menu.findAll({
             include: [
@@ -17,11 +17,11 @@ export const getMenus = async (_req: Request, res: Response) => {
 
         return res.json({ records: menus });
     } catch (error: any) {
-        return res.status(500).json({ message: error.message });
+        next(error)
     }
 };
 
-export const getMenuById = async (req: Request, res: Response) => {
+export const getMenuById = async (req: Request, res: Response,  next: NextFunction) => {
     try {
         const id = req.params.id;
 
@@ -37,11 +37,11 @@ export const getMenuById = async (req: Request, res: Response) => {
 
         return res.json(menu);
     } catch (error: any) {
-        return res.status(500).json({ message: error.message });
+        next(error)
     }
 };
 
-export const createMenu = async (req: Request, res: Response) => {
+export const createMenu = async (req: Request, res: Response,  next: NextFunction) => {
     try {
         console.log("BODY:", req.body);
         const file = (req as any).file;
@@ -102,13 +102,12 @@ export const createMenu = async (req: Request, res: Response) => {
             data: menu
         });
 
-    } catch (error: any) {
-        console.error(error);
-        return res.status(500).json({ message: error.message });
+    } catch (error) {
+        next(error)
     }
 };
 
-export const updateMenu = async (req: Request, res: Response) => {
+export const updateMenu = async (req: Request, res: Response,  next: NextFunction) => {
     try {
         const id = req.params.id;
         const file = (req as any).file;
@@ -152,13 +151,12 @@ export const updateMenu = async (req: Request, res: Response) => {
             data: menu
         });
 
-    } catch (error: any) {
-        console.error(error);
-        return res.status(500).json({ message: error.message });
+    } catch (error) {
+        next(error);
     }
 };
 
-export const deleteMenu = async (req: Request, res: Response) => {
+export const deleteMenu = async (req: Request, res: Response,  next: NextFunction) => {
     try {
         const id = req.params.id;
 
@@ -176,6 +174,6 @@ export const deleteMenu = async (req: Request, res: Response) => {
 
         return res.json({ message: "Menu deleted" });
     } catch (error: any) {
-        return res.status(500).json({ message: error.message });
+        next(error);
     }
 };

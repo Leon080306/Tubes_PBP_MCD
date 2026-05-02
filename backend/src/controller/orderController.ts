@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { Order } from "../models/Order";
 import { OrderMenu } from "../models/OrderMenu";
 import { OrderMenuOption } from "../models/OrderMenuOption";
@@ -6,7 +6,7 @@ import { Menu } from "../models/Menu";
 import { MenuVarian } from "../models/MenuVarian";
 import { MenuOption } from "../models/MenuOption";
 
-export const getAllOrder = async (req: Request, res: Response) => {
+export const getAllOrder = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const order = await Order.findAll({
             order: [['order_no', 'ASC']],
@@ -40,12 +40,11 @@ export const getAllOrder = async (req: Request, res: Response) => {
         });
         res.json(order);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Get All Order error" });
+        next(error)
     }
 }
 
-export const getTOrderById = async (req: Request, res: Response) => {
+export const getTOrderById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { order_id } = req.params;
         const order = await Order.findOne({
@@ -92,12 +91,11 @@ export const getTOrderById = async (req: Request, res: Response) => {
         })
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Get Order by ID error" })
+        next(error)
     }
 }
 
-export const createOrder = async (req: Request, res: Response) => {
+export const createOrder = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { total_harga, order_type, items } = req.body;
 
@@ -191,12 +189,11 @@ export const createOrder = async (req: Request, res: Response) => {
         })
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Create Order error" })
+        next(error)
     }
 }
 
-export const updateOrder = async (req: Request, res: Response) => {
+export const updateOrder = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { order_id } = req.params;
 
@@ -221,7 +218,6 @@ export const updateOrder = async (req: Request, res: Response) => {
         })
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Get Order by ID error" })
+        next(error);
     }
 }

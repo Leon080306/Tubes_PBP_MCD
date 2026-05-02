@@ -1,22 +1,21 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { Category } from "../models/Category";
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from "bcrypt";
 
 
-export const getAllCategory = async (req: Request, res: Response) => {
+export const getAllCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const category = await Category.findAll({
             order: [['sort_order', 'ASC']],
         });
         res.json(category);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Get All Category error" });
+       next(error);
     }
 }
 
-export const getCategoryById = async (req: Request, res: Response) => {
+export const getCategoryById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { category_id } = req.params;
         const category = await Category.findOne({
@@ -38,12 +37,11 @@ export const getCategoryById = async (req: Request, res: Response) => {
         })
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Get category by ID error" })
+        next(error);
     }
 }
 
-export const createCategory = async (req: Request, res: Response) => {
+export const createCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const payload = req.body;
         payload.category_id = uuidv4();
@@ -81,12 +79,11 @@ export const createCategory = async (req: Request, res: Response) => {
             }
         })
     } catch (error: any) {
-        console.error(error);
-        res.status(500).json({ message: "Gagal Create Category", detail: error.message })
+        next(error);
     }
 }
 
-export const updateCategory = async (req: Request, res: Response) => {
+export const updateCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { category_id } = req.params;
 
@@ -126,12 +123,11 @@ export const updateCategory = async (req: Request, res: Response) => {
         })
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Get Category by ID error" })
+        next(error)
     }
 }
 
-export const deleteCategory = async (req: Request, res: Response) => {
+export const deleteCategory = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { category_id } = req.params;
         const category = await Category.findOne({
@@ -156,7 +152,6 @@ export const deleteCategory = async (req: Request, res: Response) => {
         })
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Get Category by ID error" })
+        next(error)
     }
 }
