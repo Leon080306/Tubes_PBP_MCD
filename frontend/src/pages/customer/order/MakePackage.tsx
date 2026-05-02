@@ -33,7 +33,7 @@ export default function MakePackage({ onNext }: PackageSelectionProps) {
     // check if cart items exist
     useEffect(() => {
         if (!cartItemId || cartItems.find(item => item.cartItemId === cartItemId) === undefined) {
-            navigate("/");
+            navigate("/menu");
         }
     }, [cartItemId, cartItems, navigate]);
 

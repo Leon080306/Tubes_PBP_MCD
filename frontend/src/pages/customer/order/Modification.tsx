@@ -31,7 +31,7 @@ export default function Modification({ onNext }: PackageSelectionProps) {
 
     useEffect(() => {
         if (!cartItemId || cartItem === undefined) {
-            navigate("/");
+            navigate("/menu");
         }
     }, [cartItemId, cartItem, navigate]);
 

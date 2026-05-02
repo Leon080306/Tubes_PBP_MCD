@@ -26,7 +26,7 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
 
     useEffect(() => {
         if (!cartItemId || cartItems.find(item => item.cartItemId === cartItemId) === undefined) {
-            navigate("/");
+            navigate("/menu");
         }
     }, [cartItemId, cartItems, navigate]);
 
@@ -123,7 +123,7 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
             }}>
                 <Button variant="outlined" onClick={() => {
                     dispatch(cartActions.removeFromCart(cartItemId ?? ""));
-                    navigate("/")
+                    navigate("/menu")
                 }} sx={{
                     color: "black",
                     border: "1px solid rgba(0,0,0,0.2)",
