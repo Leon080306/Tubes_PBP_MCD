@@ -1,12 +1,12 @@
 import express from "express";
 // import dotenv from 'dotenv';
-import globalStaffApi from './roots/GlobalStaffApi';
+import globalStaffApi from './routes/GlobalStaffApi';
 import sequelize from "./../config/database";
 import "reflect-metadata";
 import cors from 'cors';
 import menuRouter from "./routes/menuRoutes";
 import Catego from "./routes/menuRoutes";
-import pakeRouter from "./roots/PaketRoutes";
+import pakeRouter from "./routes/PaketRoutes";
 import path from "path";
 import { errorHandlerMiddleware } from "./middlewares/errorMiddleware";
 import { loggerMiddleware } from "./middlewares/loggerMiddleware";
