@@ -15,7 +15,7 @@ const ListStaff = lazy(() => import('../pages/admin/StaffPage'));
 const CreateStaff = lazy(() => import('../pages/admin/CreateStaffPage'));
 const EditStaff = lazy(() => import('../pages/admin/EditStaffPage'));
 const CreateMenu = lazy(() => import('../pages/admin/CreateMenuPage'));
-const CashierPage = lazy(() => import('../pages/admin/CashierPage'));
+const CashierPage = lazy(() => import('../pages/cashier/CashierLayout'));
 const FormResetPassword = lazy(() => import('../pages/admin/FormResetPassword'));
 const OrderMenu = lazy(() => import('../pages/customer/order/OrderMenu'));
 const CategoryPage = lazy(() => import('../pages/admin/CategoryPage'));
