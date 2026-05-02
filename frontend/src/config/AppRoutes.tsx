@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect } from 'react';
+/* eslint-disable react-hooks/set-state-in-effect */
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router';
 import Cookies from 'js-cookie';
 import Layout from '../components/Layout';
@@ -27,10 +28,15 @@ const EditCategory = lazy(() => import('../pages/admin/EditCategoryPage'));
 
 export const AppRoutes = () => {
     const dispatch = useAppDispatch();
+    const [authReady, setAuthReady] = useState(false);
 
     useEffect(() => {
         const token = Cookies.get('token');
-        if (!token) return;
+
+        if (!token) {
+            setAuthReady(true);
+            return;
+        }
 
         fetch('/api/user/me', {
             headers: { Authorization: `Bearer ${token}` },
@@ -46,8 +52,15 @@ export const AppRoutes = () => {
             })
             .catch(() => {
                 Cookies.remove('token');
+            })
+            .finally(() => {
+                setAuthReady(true);
             });
     }, [dispatch]);
+
+    if (!authReady) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <Suspense fallback={<div>Loading...</div>}>

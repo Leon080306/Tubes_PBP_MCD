@@ -19,19 +19,29 @@ export const getOneUser = async (req: Request, res: Response, next: NextFunction
     try {
         const staffData = (req as any).user;
         if (!staffData) {
-            return res.status(404).json({
-                message: "Data tidak bisa di temukan"
-            })
+            return res.status(404).json({ message: "Data tidak ditemukan" });
+        }
+
+        const staff = await Staff.findOne({
+            where: { staff_id: staffData.id },
+            attributes: {
+                exclude: ['password', 'reset_token', 'reset_token_expiry']
+            },
+        });
+
+        if (!staff) {
+            return res.status(404).json({ message: "Staff not found" });
         }
 
         res.status(200).json({
-            message: "succes",
-            user: staffData
-        })
+            message: "success",
+            user: staff
+        });
     } catch (error) {
-        next(error)
+        next(error);
     }
-}
+};
+
 export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password } = req.body;
