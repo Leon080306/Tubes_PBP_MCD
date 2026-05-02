@@ -299,7 +299,7 @@ export default function Cart() {
                 <Box sx={{ display: "flex", gap: "12px", mt: "8px" }}>
                     <Button
                         variant="outlined"
-                        onClick={() => navigate("/")}
+                        onClick={() => navigate("/menu")}
                         disabled={isSubmitting}
                         sx={{
                             flex: 1,

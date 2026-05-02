@@ -327,7 +327,6 @@ export default function OrderListPage() {
                         <FormControl fullWidth>
                             <InputLabel>Status</InputLabel>
                             <Select value={status} label="Status" onChange={(e) => setStatus(e.target.value)}>
-                                <MenuItem value="Cart">Cart</MenuItem>
                                 <MenuItem value="Paid">Paid</MenuItem>
                                 <MenuItem value="Process">Process</MenuItem>
                                 <MenuItem value="Done">Done</MenuItem>

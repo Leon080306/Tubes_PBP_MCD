@@ -40,8 +40,13 @@ function MenuCardItem({ item, onEdit, onDelete }: {
         >
             <Box
                 component="img"
-                src={`/${item.gambarUrl}`}
-                alt={item.nama}
+                src={item.gambarUrl ? `/api/${item.gambarUrl}` : FALLBACK_IMAGE}
+                onError={(e) => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    if (img.src !== FALLBACK_IMAGE) {
+                        img.src = FALLBACK_IMAGE;
+                    }
+                }}
                 sx={{
                     width: "100%",
                     height: "100px",

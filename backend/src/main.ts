@@ -8,6 +8,7 @@ import menuRouter from "./routes/menuRoutes";
 import Catego from "./routes/menuRoutes";
 import pakeRouter from "./roots/PaketRoutes";
 import path from "path";
+import { errorHandlerMiddleware } from "./middlewares/errorMiddleware";
 
 const app = express();
 
@@ -17,9 +18,11 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.json());
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
-app.use('/api', globalStaffApi);
+app.use('/', globalStaffApi);
 app.use("/menu", menuRouter)
 app.use("/paket", pakeRouter)
+
+app.use(errorHandlerMiddleware);
 
 async function start() {
     try {

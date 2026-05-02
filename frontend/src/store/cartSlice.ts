@@ -75,6 +75,13 @@ export const cartSlice = createSlice({
             }
         },
 
+        setQuantity: (state, action: PayloadAction<{ cartItemId: string, quantity: number }>) => {
+            const item = state.cartItems.find(
+                item => item.cartItemId === action.payload.cartItemId
+            )
+            if (item) item.quantity = action.payload.quantity
+        },
+
         clearCart: (state) => {
             state.cartItems = []
         }

@@ -11,7 +11,7 @@ export const getAllCategory = async (req: Request, res: Response, next: NextFunc
         });
         res.json(category);
     } catch (error) {
-       next(error);
+        next(error);
     }
 }
 
@@ -101,7 +101,7 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
                 message: "Category dengan ID tersebut tidak ditemukan"
             })
         }
-        
+
         if (sort_order !== undefined) {
             const cekSortOrder = await Category.findOne({ where: { sort_order } });
 

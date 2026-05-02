@@ -5,7 +5,7 @@ import { MenuVarian } from "../models/MenuVarian";
 import { MenuOption } from "../models/MenuOption";
 
 
-export const getMenus = async (_req: Request, res: Response,  next: NextFunction) => {
+export const getMenus = async (_req: Request, res: Response, next: NextFunction) => {
     try {
         const menus = await Menu.findAll({
             include: [
@@ -21,7 +21,7 @@ export const getMenus = async (_req: Request, res: Response,  next: NextFunction
     }
 };
 
-export const getMenuById = async (req: Request, res: Response,  next: NextFunction) => {
+export const getMenuById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id;
 
@@ -41,7 +41,7 @@ export const getMenuById = async (req: Request, res: Response,  next: NextFuncti
     }
 };
 
-export const createMenu = async (req: Request, res: Response,  next: NextFunction) => {
+export const createMenu = async (req: Request, res: Response, next: NextFunction) => {
     try {
         console.log("BODY:", req.body);
         const file = (req as any).file;
@@ -107,7 +107,7 @@ export const createMenu = async (req: Request, res: Response,  next: NextFunctio
     }
 };
 
-export const updateMenu = async (req: Request, res: Response,  next: NextFunction) => {
+export const updateMenu = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id;
         const file = (req as any).file;
@@ -130,21 +130,20 @@ export const updateMenu = async (req: Request, res: Response,  next: NextFunctio
             isAvailable
         } = req.body;
 
-        let gambarUrl = null;
-
-        if (file) {
-            const folder = (req as any).uploadFolder ?? "menus";
-            gambarUrl = `uploads/${folder}/${file.filename}`;
-        }
-
-        await menu.update({
+        const updateData: any = {
             nama,
             harga_awal,
             tipe_menu,
             category_id,
             isAvailable,
-            gambarUrl
-        });
+        };
+
+        if (file) {
+            const folder = (req as any).uploadFolder ?? "menus";
+            updateData.gambarUrl = `uploads/${folder}/${file.filename}`;
+        }
+
+        await menu.update(updateData);
 
         return res.json({
             success: true,
@@ -156,7 +155,7 @@ export const updateMenu = async (req: Request, res: Response,  next: NextFunctio
     }
 };
 
-export const deleteMenu = async (req: Request, res: Response,  next: NextFunction) => {
+export const deleteMenu = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id;
 
