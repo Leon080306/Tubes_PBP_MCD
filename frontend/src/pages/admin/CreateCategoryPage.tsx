@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import { Container, Typography, TextField, Button, Paper, Stack, MenuItem, Box } from "@mui/material";
+import { Container, Typography, TextField, Button, Paper, Stack, Box } from "@mui/material";
 import { useNavigate } from "react-router";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NavBar from './NavBarAdmin';
@@ -24,12 +25,13 @@ export default function CreateCategoryPage() {
                 navigate("/admin/login");
                 return;
             }
-            
+
             const response = await fetch('/api/category/create', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json',
+                headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
-                 },
+                },
                 body: JSON.stringify(form)
             });
 
@@ -58,22 +60,22 @@ export default function CreateCategoryPage() {
                     <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3 }}>New Category</Typography>
 
                     {/* <form onSubmit={handleCreate}> */}
-                        <Stack spacing={3}>
-                            <TextField label="Name" fullWidth required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                            <TextField label="Sort Order" type="number" fullWidth required value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })} />
-                            
-                            <Button onClick={handleCreate} variant="contained" size="large" sx={{
-                                bgcolor: '#D52B1E',
-                                color: 'white',
-                                fontWeight: 'bold',
-                                py: 1.5,
-                                borderRadius: 2,
-                                '&:hover': {
-                                    bgcolor: '#b32419',
-                                    boxShadow: '0 6px 15px rgba(211, 47, 47, 0.3)'
-                                }
-                            }}>Add Category</Button>
-                        </Stack>
+                    <Stack spacing={3}>
+                        <TextField label="Name" fullWidth required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                        <TextField label="Sort Order" type="number" fullWidth required value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })} />
+
+                        <Button onClick={handleCreate} variant="contained" size="large" sx={{
+                            bgcolor: '#D52B1E',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            py: 1.5,
+                            borderRadius: 2,
+                            '&:hover': {
+                                bgcolor: '#b32419',
+                                boxShadow: '0 6px 15px rgba(211, 47, 47, 0.3)'
+                            }
+                        }}>Add Category</Button>
+                    </Stack>
                     {/* </form> */}
                 </Paper>
             </Container>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import { Container, Typography, TextField, Button, Paper, Stack, MenuItem, Box } from "@mui/material";
 import { useNavigate } from "react-router";
@@ -71,7 +72,7 @@ export default function CreateMenuPage() {
         formData.append("options", JSON.stringify(options));
 
         try {
-            const response = await fetch('/api/menu/', {
+            const response = await fetch('/api/admin/menu/', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData

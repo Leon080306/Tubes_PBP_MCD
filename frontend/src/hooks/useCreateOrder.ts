@@ -30,7 +30,7 @@ export function useCreateOrder() {
     const createOrder = useCallback(async (payload: CreateOrderPayload) => {
         setState("loading");
         try {
-            const response = await fetch(`/api/api/order`, {
+            const response = await fetch(`/api/order`, {
                 method: "POST",
                 headers: {
                     "content-type": "application/json",

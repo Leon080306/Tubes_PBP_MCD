@@ -15,7 +15,7 @@ router.use("/user", UserRoutes);
 
 // router.use(authMiddleware);
 router.use("/staff", authMiddleware, StaffRoutes);
-router.use("/menu", authMiddleware, MenuAdminRoutes);
+router.use("/admin/menu", authMiddleware, MenuAdminRoutes);
 router.use("/order", OrderRoutes);
 router.use("/category", CategoryRoutes);
 

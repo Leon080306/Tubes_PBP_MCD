@@ -77,7 +77,7 @@ export default function MenuList() {
     }, []);
 
     useEffect(() => {
-        fetch("http://localhost:3000/api/category")
+        fetch("http://localhost:3000/category")
             .then((res) => res.json())
             .then((data) => setCategories(data))
             .catch((err) => console.error(err));

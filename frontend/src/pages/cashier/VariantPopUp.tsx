@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
     Button, Typography, Box, FormControlLabel, Checkbox, Radio, RadioGroup
@@ -22,8 +23,8 @@ export default function VariantModal({ open, onClose, menu, onConfirm }: Props) 
 
     if (!menu) return null;
 
-    const variants = menu.mvs || []; 
-    const options = menu.mos || []; 
+    const variants = menu.mvs || [];
+    const options = menu.mos || [];
 
     const toggleOption = (id: string) => {
         setSelectedOptions((prev) =>
@@ -56,8 +57,8 @@ export default function VariantModal({ open, onClose, menu, onConfirm }: Props) 
 
             <DialogContent>
                 {variants.length > 0 && (
-                    <Box mb={2}>
-                        <Typography fontWeight="bold">Pilih Varian</Typography>
+                    <Box sx={{ mb: 2 }}>
+                        <Typography sx={{ fontWeight: "bold" }}>Pilih Varian</Typography>
                         <RadioGroup
                             value={selectedVariantId || ""}
                             onChange={(e) => setSelectedVariantId(e.target.value)}
@@ -76,7 +77,7 @@ export default function VariantModal({ open, onClose, menu, onConfirm }: Props) 
 
                 {options.length > 0 && (
                     <Box>
-                        <Typography fontWeight="bold">Tambahan</Typography>
+                        <Typography sx={{ fontWeight: "bold" }}>Tambahan</Typography>
                         {options.map(o => (
                             <FormControlLabel
                                 key={o.mo_id}

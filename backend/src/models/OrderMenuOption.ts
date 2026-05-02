@@ -1,4 +1,4 @@
-import { Table, Column, Model, DataType, PrimaryKey, BelongsTo, CreatedAt, UpdatedAt } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, BelongsTo, CreatedAt, UpdatedAt, DeletedAt } from 'sequelize-typescript';
 import { OrderMenu } from './OrderMenu.js';
 import { MenuOption } from './MenuOption.js';
 
@@ -29,6 +29,9 @@ export class OrderMenuOption extends Model {
 
     @UpdatedAt
     declare updatedAt: Date;
+
+    @DeletedAt
+    declare deletedAt: Date;
 
     @BelongsTo(() => OrderMenu, 'om_id')
     orderMenu!: OrderMenu;

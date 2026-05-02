@@ -133,21 +133,6 @@ export default function NavBar() {
                             </>
                         )}
 
-                        {userInfo.role === 'Cashier' && (
-                            <Button sx={{
-                                backgroundColor: "#FDC82F",
-                                color: 'white',
-                                boxShadow: 3,
-                                '&:hover': {
-                                    backgroundColor: "#ffdb70",
-                                    transform: 'translateY(-5px)',
-                                    boxShadow: 6,
-                                }
-                            }} onClick={() => navigate('/cashier/addOrder')}>
-                                Add Order
-                            </Button>
-                        )}
-
                         <Button
                             variant="contained"
                             sx={{

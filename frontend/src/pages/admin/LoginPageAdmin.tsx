@@ -19,7 +19,6 @@ export default function LoginPageAdmin() {
 
     const [popUpEmail, setPopUpEmail] = useState(false);
     const [emailForgotPw, setEmailForgotPw] = useState('');
-    const [loadingForgot, setLoadingForgot] = useState(false);
 
     const login = async () => {
         if (!isEmail(email)) {
@@ -174,7 +173,6 @@ export default function LoginPageAdmin() {
                     <Button
                         onClick={handleSendForgotEmail}
                         variant="contained"
-                        disabled={loadingForgot}
                         sx={{
                             bgcolor: '#D52B1E',
                             borderRadius: 2,

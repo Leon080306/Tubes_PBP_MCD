@@ -49,7 +49,7 @@ export default function FormResetPassword() {
             <div className="login-container" style={{ backgroundImage: `url(${bgLogin})` }}>
                 <div className="login-overlay">
                     <div className="login-card">
-                        <Typography variant="h4" className="login-title" sx={{ mb: 10}}>
+                        <Typography variant="h4" className="login-title" sx={{ mb: 10 }}>
                             New Password
                         </Typography>
 

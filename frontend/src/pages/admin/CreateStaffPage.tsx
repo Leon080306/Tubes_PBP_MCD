@@ -28,9 +28,10 @@ export default function CreateStaffPage() {
             }
             const response = await fetch('/api/staff/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json',
+                headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
-                 },
+                },
                 body: JSON.stringify(form)
             });
 
@@ -59,33 +60,33 @@ export default function CreateStaffPage() {
                     <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3 }}>Register New Staff</Typography>
 
                     {/* <form onSubmit={handleCreate}> */}
-                        <Stack spacing={3}>
-                            <TextField label="Name" fullWidth required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                            <TextField label="Email Address" type="email" fullWidth required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-                            <TextField label="Password" type="password" fullWidth required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
-                            <TextField
-                                select
-                                label="Select Role"
-                                fullWidth
-                                required
-                                value={form.role}
-                                onChange={(e) => setForm({ ...form, role: e.target.value })}
-                            >
-                                <MenuItem value="Admin">Admin</MenuItem>
-                                <MenuItem value="Cashier">Cashier</MenuItem>
-                            </TextField>
-                            <Button onClick={handleCreate} variant="contained" size="large" sx={{
-                                bgcolor: '#D52B1E',
-                                color: 'white',
-                                fontWeight: 'bold',
-                                py: 1.5,
-                                borderRadius: 2,
-                                '&:hover': {
-                                    bgcolor: '#b32419',
-                                    boxShadow: '0 6px 15px rgba(211, 47, 47, 0.3)'
-                                }
-                            }}>Register Staff</Button>
-                        </Stack>
+                    <Stack spacing={3}>
+                        <TextField label="Name" fullWidth required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                        <TextField label="Email Address" type="email" fullWidth required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                        <TextField label="Password" type="password" fullWidth required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+                        <TextField
+                            select
+                            label="Select Role"
+                            fullWidth
+                            required
+                            value={form.role}
+                            onChange={(e) => setForm({ ...form, role: e.target.value })}
+                        >
+                            <MenuItem value="Admin">Admin</MenuItem>
+                            <MenuItem value="Cashier">Cashier</MenuItem>
+                        </TextField>
+                        <Button onClick={handleCreate} variant="contained" size="large" sx={{
+                            bgcolor: '#D52B1E',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            py: 1.5,
+                            borderRadius: 2,
+                            '&:hover': {
+                                bgcolor: '#b32419',
+                                boxShadow: '0 6px 15px rgba(211, 47, 47, 0.3)'
+                            }
+                        }}>Register Staff</Button>
+                    </Stack>
                     {/* </form> */}
                 </Paper>
             </Container>

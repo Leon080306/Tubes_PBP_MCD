@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Box, Typography, Button, Container, Stack, IconButton, Dialog, DialogTitle, TextField, DialogContent, FormControl, InputLabel, Select, MenuItem, DialogActions } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { Menu } from "../../type"
@@ -6,6 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from "react-router";
 import Cookies from 'js-cookie';
+import { FALLBACK_IMAGE } from "../../constants";
 
 function MenuCardItem({ item, onEdit, onDelete }: {
     item: Menu;
@@ -106,7 +108,6 @@ function MenuCardItem({ item, onEdit, onDelete }: {
 export default function HomePageAdmin() {
     const navigate = useNavigate();
     const [menu, setMenu] = useState<Menu[]>([]);
-    const [category, setCategory] = useState<string>("All");
 
     const [openEdit, setOpenEdit] = useState(false);
     const [menuId, setMenuId] = useState("");
@@ -134,7 +135,7 @@ export default function HomePageAdmin() {
                 navigate("/admin/login");
                 return;
             }
-            const res = await fetch("/api/menu/", {
+            const res = await fetch("/api/admin/menu/", {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -159,23 +160,23 @@ export default function HomePageAdmin() {
         setOpenEdit(true);
     }
 
-    const handleOpenEdit = (menu: Menu) => {
-        setNama(menu.nama);
-        setHarga(menu.harga_awal);
-        setGambarUrl(menu.gambarUrl);
-        setCategoryId(menu.category_id);
-        setTipeMenu(menu.tipe_menu);
-        setAvailable(menu.isAvailable ?? true);
-        setNewImage(null);
-        setNewImagePreview("");
-        setOpenEdit(true);
-    };
+    // const handleOpenEdit = (menu: Menu) => {
+    //     setNama(menu.nama);
+    //     setHarga(menu.harga_awal);
+    //     setGambarUrl(menu.gambarUrl);
+    //     setCategoryId(menu.category_id);
+    //     setTipeMenu(menu.tipe_menu);
+    //     setAvailable(menu.isAvailable ?? true);
+    //     setNewImage(null);
+    //     setNewImagePreview("");
+    //     setOpenEdit(true);
+    // };
 
     const handleDelete = async (id: string) => {
         if (window.confirm("Yakin ingin menghapus menu ini?")) {
             try {
                 const token = Cookies.get('token');
-                const response = await fetch(`/api/menu/${id}`, {
+                const response = await fetch(`/api/admin/menu/${id}`, {
                     method: "DELETE",
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -203,7 +204,7 @@ export default function HomePageAdmin() {
         }
 
         try {
-            const response = await fetch(`/api/menu/${menuId}`, {
+            const response = await fetch(`/api/admin/menu/${menuId}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData,
@@ -213,7 +214,7 @@ export default function HomePageAdmin() {
                 setOpenEdit(false);
                 setNewImage(null);
                 setNewImagePreview("");
-                await fetchMenu();   // 👈 refresh list
+                await fetchMenu();
             }
         } catch (error) {
             console.error("Error: ", error);
@@ -222,7 +223,7 @@ export default function HomePageAdmin() {
 
     useEffect(() => {
         const token = Cookies.get('token');
-        fetch("/api/menu/", {
+        fetch("/api/admin/menu/", {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -249,12 +250,7 @@ export default function HomePageAdmin() {
             .then(data => setCategories(data));
     }, []);
 
-    const filtered =
-        category === "All"
-            ? menu
-            : menu.filter((item) => item.category.name === category);
-
-    const sortedMenu = [...filtered].sort((a, b) =>
+    const sortedMenu = [...menu].sort((a, b) =>
         a.category.name.localeCompare(b.category.name)
     );
 
@@ -264,12 +260,6 @@ export default function HomePageAdmin() {
         acc[cat].push(item);
         return acc;
     }, {} as Record<string, Menu[]>);
-
-    const handleAdd = (item: Menu) => {
-        console.log("Ditambah:", item);
-
-        // code buat ke cart (leon)
-    };
 
     return (
         <Box>
@@ -289,11 +279,11 @@ export default function HomePageAdmin() {
                     </Button>
                 </Box>
                 {/* TITLE */}
-                {category !== "All" && (
+                {/* {category !== "All" && (
                     <Typography sx={{ variant: "h6", fontWeight: "bold", mb: 2 }}>
                         {category}
                     </Typography>
-                )}
+                )} */}
                 {/* GRID */}
 
                 {sortedMenu.length > 0 ? (

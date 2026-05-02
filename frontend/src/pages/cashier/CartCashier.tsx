@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     Box,
     Typography,
@@ -25,7 +26,7 @@ export default function CartCashier() {
 
     const handleCheckout = async () => {
         const payload = {
-            order_type: "Dine-in",
+            order_type: "Dine-in" as const,
             total_harga: total,
             items: items.map((item: any) => ({
                 menu_id: item.menu.menu_id,
@@ -55,7 +56,7 @@ export default function CartCashier() {
                     {items.map((item: any) => (
                         <Box key={item.cartItemId} sx={{ mb: 2 }}>
 
-                            <Typography fontWeight="bold">
+                            <Typography sx={{ fontWeight: "bold" }}>
                                 {item.menu.nama}
                             </Typography>
 
@@ -78,7 +79,7 @@ export default function CartCashier() {
                                         -
                                     </Button>
 
-                                    <Typography fontWeight="bold">
+                                    <Typography sx={{ fontWeight: "bold" }}>
                                         {item.quantity}
                                     </Typography>
 
@@ -93,7 +94,7 @@ export default function CartCashier() {
                                     </Button>
                                 </Box>
 
-                                <Typography fontWeight="bold">
+                                <Typography sx={{ fontWeight: "bold" }}>
                                     Rp {(item.price * item.quantity).toLocaleString()}
                                 </Typography>
                             </Box>
@@ -103,7 +104,7 @@ export default function CartCashier() {
                 </Box>
 
                 <Box sx={{ borderTop: "1px solid #eee", pt: 2 }}>
-                    <Typography fontWeight="bold">
+                    <Typography sx={{ fontWeight: "bold" }}>
                         Total: Rp {total.toLocaleString()}
                     </Typography>
 

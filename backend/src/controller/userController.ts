@@ -87,7 +87,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
         const token = crypto.randomBytes(32).toString("hex");
         const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
 
-        staff.reset_token = tokenHash;  // 👈 store the HASH
+        staff.reset_token = tokenHash;
         staff.reset_token_expiry = new Date(Date.now() + 1000 * 60 * 30);
         await staff.save();
 
