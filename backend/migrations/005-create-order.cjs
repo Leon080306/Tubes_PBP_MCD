@@ -27,7 +27,7 @@ module.exports = {
                 allowNull: false,
             },
             status: {
-                type: Sequelize.ENUM('Cart', 'Paid', 'Process', 'Done', 'Canceled'),
+                type: Sequelize.ENUM('Paid', 'Process', 'Done', 'Canceled'),
                 allowNull: false,
             },
             createdAt: {

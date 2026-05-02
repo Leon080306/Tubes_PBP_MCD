@@ -4,9 +4,10 @@ import { useNavigate, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { useGetMenu } from "../../../hooks/useGetMenu";
 import FormatPrice from "../../../utils/FormatPrice";
-import type { AppDispatch, RootState } from "../../../redux/store";
-import { useDispatch, useSelector } from "react-redux";
 import { cartActions } from "../../../store/cartSlice";
+import { useAppDispatch } from "../../../hooks/useAppDispatch";
+import { useAppSelector } from "../../../hooks/useAppSelector";
+import { FALLBACK_IMAGE } from "../../../constants";
 
 type PackageSelectionProps = {
     onNext: (step: string) => void;
@@ -16,8 +17,8 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
     const navigate = useNavigate();
     const { menu, reload } = useGetMenu();
     const { cartItemId } = useParams();
-    const dispatch = useDispatch<AppDispatch>()
-    const cartItems = useSelector((state: RootState) => state.cart.cartItems)
+    const dispatch = useAppDispatch();
+    const cartItems = useAppSelector((state) => state.cart.cartItems);
     const [hasOptions, setHasOptions] = useState(false);
     const [hasVariants, setHasVariants] = useState(false);
 
@@ -68,9 +69,12 @@ export default function SetQuantity({ onNext }: PackageSelectionProps) {
                 gap: "8px"
             }}>
                 <img
-                    src={menu?.gambarUrl}
+                    src={menu?.gambarUrl ? `/api/${menu?.gambarUrl}` : FALLBACK_IMAGE}
                     onError={(e) => {
-                        e.currentTarget.src = "https://blocks.astratic.com/img/general-img-landscape.png";
+                        const img = e.currentTarget as HTMLImageElement;
+                        if (img.src !== FALLBACK_IMAGE) {
+                            img.src = FALLBACK_IMAGE;
+                        }
                     }}
                     alt=""
                     style={{

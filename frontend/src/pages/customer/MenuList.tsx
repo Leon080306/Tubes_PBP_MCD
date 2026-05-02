@@ -1,12 +1,12 @@
 import { Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "../../redux/store";
 import { cartActions } from "../../store/cartSlice";
 import type { Menu, Category } from "../../type";
-
-const FALLBACK_IMAGE = "https://blocks.astratic.com/img/general-img-landscape.png";
+import { FALLBACK_IMAGE } from "../../constants";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { useAppSelector } from "../../hooks/useAppSelector";
+import { sessionActions } from "../../store/sessionSlice";
 
 function MenuCardItem({
     item,
@@ -35,13 +35,13 @@ function MenuCardItem({
             <Box
                 component="img"
                 src={item.gambarUrl ? `/api/${item.gambarUrl}` : FALLBACK_IMAGE}
-                alt={item.nama}
                 onError={(e) => {
                     const img = e.currentTarget as HTMLImageElement;
                     if (img.src !== FALLBACK_IMAGE) {
                         img.src = FALLBACK_IMAGE;
                     }
                 }}
+                alt={item.nama}
                 sx={{
                     width: "50%",
                     height: "80px",
@@ -64,10 +64,10 @@ function MenuCardItem({
 export default function MenuList() {
     const [menu, setMenu] = useState<Menu[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [category, setCategory] = useState<string>("All");
-
-    const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const category = useAppSelector((state) => state.session.selectedCategory);
+    const setCategory = (value: string) => dispatch(sessionActions.setSelectedCategory(value));
 
     useEffect(() => {
         fetch("http://localhost:3000/menu")
@@ -105,7 +105,7 @@ export default function MenuList() {
             cartItemId: cartItemId,
             menu: menu,
             quantity: 1,
-            selectedVariants: [],
+            selectedVariant: null,
             selectedOptions: [],
             price: menu.harga_awal
         }))
@@ -167,7 +167,10 @@ export default function MenuList() {
 
             <Box sx={{ flex: 1 }}>
                 {category !== "All" && (
-                    <Typography variant="h6" fontWeight="bold" mb={2}>
+                    <Typography variant="h6" sx={{
+                        fontWeight: "bold",
+                        mb: 2
+                    }} >
                         {category}
                     </Typography>
                 )}
@@ -175,7 +178,9 @@ export default function MenuList() {
                 {sortedMenu.length > 0 ? (
                     <Box>
                         {Object.entries(groupedMenu).map(([kategori, items], index) => (
-                            <Box key={kategori} mb={4}>
+                            <Box key={kategori} sx={{
+                                mb: 4
+                            }} >
                                 <Box
                                     sx={{
                                         borderTop: index === 0 ? "none" : "2px solid #eee",
@@ -184,8 +189,7 @@ export default function MenuList() {
                                     }}
                                 >
                                     <Typography
-                                        fontWeight="bold"
-                                        sx={{ borderLeft: "5px solid #ffcc00", pl: 1 }}
+                                        sx={{ borderLeft: "5px solid #ffcc00", pl: 1, fontWeight: "bold" }}
                                     >
                                         {kategori}
                                     </Typography>

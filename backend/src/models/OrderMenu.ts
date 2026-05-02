@@ -14,25 +14,26 @@ import { MenuOption } from './MenuOption.js';
 export class OrderMenu extends Model {
     @PrimaryKey
     @Column({
-        type: DataType.UUIDV4,
+        type: DataType.UUID,
+        defaultValue: DataType.UUIDV4,
         allowNull: false,
     })
     declare om_id: string;
 
     @Column({
-        type: DataType.UUIDV4,
+        type: DataType.UUID,
         allowNull: false,
     })
     declare order_id: string;
 
     @Column({
-        type: DataType.UUIDV4,
+        type: DataType.UUID,
         allowNull: false,
     })
     declare menu_id: string;
 
     @Column({
-        type: DataType.UUIDV4,
+        type: DataType.UUID,
         allowNull: true,
     })
     declare mv_id: string | null;

@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import type { FetchStatus, Menu } from "../type";
 
-// Tipe response dari endpoint /menu/:menu_id/recommendations
 export type RecommendationItem = {
     menu_id: string;
     bought_together_count: string;
@@ -21,8 +20,6 @@ export function useGetRecommendations() {
                 method: "GET",
                 headers: { "content-type": "application/json" },
             });
-
-            console.log("🔵 Status:", response.status);
 
             if (response.status !== 200) {
                 throw new Error(`HTTP ${response.status}`);

@@ -9,6 +9,7 @@ import { useGetPakets } from "../../../hooks/useGetPakets";
 import { useAppDispatch } from "../../../hooks/useAppDispatch";
 import { useAppSelector } from "../../../hooks/useAppSelector";
 import { LoadingScreen } from "../../../components/LoadingScreen";
+import { FALLBACK_IMAGE } from "../../../constants";
 
 type PackageSelectionProps = {
     onNext: (step: string) => void;
@@ -86,12 +87,10 @@ export default function MakePackage({ onNext }: PackageSelectionProps) {
                 alignItems: "center",
                 gap: "24px",
             }}>
-                {/* mcd logo on top left */}
                 <img src="/src/assets/logo_mcd.png" alt="" style={{
                     width: "32px",
                     height: "32px"
                 }} />
-                {/* menu name */}
                 <Typography variant="h4" sx={{
                     fontSize: "14px",
                     fontWeight: "bold"
@@ -128,10 +127,13 @@ export default function MakePackage({ onNext }: PackageSelectionProps) {
                         onClick={() => handleSelect("package")}
                     >
                         <img
-                            src={menu?.gambarUrl}
+                            src={pakets[0].pakets?.gambarUrl ? `/api/${pakets[0].pakets?.gambarUrl}` : FALLBACK_IMAGE}
                             alt=""
                             onError={(e) => {
-                                e.currentTarget.src = "https://blocks.astratic.com/img/general-img-landscape.png";
+                                const img = e.currentTarget as HTMLImageElement;
+                                if (img.src !== FALLBACK_IMAGE) {
+                                    img.src = FALLBACK_IMAGE;
+                                }
                             }}
                             style={{
                                 width: "100%",
@@ -159,10 +161,12 @@ export default function MakePackage({ onNext }: PackageSelectionProps) {
                         onClick={() => handleSelect("a la carte")}
                     >
                         <img
-                            src={menu?.gambarUrl ?? "https://blocks.astratic.com/img/general-img-landscape.png"}
-                            alt=""
+                            src={menu?.gambarUrl ? `/api/${menu?.gambarUrl}` : FALLBACK_IMAGE}
                             onError={(e) => {
-                                e.currentTarget.src = "https://blocks.astratic.com/img/general-img-landscape.png";
+                                const img = e.currentTarget as HTMLImageElement;
+                                if (img.src !== FALLBACK_IMAGE) {
+                                    img.src = FALLBACK_IMAGE;
+                                }
                             }}
                             style={{
                                 width: "100%",

@@ -42,10 +42,10 @@ export class Order extends Model {
     declare order_no: number;
 
     @Column({
-        type: DataType.ENUM('Cart', 'Paid', 'Process', 'Done', 'Canceled'),
+        type: DataType.ENUM('Paid', 'Process', 'Done', 'Canceled'),
         allowNull: false,
     })
-    declare status: 'Cart' | 'Paid' | 'Process' | 'Done' | 'Canceled';
+    declare status: 'Paid' | 'Process' | 'Done' | 'Canceled';
 
     @CreatedAt
     declare createdAt: Date;

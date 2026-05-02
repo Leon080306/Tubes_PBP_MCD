@@ -1,28 +1,45 @@
-import { Box, Button, Divider, IconButton, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Typography } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-import { cartActions } from "../../../store/cartSlice";
-import type { RootState } from "../../../redux/store";
-import FormatPrice from "../../../utils/FormatPrice";
-import { useCreateOrder } from "../../../hooks/useCreateOrder"; // ✅ adjust path
+import { cartActions, type CartItem } from "../../store/cartSlice";
+import FormatPrice from "../../utils/FormatPrice";
+import { useCreateOrder } from "../../hooks/useCreateOrder";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { useAppSelector } from "../../hooks/useAppSelector";
+import { FALLBACK_IMAGE } from "../../constants";
+import { useEffect, useState } from "react";
+import { sessionActions } from "../../store/sessionSlice";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
-
-type PackageSelectionProps = {
-    onNext: (step: string) => void;
-};
-
-export default function Cart({ onNext }: PackageSelectionProps) {
-    const dispatch = useDispatch();
+export default function Cart() {
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const cartItems = useSelector((state: RootState) => state.cart.cartItems);
+    const cartItems = useAppSelector((state) => state.cart.cartItems);
+    const orderType = useAppSelector((state) => state.session.orderType);
 
-    // ✅ Hook untuk create order
-    const { state: createOrderState, createOrder } = useCreateOrder();
+    const { order, state: createOrderState, createOrder } = useCreateOrder();
     const isSubmitting = createOrderState === "loading";
+
+    const [successOpen, setSuccessOpen] = useState(false);
+
+    useEffect(() => {
+        if (cartItems.length === 0 && !successOpen) navigate("/")
+    }, [cartItems, successOpen])
+
+    useEffect(() => {
+        if (!successOpen) return;
+        const timer = setTimeout(() => handleSuccessClose(), 15000);
+        return () => clearTimeout(timer);
+    }, [successOpen]);
+
+    const handleSuccessClose = () => {
+        setSuccessOpen(false);
+        dispatch(cartActions.clearCart());
+        dispatch(sessionActions.resetSession());
+        navigate("/");
+    };
 
     const handleIncrement = (cartItemId: string) =>
         dispatch(cartActions.increaseQuantity(cartItemId));
@@ -35,21 +52,27 @@ export default function Cart({ onNext }: PackageSelectionProps) {
 
     const handleClearCart = () => dispatch(cartActions.clearCart());
 
-    // ✅ Handler untuk edit cart item
     const handleEdit = (cartItemId: string) => {
         navigate(`/order/${cartItemId}`);
-        onNext("modification");
     };
 
-    const subtotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const calculateMenuPrice = (cartItem: CartItem) => {
+        const totalOptionsPrice = cartItem.selectedOptions?.reduce((sum, option) => sum + option.tambahan_harga, 0);
+        const variantPrice = cartItem.selectedVariant?.harga_tambahan ?? 0;
+        const totalPrice = (cartItem.price + totalOptionsPrice + variantPrice) * cartItem.quantity;
+
+        return totalPrice;
+    }
+
+    const subtotal = cartItems.reduce((sum, i) => sum + calculateMenuPrice(i), 0);
     const total = subtotal;
 
-    // ✅ Handler untuk Selesaikan Pesanan
     const handleCheckout = async () => {
         if (cartItems.length === 0) return;
+        if (!orderType) return;
 
         const payload = {
-            order_type: "Dine-in" as const,
+            order_type: orderType,
             total_harga: total,
             items: cartItems.map((item) => ({
                 menu_id: item.menu.menu_id,
@@ -63,11 +86,8 @@ export default function Cart({ onNext }: PackageSelectionProps) {
         const result = await createOrder(payload);
 
         if (result) {
-            // Simpan order_id untuk step selanjutnya (checkout/payment)
             sessionStorage.setItem("current_order_id", result.order_id);
-
-            dispatch(cartActions.clearCart());
-            onNext("checkout");
+            setSuccessOpen(true);
         }
     };
 
@@ -81,7 +101,6 @@ export default function Cart({ onNext }: PackageSelectionProps) {
             width: "100%",
             padding: "24px"
         }}>
-            {/* Header */}
             <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
                 <Box sx={{ display: "flex", alignItems: "flex-end", gap: "12px" }}>
                     <img src="/src/assets/logo_mcd.png" alt="" style={{ width: "32px", height: "32px" }} />
@@ -106,7 +125,6 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                 </Button>
             </Box>
 
-            {/* Cart Items */}
             <Box sx={{
                 flex: 1,
                 overflow: "auto",
@@ -128,7 +146,6 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                                 gap: "8px",
                                 py: "12px",
                             }}>
-                                {/* Hapus Button */}
                                 <Button
                                     variant="outlined"
                                     size="small"
@@ -147,7 +164,6 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                                     Hapus
                                 </Button>
 
-                                {/* ✅ Edit Button */}
                                 <Button
                                     variant="outlined"
                                     size="small"
@@ -174,13 +190,14 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                                     Edit
                                 </Button>
 
-                                {/* Image with red badge */}
                                 <Box sx={{ position: "relative", flexShrink: 0 }}>
                                     <img
-                                        src={`${BASE_URL}/uploads/${item.menu.gambarUrl}`}
-                                        alt={item.menu.nama}
+                                        src={item.menu.gambarUrl ? `/api/${item.menu.gambarUrl}` : FALLBACK_IMAGE}
                                         onError={(e) => {
-                                            e.currentTarget.src = "https://blocks.astratic.com/img/general-img-landscape.png";
+                                            const img = e.currentTarget as HTMLImageElement;
+                                            if (img.src !== FALLBACK_IMAGE) {
+                                                img.src = FALLBACK_IMAGE;
+                                            }
                                         }}
                                         style={{ width: "56px", height: "56px", objectFit: "contain" }}
                                     />
@@ -202,7 +219,6 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                                     </Box>
                                 </Box>
 
-                                {/* Item Name + variant/options */}
                                 <Box sx={{ flex: 1, minWidth: 0 }}>
                                     <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>
                                         {item.menu.nama}
@@ -219,7 +235,6 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                                     )}
                                 </Box>
 
-                                {/* Qty Stepper */}
                                 <Box sx={{
                                     display: "flex",
                                     alignItems: "center",
@@ -247,9 +262,8 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                                     </IconButton>
                                 </Box>
 
-                                {/* Price */}
                                 <Typography sx={{ fontSize: "14px", fontWeight: "500", minWidth: "72px", textAlign: "right", flexShrink: 0 }}>
-                                    {FormatPrice(item.price * item.quantity)}
+                                    {FormatPrice(calculateMenuPrice(item))}
                                 </Typography>
                             </Box>
 
@@ -259,7 +273,6 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                 )}
             </Box>
 
-            {/* Bottom: Totals + Buttons */}
             <Box sx={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                     <Typography sx={{ fontSize: "14px", color: "text.secondary" }}>Sub total</Typography>
@@ -277,7 +290,6 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                     </Typography>
                 </Box>
 
-                {/* ✅ Error message */}
                 {createOrderState === "error" && (
                     <Typography sx={{ color: "#d32f2f", fontSize: "13px", textAlign: "center" }}>
                         Gagal membuat pesanan. Silakan coba lagi.
@@ -306,8 +318,8 @@ export default function Cart({ onNext }: PackageSelectionProps) {
 
                     <Button
                         variant="contained"
-                        onClick={handleCheckout}                                    // ✅ changed
-                        disabled={cartItems.length === 0 || isSubmitting}           // ✅ changed
+                        onClick={handleCheckout}
+                        disabled={cartItems.length === 0 || isSubmitting}
                         disableElevation
                         sx={{
                             flex: 2,
@@ -322,10 +334,63 @@ export default function Cart({ onNext }: PackageSelectionProps) {
                             "&.Mui-disabled": { backgroundColor: "rgba(0,0,0,0.12)" }
                         }}
                     >
-                        {isSubmitting ? "Memproses..." : "Selesaikan Pesanan"}     {/* ✅ */}
+                        {isSubmitting ? "Memproses..." : "Selesaikan Pesanan"}
                     </Button>
                 </Box>
             </Box>
+
+            <Dialog
+                open={successOpen}
+                onClose={handleSuccessClose}
+                slotProps={{
+                    paper: {
+                        sx: {
+                            borderRadius: "16px",
+                            padding: "16px",
+                            minWidth: "360px",
+                            textAlign: "center",
+                        }
+                    }
+                }}
+            >
+                <Box sx={{ display: "flex", justifyContent: "center", mt: "8px" }}>
+                    <CheckCircleIcon sx={{ fontSize: "64px", color: "#ffbc0d" }} />
+                </Box>
+
+                <DialogTitle sx={{ fontWeight: "bold", fontSize: "22px", pb: 0 }}>
+                    Pesanan Berhasil Dibuat!
+                </DialogTitle>
+
+                <DialogContent>
+                    <Typography sx={{ fontSize: "14px", color: "text.secondary", mb: 1 }}>
+                        Terima kasih, pesanan Anda sedang diproses. Silakan tunggu nomor pesanan Anda dipanggil.
+                    </Typography>
+
+                    <Typography sx={{ fontSize: "16px", fontWeight: "bold" }}>
+                        Nomor pesanan: {order?.order_no}
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ justifyContent: "center", pb: "16px" }}>
+                    <Button
+                        variant="contained"
+                        onClick={handleSuccessClose}
+                        disableElevation
+                        sx={{
+                            backgroundColor: "#ffbc0d",
+                            color: "black",
+                            textTransform: "none",
+                            fontWeight: "bold",
+                            fontSize: "16px",
+                            px: "32px",
+                            py: "10px",
+                            borderRadius: "8px",
+                            "&:hover": { backgroundColor: "#e6a800" },
+                        }}
+                    >
+                        Kembali ke Beranda
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }

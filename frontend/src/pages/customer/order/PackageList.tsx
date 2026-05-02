@@ -2,13 +2,12 @@ import { Box, Button, Card, CardContent, CardMedia, CircularProgress, Typography
 import { useEffect, useMemo } from "react";
 import { useParams } from "react-router";
 import FormatPrice from "../../../utils/FormatPrice";
-import { useDispatch } from "react-redux";
 import { cartActions } from "../../../store/cartSlice";
 import type { Menu } from "../../../type";
 import { useGetMenu } from "../../../hooks/useGetMenu";
 import { useGetPakets } from "../../../hooks/useGetPakets";
-
-const FALLBACK_IMAGE = "https://blocks.astratic.com/img/general-img-landscape.png";
+import { useAppDispatch } from "../../../hooks/useAppDispatch";
+import { FALLBACK_IMAGE } from "../../../constants";
 
 type PackageSelectionProps = {
     onNext: (step: string) => void;
@@ -16,7 +15,7 @@ type PackageSelectionProps = {
 
 export default function PackageList({ onNext }: PackageSelectionProps) {
     const { cartItemId } = useParams();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const { menu, reload: reloadMenu } = useGetMenu();
     const { pakets, state: paketsState, reload: reloadPakets } = useGetPakets();
@@ -160,13 +159,11 @@ export default function PackageList({ onNext }: PackageSelectionProps) {
                                     <CardMedia
                                         component="img"
                                         height="140"
-                                        image={`/api/uploads/${encodeURI(paketMenu.gambarUrl)}`}
-                                        alt={paketMenu.nama}
-                                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                                            const target = e.currentTarget;
-                                            if (!target.dataset.fallback) {
-                                                target.dataset.fallback = "true";
-                                                target.src = FALLBACK_IMAGE;
+                                        image={item.pakets?.gambarUrl ? `/api/${item.pakets?.gambarUrl}` : FALLBACK_IMAGE}
+                                        onError={(e) => {
+                                            const img = e.currentTarget as HTMLImageElement;
+                                            if (img.src !== FALLBACK_IMAGE) {
+                                                img.src = FALLBACK_IMAGE;
                                             }
                                         }}
                                         sx={{ objectFit: "cover" }}
@@ -193,7 +190,6 @@ export default function PackageList({ onNext }: PackageSelectionProps) {
                 )}
             </Box>
 
-            {/* Batal — Sticky di bawah */}
             <Box sx={{
                 position: "sticky",
                 bottom: 0,

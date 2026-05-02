@@ -1,0 +1,1 @@
+export const FALLBACK_IMAGE = "https://blocks.astratic.com/img/general-img-landscape.png";

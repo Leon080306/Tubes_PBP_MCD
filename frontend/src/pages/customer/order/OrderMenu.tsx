@@ -1,18 +1,19 @@
-import { useState } from "react";
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useEffect, useState } from "react";
 import PackageSelection from "./MakePackage";
 import SetQuantity from "./SetQuantity";
 import Recommendation from "./Recommendation";
 import Modification from "./Modification";
-import Cart from "./Cart";
 import PackageList from "./PackageList";
+import { useParams } from "react-router";
 
 export default function OrderMenu() {
+    const { cartItemId } = useParams();
     const [step, setStep] = useState("package");
-    // const { menuId } = useParams();
 
-    // if (stepParam) {
-    //     setStep(stepParam);
-    // }
+    useEffect(() => {
+        setStep("package");
+    }, [cartItemId]);
 
     return (
         <>
@@ -38,11 +39,6 @@ export default function OrderMenu() {
             )}
             {step === "modification" && (
                 <Modification
-                    onNext={(nextStep: string) => setStep(nextStep)}
-                />
-            )}
-            {step === "cart" && (
-                <Cart
                     onNext={(nextStep: string) => setStep(nextStep)}
                 />
             )}

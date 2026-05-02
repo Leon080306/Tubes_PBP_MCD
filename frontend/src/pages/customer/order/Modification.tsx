@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import { useGetMenu } from "../../../hooks/useGetMenu";
 import { useNavigate, useParams } from "react-router";
 import FormatPrice from "../../../utils/FormatPrice";
-import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../../../redux/store";
 import { cartActions } from "../../../store/cartSlice";
 import type { MenuVarian, MenuOption } from "../../../type";
+import { useAppSelector } from "../../../hooks/useAppSelector";
+import { useAppDispatch } from "../../../hooks/useAppDispatch";
+import { FALLBACK_IMAGE } from "../../../constants";
 type PackageSelectionProps = {
     onNext: (step: string) => void;
 };
@@ -14,9 +16,9 @@ type PackageSelectionProps = {
 export default function Modification({ onNext }: PackageSelectionProps) {
     const { menu, reload } = useGetMenu();
     const { cartItemId } = useParams();
-    const cartItems = useSelector((state: RootState) => state.cart.cartItems);
+    const cartItems = useAppSelector((state: RootState) => state.cart.cartItems)
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const cartItem = cartItems.find(item => item.cartItemId === cartItemId);
 
@@ -80,13 +82,15 @@ export default function Modification({ onNext }: PackageSelectionProps) {
                 Modifikasi
             </Typography>
 
-            {/* Menu info */}
             <Paper elevation={3} sx={{ width: "100%", padding: "12px" }}>
                 <Box sx={{ display: "flex", gap: "4px", width: "100%", height: "80px", mb: "12px" }}>
                     <img
-                        src={menu?.gambarUrl}
+                        src={menu?.gambarUrl ? `/api/${menu?.gambarUrl}` : FALLBACK_IMAGE}
                         onError={(e) => {
-                            e.currentTarget.src = "https://blocks.astratic.com/img/general-img-landscape.png";
+                            const img = e.currentTarget as HTMLImageElement;
+                            if (img.src !== FALLBACK_IMAGE) {
+                                img.src = FALLBACK_IMAGE;
+                            }
                         }}
                         alt=""
                         style={{ height: "100%", objectFit: "cover" }}
@@ -111,7 +115,6 @@ export default function Modification({ onNext }: PackageSelectionProps) {
                 </Button>
             </Paper>
 
-            {/* Pilih Varian */}
             {menu?.mvs && menu.mvs.length > 0 && (
                 <Paper elevation={3} sx={{ width: "100%", padding: "12px" }}>
                     <Typography sx={{ fontSize: "16px", fontWeight: "bold", mb: 1.5 }}>
@@ -156,7 +159,6 @@ export default function Modification({ onNext }: PackageSelectionProps) {
                 </Paper>
             )}
 
-            {/* Permintaan Khusus */}
             {menu?.mos && menu.mos.length > 0 && (
                 <Paper elevation={3} sx={{ width: "100%", padding: "12px" }}>
                     <Typography sx={{ fontSize: "16px", fontWeight: "bold", mb: 1.5 }}>
@@ -201,7 +203,6 @@ export default function Modification({ onNext }: PackageSelectionProps) {
                 </Paper>
             )}
 
-            {/* Bottom action buttons */}
             <Paper elevation={3} sx={{ width: "100%", padding: "0", flex: 0.15, display: "flex" }}>
                 <Button
                     variant="outlined"

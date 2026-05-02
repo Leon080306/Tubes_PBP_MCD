@@ -115,7 +115,6 @@ export const createOrder = async (req: Request, res: Response) => {
             })
         }
 
-        // Validate each item
         for (const [idx, item] of items.entries()) {
             if (!item.menu_id) {
                 return res.status(400).json({
@@ -137,22 +136,19 @@ export const createOrder = async (req: Request, res: Response) => {
             }
         }
 
-        // Generate order_no (auto increment)
         const lastOrder = await Order.findOne({
             order: [['order_no', 'DESC']]
         });
         const nextOrderNo = (lastOrder?.order_no ?? 0) + 1;
 
-        // Create Order
         const order = await Order.create({
             waktu_pesanan: new Date(),
             total_harga,
             order_type,
             order_no: nextOrderNo,
-            status: 'Cart',
+            status: 'Process',
         });
 
-        // Create OrderMenu (1 row per cart item) + OrderMenuOption
         for (const item of items) {
             const orderMenu = await OrderMenu.create({
                 order_id: order.order_id,
@@ -173,7 +169,6 @@ export const createOrder = async (req: Request, res: Response) => {
             }
         }
 
-        // Get full order with relations
         const newOrder = await Order.findOne({
             where: { order_id: order.order_id },
             include: [{

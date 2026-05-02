@@ -1,16 +1,27 @@
-import { Box, Fab, Badge, Typography, IconButton, Button } from "@mui/material";
+import { Box, Fab, Badge, Typography, IconButton, Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CloseIcon from "@mui/icons-material/Close";
-import { Outlet } from "react-router";
-import { useState } from "react";
+import RestaurantIcon from "@mui/icons-material/Restaurant";
+import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import { Outlet, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "../hooks/useAppSelector";
 import FormatPrice from "../utils/FormatPrice";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { cartActions } from "../store/cartSlice";
+import { sessionActions } from "../store/sessionSlice";
+import type { order_type } from "../type";
 
 export default function Layout() {
     const cartItems = useAppSelector(state => state.cart.cartItems);
+    const orderType = useAppSelector(state => state.session.orderType);
     const [cartOpen, setCartOpen] = useState(false);
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        if (!orderType) navigate("/");
+    }, [orderType])
 
     const totalQty = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     const totalPrice = cartItems.reduce((sum, item) => {
@@ -22,10 +33,13 @@ export default function Layout() {
         return sum + (item.price + variantPrice + optionsTotal) * item.quantity;
     }, 0);
 
-    const dispatch = useAppDispatch();
+    const handleOrderTypeChange = (_: React.MouseEvent<HTMLElement>, newType: order_type | null) => {
+        if (newType !== null) {
+            dispatch(sessionActions.setOrderType(newType));
+        }
+    };
 
     return (
-        // page container with background
         <Box
             sx={{
                 width: "100%",
@@ -39,7 +53,6 @@ export default function Layout() {
                 backgroundRepeat: "no-repeat"
             }}
         >
-            {/* main ui container */}
             <Box sx={{
                 position: "relative",
                 width: "640px",
@@ -49,7 +62,6 @@ export default function Layout() {
                 flexDirection: "column",
                 overflow: "hidden",
             }}>
-                {/* container content with outlet */}
                 <Box sx={{
                     flex: 1,
                     width: "100%",
@@ -63,7 +75,49 @@ export default function Layout() {
                     <Outlet />
                 </Box>
 
-                {/* cart preview */}
+                {orderType && (
+                    <ToggleButtonGroup
+                        value={orderType}
+                        exclusive
+                        onChange={handleOrderTypeChange}
+                        size="small"
+                        sx={{
+                            position: "absolute",
+                            bottom: "32px",
+                            left: "24px",
+                            zIndex: 1000,
+                            backgroundColor: "white",
+                            borderRadius: "999px",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                            padding: "4px",
+                            "& .MuiToggleButton-root": {
+                                border: "none",
+                                borderRadius: "999px !important",
+                                textTransform: "none",
+                                fontWeight: 600,
+                                fontSize: "12px",
+                                padding: "6px 12px",
+                                color: "#666",
+                                gap: "6px",
+                                "&.Mui-selected": {
+                                    backgroundColor: "#DA291C",
+                                    color: "white",
+                                    "&:hover": { backgroundColor: "#B71C1C" },
+                                },
+                            },
+                        }}
+                    >
+                        <ToggleButton value="Dine-in">
+                            <RestaurantIcon sx={{ fontSize: "16px" }} />
+                            Dine-in
+                        </ToggleButton>
+                        <ToggleButton value="Takeaway">
+                            <ShoppingBagIcon sx={{ fontSize: "16px" }} />
+                            Takeaway
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                )}
+
                 {cartOpen && cartItems.length > 0 && (
                     <Box sx={{
                         position: "absolute",
@@ -80,7 +134,6 @@ export default function Layout() {
                         zIndex: 999,
                         overflow: "hidden",
                     }}>
-                        {/* cart header */}
                         <Box sx={{
                             display: "flex",
                             justifyContent: "space-between",
@@ -99,7 +152,6 @@ export default function Layout() {
                             </IconButton>
                         </Box>
 
-                        {/* cart items */}
                         <Box sx={{
                             flex: 1,
                             overflowY: "auto",
@@ -108,9 +160,8 @@ export default function Layout() {
                             {cartItems.map((item) => {
                                 const totalOptionsPrice = item.selectedOptions?.reduce((sum, option) => sum + option.tambahan_harga, 0);
                                 const variantPrice = item.selectedVariant?.harga_tambahan ?? 0;
-                                const totalPrice = item.price * item.quantity + totalOptionsPrice + variantPrice;
+                                const totalPrice = (item.price + totalOptionsPrice + variantPrice) * item.quantity;
 
-                                // cart item
                                 return <Box
                                     key={item.cartItemId}
                                     sx={{
@@ -119,21 +170,17 @@ export default function Layout() {
                                         borderBottom: "1px solid #f0f0f0",
                                     }}
                                 >
-                                    {/* menu cart item */}
                                     <Box sx={{
                                         display: "flex",
                                         justifyContent: "space-between",
                                         marginBottom: "4px"
                                     }}>
-                                        {/* menu item name + quantity */}
                                         <Typography sx={{
                                             fontWeight: 600,
                                             fontSize: "14px"
                                         }}>
                                             {item.quantity}× {item.menu.nama}
                                         </Typography>
-
-                                        {/* menu item price */}
                                         <Typography sx={{
                                             fontWeight: 600,
                                             fontSize: "14px"
@@ -142,7 +189,6 @@ export default function Layout() {
                                         </Typography>
                                     </Box>
 
-                                    {/* menu variants */}
                                     {item.selectedVariant && (
                                         <Typography sx={{
                                             fontSize: "12px",
@@ -152,7 +198,6 @@ export default function Layout() {
                                         </Typography>
                                     )}
 
-                                    {/* menu options */}
                                     {item.selectedOptions.length > 0 && (
                                         <Typography sx={{
                                             fontSize: "12px",
@@ -165,7 +210,6 @@ export default function Layout() {
                             })}
                         </Box>
 
-                        {/* checkout + clear cart button */}
                         <Box sx={{
                             padding: "12px 18px",
                             borderTop: "1px solid #eee",
@@ -191,6 +235,10 @@ export default function Layout() {
                             </Button>
                             <Button
                                 variant="contained"
+                                onClick={() => {
+                                    setCartOpen(false);
+                                    navigate("/cart");
+                                }}
                                 sx={{
                                     flex: 1,
                                     backgroundColor: "#DA291C",
@@ -208,7 +256,6 @@ export default function Layout() {
                     </Box>
                 )}
 
-                {/* cart fab */}
                 {cartItems.length > 0 && (
                     <Fab
                         variant="extended"
@@ -216,9 +263,8 @@ export default function Layout() {
                         sx={{
                             position: "absolute",
                             bottom: "24px",
-                            left: "50%",
+                            right: "24px",
                             zIndex: 1000,
-                            transform: "translateX(-50%)",
                             backgroundColor: "#DA291C",
                             color: "yellow",
                             textTransform: "none",

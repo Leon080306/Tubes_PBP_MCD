@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import type { FetchStatus } from "../type";
+import type { FetchStatus, order_type } from "../type";
 
 export type CreateOrderItemPayload = {
     menu_id: string;
@@ -19,7 +19,7 @@ export type CreatedOrder = {
     order_id: string;
     order_no: number;
     total_harga: number;
-    order_type: "Dine-in" | "Takeaway";
+    order_type: order_type;
     status: string;
 };
 

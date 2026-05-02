@@ -59,7 +59,7 @@ export type Order = {
     order_id: string;
     waktu_pesanan: string;
     total_harga: number;
-    order_type: 'Dine-in' | 'Takeaway';
+    order_type: order_type;
     order_no: number;
     status: 'Cart' | 'Paid' | 'Process' | 'Done' | 'Canceled';
     createdAt?: string;
@@ -68,6 +68,8 @@ export type Order = {
     orderMenus?: OrderMenu[];
     payments?: Payment;
 };
+
+export type order_type = 'Dine-in' | 'Takeaway';
 
 export type OrderMenu = {
     om_id: string;
