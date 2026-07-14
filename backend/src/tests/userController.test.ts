@@ -99,8 +99,13 @@ describe("loginUser", () => {
 
         // mock user dari database
         const fakeUser = {
-            email: "test@test.com",
-            password: "hashedpassword"
+            getDataValue: (field: string) => {
+                if (field === "password") return "hashedpassword";
+                if (field === "staff_id") return 1;
+                if (field === "email") return "test@test.com";
+                if (field === "role") return "admin";
+                return null;
+            }
         };
 
         jest.spyOn(Staff, "findOne").mockResolvedValue(fakeUser as any);
@@ -112,7 +117,7 @@ describe("loginUser", () => {
 
         expect(res.status).toHaveBeenCalledWith(401);
         expect(res.json).toHaveBeenCalledWith({
-            message: "Password salah"
+            message: "Password Salah"
         });
     });
 });
