@@ -37,6 +37,45 @@ describe("loginUser", () => {
         });
     }),
 
+    it("should return 401 if password is incorrect", async () => {
+        const req = {
+            body: {
+                email: "test@test.com",
+                password: "wrongpassword"
+            }
+        } as Request;
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        } as unknown as Response;
+
+        const next = jest.fn();
+
+        // mock user dari database
+        const fakeUser = {
+            getDataValue: (field: string) => {
+                if (field === "password") return "hashedpassword";
+                if (field === "staff_id") return 1;
+                if (field === "email") return "test@test.com";
+                if (field === "role") return "admin";
+                return null;
+            }
+        };
+
+        jest.spyOn(Staff, "findOne").mockResolvedValue(fakeUser as any);
+
+        // mock bcrypt.compare → return false (password salah)
+        jest.spyOn(bcrypt, "compare").mockResolvedValue(false as never);
+
+        await loginUser(req, res, next);
+
+        expect(res.status).toHaveBeenCalledWith(401);
+        expect(res.json).toHaveBeenCalledWith({
+            message: "Password Salah"
+        });
+    });
+
     it("should login successfully and return JWT token", async () => {
 
         const req = {
@@ -82,42 +121,4 @@ describe("loginUser", () => {
         });
     });
 
-    it("should return 401 if password is incorrect", async () => {
-        const req = {
-            body: {
-                email: "test@test.com",
-                password: "wrongpassword"
-            }
-        } as Request;
-
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        } as unknown as Response;
-
-        const next = jest.fn();
-
-        // mock user dari database
-        const fakeUser = {
-            getDataValue: (field: string) => {
-                if (field === "password") return "hashedpassword";
-                if (field === "staff_id") return 1;
-                if (field === "email") return "test@test.com";
-                if (field === "role") return "admin";
-                return null;
-            }
-        };
-
-        jest.spyOn(Staff, "findOne").mockResolvedValue(fakeUser as any);
-
-        // mock bcrypt.compare → return false (password salah)
-        jest.spyOn(bcrypt, "compare").mockResolvedValue(false as never);
-
-        await loginUser(req, res, next);
-
-        expect(res.status).toHaveBeenCalledWith(401);
-        expect(res.json).toHaveBeenCalledWith({
-            message: "Password Salah"
-        });
-    });
 });
