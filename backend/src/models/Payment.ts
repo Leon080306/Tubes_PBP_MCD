@@ -1,5 +1,5 @@
 import { Table, Column, Model, DataType, PrimaryKey, BelongsTo, CreatedAt, UpdatedAt, DeletedAt } from 'sequelize-typescript';
-import { Order } from './Order.js';
+import { Order } from './Order';
 
 @Table({
     tableName: 'Payment',
@@ -25,7 +25,7 @@ export class Payment extends Model {
         type: DataType.ENUM('Completed', 'Canceled'),
         allowNull: false,
     })
-    status!:'Completed' | 'Canceled';
+    status!: 'Completed' | 'Canceled';
 
     @Column({
         type: DataType.DATE,

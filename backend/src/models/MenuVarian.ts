@@ -1,5 +1,5 @@
 import { Table, Column, Model, DataType, PrimaryKey, BelongsTo, CreatedAt, UpdatedAt, DeletedAt } from 'sequelize-typescript';
-import { Menu } from './Menu.js';
+import { Menu } from './Menu';
 
 
 @Table({

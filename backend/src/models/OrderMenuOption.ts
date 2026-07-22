@@ -1,6 +1,6 @@
 import { Table, Column, Model, DataType, PrimaryKey, BelongsTo, CreatedAt, UpdatedAt, DeletedAt } from 'sequelize-typescript';
-import { OrderMenu } from './OrderMenu.js';
-import { MenuOption } from './MenuOption.js';
+import { OrderMenu } from './OrderMenu';
+import { MenuOption } from './MenuOption';
 
 @Table({ tableName: 'OrderMenuOption', timestamps: true })
 export class OrderMenuOption extends Model {

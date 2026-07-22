@@ -4,7 +4,6 @@ import { Category } from "../models/Category";
 import { MenuVarian } from "../models/MenuVarian";
 import { MenuOption } from "../models/MenuOption";
 
-
 export const getMenus = async (_req: Request, res: Response, next: NextFunction) => {
     try {
         const menus = await Menu.findAll({
