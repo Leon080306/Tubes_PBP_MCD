@@ -108,7 +108,7 @@ describe("Admin - Dashboard & Management", () => {
             token: "fake-jwt-token"
         });
     });
-    
+
 
     it("TC-AD-002: should successfully get all menus", async () => {
         const req = {} as Request;
@@ -165,7 +165,7 @@ describe("Admin - Dashboard & Management", () => {
         const req = {
             body: { 
                 nama: "Nasi Goreng", 
-                variants: "invalid-json" // Sengaja dibikin error parsing JSON
+                variants: "invalid-json" 
             }
         } as Request;
         const res = {
@@ -230,9 +230,6 @@ describe("Admin - Dashboard & Management", () => {
     });
 
 
-    // ==========================================
-    // 🏷️ MANAJEMEN KATEGORI
-    // ==========================================
 
     it("TC-AD-006: should successfully add a new category", async () => {
         const req = {
@@ -361,14 +358,11 @@ describe("Admin - Dashboard & Management", () => {
     });
 
 
-    // ==========================================
-    // 🧑‍💼 MANAJEMEN STAFF & MIDDLEWARE
-    // ==========================================
 
     it("TC-AD-009N: should return 400 if staff data is incomplete", async () => {
         const req = {
             body: {
-                name: "", // Dikosongkan agar ditolak oleh validasi
+                name: "", 
                 email: "test@staff.com",
                 password: "password123",
                 role: "Cashier"
@@ -381,12 +375,10 @@ describe("Admin - Dashboard & Management", () => {
         } as unknown as Response;
         const next = jest.fn();
 
-        // 👇 TAMBAHKAN INI: Kita bikin "spy" untuk memantau Staff.create
         const spyCreate = jest.spyOn(Staff, "create").mockResolvedValue({} as any);
 
         await createStaff(req, res, next);
 
-        // 👇 Pakai spyCreate untuk pengecekannya
         expect(spyCreate).not.toHaveBeenCalled(); 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({
