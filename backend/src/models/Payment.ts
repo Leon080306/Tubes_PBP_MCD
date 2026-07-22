@@ -25,7 +25,7 @@ export class Payment extends Model {
         type: DataType.ENUM('Completed', 'Canceled'),
         allowNull: false,
     })
-    status!:'Completed' | 'Canceled';
+    status!: 'Completed' | 'Canceled';
 
     @Column({
         type: DataType.DATE,
