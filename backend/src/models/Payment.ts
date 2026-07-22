@@ -1,5 +1,5 @@
 import { Table, Column, Model, DataType, PrimaryKey, BelongsTo, CreatedAt, UpdatedAt, DeletedAt } from 'sequelize-typescript';
-import { Order } from './Order.js';
+import { Order } from './Order';
 
 @Table({
     tableName: 'Payment',
