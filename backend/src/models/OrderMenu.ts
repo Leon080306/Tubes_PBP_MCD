@@ -1,9 +1,9 @@
 import { Table, Column, Model, DataType, PrimaryKey, BelongsTo, HasMany, CreatedAt, UpdatedAt, DeletedAt } from 'sequelize-typescript';
-import { Menu } from './Menu.js'
-import { Order } from './Order.js'
-import { MenuVarian } from './MenuVarian.js'
-import { OrderMenuOption } from './OrderMenuOption.js'
-import { MenuOption } from './MenuOption.js';
+import { Menu } from './Menu'
+import { Order } from './Order'
+import { MenuVarian } from './MenuVarian'
+import { OrderMenuOption } from './OrderMenuOption'
+import { MenuOption } from './MenuOption';
 
 @Table({
     tableName: 'OrderMenu',
