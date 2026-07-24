@@ -232,9 +232,6 @@ describe("Admin - Dashboard & Management", () => {
     });
 
 
-    // ==========================================
-    // 🏷️ MANAJEMEN KATEGORI
-    // ==========================================
 
     it("TC-AD-006: should successfully add a new category", async () => {
         const req = {
