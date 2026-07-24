@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import bcrypt from "bcrypt";
 import { Staff } from "../models/Staff";
 
-export const getAllStaff = async (req: Request, res: Response,  next: NextFunction) => {
+export const getAllStaff = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const staff = await Staff.findAll({
             attributes: {
@@ -20,7 +20,7 @@ export const getStaffById = async (req: Request, res: Response, next: NextFuncti
     try {
         const { id } = req.params;
         const staff = await Staff.findOne({
-            where:{
+            where: {
                 staff_id: id,
             },
             attributes: {
@@ -49,7 +49,7 @@ export const createStaff = async (req: Request, res: Response, next: NextFunctio
         const payload = req.body;
         payload.staff_id = uuidv4();
 
-        const { name, email, password, role} = payload;
+        const { name, email, password, role } = payload;
         const hashedPassword = await bcrypt.hash(password, 10);
         payload.password = hashedPassword;
 
@@ -91,13 +91,13 @@ export const createStaff = async (req: Request, res: Response, next: NextFunctio
     }
 }
 
-export const updateStaff = async (req: Request, res: Response,  next: NextFunction) => {
+export const updateStaff = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
-        const {email, name} = req.body;
+        const { email, name } = req.body;
         console.log("DATA DARI FRONTEND:", req.body);
         const staff = await Staff.findOne({
-            where:{
+            where: {
                 staff_id: id,
             },
             attributes: {
@@ -125,12 +125,12 @@ export const updateStaff = async (req: Request, res: Response,  next: NextFuncti
     }
 }
 
-export const deleteStaff = async (req: Request, res: Response,  next: NextFunction) => {
+export const deleteStaff = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
         const staff = await Staff.findOne({
             where: {
-                staff_id:id
+                staff_id: id
             },
             attributes: {
                 exclude: ['password']

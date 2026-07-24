@@ -7,7 +7,6 @@ import UserRoutes from "./UserRoutes"
 import CategoryRoutes from "./CategoryRoutes"
 import { verifyResetToken } from "../controller/userController";
 
-
 const router: Router = Router();
 
 router.get("/user/verify-reset-token", verifyResetToken);

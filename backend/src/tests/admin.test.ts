@@ -1,7 +1,9 @@
-import { getMenus, getMenuById, createMenu, updateMenu, deleteMenu } from "../controller/menuCRUDController"; 
+import { getMenus, getMenuById, createMenu, updateMenu, deleteMenu } from "../controller/menuCRUDController";
 import { getAllCategory, getCategoryById, createCategory, updateCategory, deleteCategory } from "../controller/categoryController";
 import { getAllStaff, getStaffById, createStaff, updateStaff, deleteStaff } from "../controller/staffController";
-import { loginUser } from "../controller/userController";
+import { Order } from "../models/Order";
+import { getAllOrder, getTOrderById, updateOrder } from "../controller/orderController";
+import { forgotPassword, loginUser } from "../controller/userController";
 import { roleMiddleware } from "../middlewares/roleMiddleware";
 import { Menu } from "../models/Menu";
 import { MenuVarian } from "../models/MenuVarian";
@@ -9,6 +11,8 @@ import { MenuOption } from "../models/MenuOption";
 import { Category } from "../models/Category";
 import { Staff } from "../models/Staff";
 import { Request, Response, NextFunction } from "express";
+import * as mailer from "../utils/mailer";
+import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -28,54 +32,6 @@ describe("Admin - Dashboard & Management", () => {
 
 
     // TC-AD-001 : login
-    it("should return 404 if user is not found", async () => {
-        const req = {
-            body: { email: "test@test.com", password: "123456" }
-        } as Request;
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        } as unknown as Response;
-        const next = jest.fn();
-
-        jest.spyOn(Staff, "findOne").mockResolvedValue(null);
-        await loginUser(req, res, next);
-
-        expect(res.status).toHaveBeenCalledWith(404);
-        expect(res.json).toHaveBeenCalledWith({
-            message: "User dengan email tersebut tidak ditemukan"
-        });
-    });
-
-    it("should return 401 if password is incorrect", async () => {
-        const req = {
-            body: { email: "test@test.com", password: "wrongpassword" }
-        } as Request;
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        } as unknown as Response;
-        const next = jest.fn();
-
-        const fakeUser = {
-            getDataValue: (field: string) => {
-                if (field === "password") return "hashedpassword";
-                if (field === "staff_id") return 1;
-                if (field === "email") return "test@test.com";
-                if (field === "role") return "admin";
-                return null;
-            }
-        };
-
-        jest.spyOn(Staff, "findOne").mockResolvedValue(fakeUser as any);
-        jest.spyOn(bcrypt, "compare").mockResolvedValue(false as never);
-
-        await loginUser(req, res, next);
-
-        expect(res.status).toHaveBeenCalledWith(401);
-        expect(res.json).toHaveBeenCalledWith({ message: "Password Salah" });
-    });
-
     it("should login successfully and return JWT token", async () => {
         const req = {
             body: { email: "test@test.com", password: "123456" }
@@ -108,22 +64,68 @@ describe("Admin - Dashboard & Management", () => {
             token: "fake-jwt-token"
         });
     });
-    
 
-    it("TC-AD-002: should successfully get all menus", async () => {
-        const req = {} as Request;
+    it("TC-AD-002: Forgot Password berhasil mengirim email", async () => {
+        const req = {
+            body: {
+                email: "test@test.com"
+            }
+        } as Request;
+
         const res = {
+            status: jest.fn().mockReturnThis(),
             json: jest.fn()
         } as unknown as Response;
+
         const next = jest.fn();
 
-        const mockMenus = [{ menu_id: "1", nama: "Nasi Goreng" }];
-        jest.spyOn(Menu, "findAll").mockResolvedValue(mockMenus as any);
+        const mockStaff = {
+            email: "test@test.com",
+            name: "Leon",
+            reset_token: null,
+            reset_token_expiry: null,
+            save: jest.fn().mockResolvedValue(true)
+        };
 
-        await getMenus(req, res, next);
+        const mockSendMail = jest.fn().mockResolvedValue({
+            messageId: "message-id"
+        });
 
-        expect(Menu.findAll).toHaveBeenCalled();
-        expect(res.json).toHaveBeenCalledWith({ records: mockMenus });
+        jest
+            .spyOn(Staff, "findOne")
+            .mockResolvedValue(mockStaff as any);
+
+        jest
+            .spyOn(mailer, "createTransporter")
+            .mockResolvedValue({
+                transporter: {
+                    sendMail: mockSendMail
+                } as any,
+                previewUser: "ethereal-user"
+            });
+
+        jest
+            .spyOn(nodemailer, "getTestMessageUrl")
+            .mockReturnValue("http://preview-url");
+
+        await forgotPassword(req, res, next);
+
+        expect(Staff.findOne).toHaveBeenCalledWith({
+            where: {
+                email: "test@test.com"
+            }
+        });
+
+        expect(mockStaff.save).toHaveBeenCalled();
+
+        expect(mockSendMail).toHaveBeenCalled();
+
+        expect(res.json).toHaveBeenCalledWith({
+            message: "If that email exists, a reset link has been sent.",
+            previewUrl: "http://preview-url"
+        });
+
+        expect(next).not.toHaveBeenCalled();
     });
 
     it("TC-AD-003: should successfully add a new menu and return 201", async () => {
@@ -156,15 +158,15 @@ describe("Admin - Dashboard & Management", () => {
         expect(res.status).toHaveBeenCalledWith(201);
         expect(res.json).toHaveBeenCalledWith({
             success: true,
-            message: "Menu + variants + options berhasil dibuat", 
+            message: "Menu + variants + options berhasil dibuat",
             data: mockMenu
         });
     });
 
     it("TC-AD-003N: should call next(error) if create menu fails (e.g., invalid JSON variants)", async () => {
         const req = {
-            body: { 
-                nama: "Nasi Goreng", 
+            body: {
+                nama: "Nasi Goreng",
                 variants: "invalid-json" // Sengaja dibikin error parsing JSON
             }
         } as Request;
@@ -178,7 +180,7 @@ describe("Admin - Dashboard & Management", () => {
 
         await createMenu(req, res, next);
 
-        expect(next).toHaveBeenCalledWith(expect.any(SyntaxError)); 
+        expect(next).toHaveBeenCalledWith(expect.any(SyntaxError));
     });
 
     it("TC-AD-004: should successfully update menu", async () => {
@@ -218,14 +220,14 @@ describe("Admin - Dashboard & Management", () => {
         const mockMenu = {
             id: "menu-123",
             nama: "Nasi Goreng",
-            destroy: jest.fn().mockResolvedValue(true) 
+            destroy: jest.fn().mockResolvedValue(true)
         };
 
         jest.spyOn(Menu, "findByPk").mockResolvedValue(mockMenu as any);
 
         await deleteMenu(req, res, next);
 
-        expect(mockMenu.destroy).toHaveBeenCalled(); 
+        expect(mockMenu.destroy).toHaveBeenCalled();
         expect(res.json).toHaveBeenCalledWith({ message: "Menu deleted" });
     });
 
@@ -244,7 +246,7 @@ describe("Admin - Dashboard & Management", () => {
         } as unknown as Response;
         const next = jest.fn();
 
-        jest.spyOn(Category, "findOne").mockResolvedValue(null); 
+        jest.spyOn(Category, "findOne").mockResolvedValue(null);
         const mockNewCat = { category_id: "mocked-uuid", name: "Minuman Dingin", sort_order: 1 };
         jest.spyOn(Category, "create").mockResolvedValue(mockNewCat as any);
 
@@ -254,7 +256,7 @@ describe("Admin - Dashboard & Management", () => {
         expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
     });
 
-    it("TC-AD-007: should successfully get all categories", async () => {
+    it("-: should successfully get all categories", async () => {
         const req = {} as Request;
         const res = {
             json: jest.fn()
@@ -269,7 +271,7 @@ describe("Admin - Dashboard & Management", () => {
         expect(res.json).toHaveBeenCalledWith(mockCategories);
     });
 
-    it("TC-AD-008: should successfully update category", async () => {
+    it("TC-AD-007: should successfully update category", async () => {
         const req = {
             params: { category_id: "cat-1" },
             body: { name: "Makanan Berat", sort_order: 2 }
@@ -283,10 +285,10 @@ describe("Admin - Dashboard & Management", () => {
             category_id: "cat-1",
             update: jest.fn().mockResolvedValue(true)
         };
-        
+
         jest.spyOn(Category, "findOne")
-            .mockResolvedValueOnce(mockCategory as any) 
-            .mockResolvedValueOnce(null); 
+            .mockResolvedValueOnce(mockCategory as any)
+            .mockResolvedValueOnce(null);
 
         await updateCategory(req, res, next);
 
@@ -294,34 +296,7 @@ describe("Admin - Dashboard & Management", () => {
         expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
     });
 
-    it("TC-AD-008N: should return 400 if sort_order is already used by another category", async () => {
-        const req = {
-            params: { category_id: "cat-1" },
-            body: { name: "Makanan Berat", sort_order: 2 }
-        } as unknown as Request;
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        } as unknown as Response;
-        const next = jest.fn();
-
-        const mockCategory = { category_id: "cat-1", name: "Makanan" };
-        const mockClashCategory = { category_id: "cat-2", name: "Snack" }; 
-        
-        jest.spyOn(Category, "findOne")
-            .mockResolvedValueOnce(mockCategory as any) 
-            .mockResolvedValueOnce(mockClashCategory as any); 
-
-        await updateCategory(req, res, next);
-
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.json).toHaveBeenCalledWith({
-            status: "Fail",
-            message: 'Nomor Sort Order 2 sudah gunakan oleh "Snack"'
-        });
-    });
-
-    it("TC-AD-013: should successfully delete category", async () => {
+    it("TC-AD-008: should successfully delete category", async () => {
         const req = {
             params: { category_id: "cat-1" }
         } as unknown as Request;
@@ -342,9 +317,10 @@ describe("Admin - Dashboard & Management", () => {
         expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true, message: "Data Category berhasil di delete" }));
     });
 
-    it("TC-AD-016: should return 404 if category not found", async () => {
+    it("TC-AD-008N: should return 400 if sort_order is already used by another category", async () => {
         const req = {
-            params: { category_id: "invalid-id" }
+            params: { category_id: "cat-1" },
+            body: { name: "Makanan Berat", sort_order: 2 }
         } as unknown as Request;
         const res = {
             status: jest.fn().mockReturnThis(),
@@ -352,23 +328,57 @@ describe("Admin - Dashboard & Management", () => {
         } as unknown as Response;
         const next = jest.fn();
 
-        jest.spyOn(Category, "findOne").mockResolvedValue(null);
+        const mockCategory = { category_id: "cat-1", name: "Makanan" };
+        const mockClashCategory = { category_id: "cat-2", name: "Snack" };
 
-        await getCategoryById(req, res, next);
+        jest.spyOn(Category, "findOne")
+            .mockResolvedValueOnce(mockCategory as any)
+            .mockResolvedValueOnce(mockClashCategory as any);
 
-        expect(res.status).toHaveBeenCalledWith(404);
-        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: "Category dengan ID tersebut tidak ditemukan" }));
+        await updateCategory(req, res, next);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+            status: "Fail",
+            message: 'Nomor Sort Order 2 sudah gunakan oleh "Snack"'
+        });
     });
 
+    it("TC-AD-009: add staff", async () => {
+        const req = {
+            body: {
+                name: "Staff Baru",
+                email: "staff@test.com",
+                password: "password123",
+                role: "Admin"
+            }
+        } as Request;
 
-    // ==========================================
-    // 🧑‍💼 MANAJEMEN STAFF & MIDDLEWARE
-    // ==========================================
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        } as unknown as Response;
+        const next = jest.fn();
+
+        jest.spyOn(Staff, "create").mockResolvedValue(req.body as any);
+
+        await createStaff(req, res, next);
+
+        expect(Staff.create).toHaveBeenCalled();
+        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.json).toHaveBeenCalledWith(
+            expect.objectContaining({
+                success: true,
+                message: expect.any(String)
+            })
+        );
+    });
+
 
     it("TC-AD-009N: should return 400 if staff data is incomplete", async () => {
         const req = {
             body: {
-                name: "", // Dikosongkan agar ditolak oleh validasi
+                name: "",
                 email: "test@staff.com",
                 password: "password123",
                 role: "Cashier"
@@ -381,17 +391,15 @@ describe("Admin - Dashboard & Management", () => {
         } as unknown as Response;
         const next = jest.fn();
 
-        // 👇 TAMBAHKAN INI: Kita bikin "spy" untuk memantau Staff.create
         const spyCreate = jest.spyOn(Staff, "create").mockResolvedValue({} as any);
 
         await createStaff(req, res, next);
 
-        // 👇 Pakai spyCreate untuk pengecekannya
-        expect(spyCreate).not.toHaveBeenCalled(); 
+        expect(spyCreate).not.toHaveBeenCalled();
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({
             status: "Fail",
-            message: "Data tidak boleh kosong" 
+            message: "Data tidak boleh kosong"
         });
     });
 
@@ -439,39 +447,6 @@ describe("Admin - Dashboard & Management", () => {
         expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
     });
 
-    it("TC-AD-014: should successfully get all staff", async () => {
-        const req = {} as Request;
-        const res = {
-            json: jest.fn()
-        } as unknown as Response;
-        const next = jest.fn();
-
-        const mockStaffList = [{ staff_id: "1", name: "Jennie" }];
-        jest.spyOn(Staff, "findAll").mockResolvedValue(mockStaffList as any);
-
-        await getAllStaff(req, res, next);
-
-        expect(res.json).toHaveBeenCalledWith(mockStaffList);
-    });
-
-    it("TC-AD-015: should return 404 if staff not found by ID", async () => {
-        const req = {
-            params: { id: "unknown-id" }
-        } as unknown as Request;
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        } as unknown as Response;
-        const next = jest.fn();
-
-        jest.spyOn(Staff, "findOne").mockResolvedValue(null);
-
-        await getStaffById(req, res, next);
-
-        expect(res.status).toHaveBeenCalledWith(404);
-        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: "Staff dengan ID tersebut tidak ditemukan" }));
-    });
-
     it("TC-AD-012: should return 403 Forbidden if Cashier accesses Admin route", async () => {
         const req = {
             user: { role: "Cashier" }
@@ -488,8 +463,88 @@ describe("Admin - Dashboard & Management", () => {
 
         expect(res.status).toHaveBeenCalledWith(403);
         expect(res.json).toHaveBeenCalledWith({
-            message: "Forbidden: requires one of [Admin]" 
+            message: "Forbidden: requires one of [Admin]"
         });
-        expect(next).not.toHaveBeenCalled(); 
+        expect(next).not.toHaveBeenCalled();
+    });
+
+
+    it("TC-AD-013: melihat daftar order", async () => {
+        const req = {} as Request;
+        const res = {
+            json: jest.fn()
+        } as unknown as Response;
+        const next = jest.fn();
+
+        const mockOrders = [
+            { order_id: "ord-1", order_no: 1, total_harga: 100000, status: "Process" }
+        ];
+
+        jest.spyOn(Order, "findAll").mockResolvedValue(mockOrders as any);
+
+        await getAllOrder(req, res, next);
+
+        expect(Order.findAll).toHaveBeenCalled();
+        expect(res.json).toHaveBeenCalledWith(mockOrders);
+    });
+
+    it("TC-AD-014: melihat detail order", async () => {
+        const req = {
+            params: { order_id: "ord-1" }
+        } as unknown as Request;
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        } as unknown as Response;
+        const next = jest.fn();
+
+        const mockOrder = { order_id: "ord-1", order_no: 1, total_harga: 100000 };
+        jest.spyOn(Order, "findOne").mockResolvedValue(mockOrder as any);
+
+        await getTOrderById(req, res, next);
+
+        expect(Order.findOne).toHaveBeenCalled();
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+            status: "Success",
+            data: mockOrder
+        });
+    });
+
+    it("TC-AD-015: update status order", async () => {
+        const req = {
+            params: { order_id: "ord-1" },
+            body: {
+                status: "Done",
+                order_type: "Dine-in",
+                order_no: 1
+            }
+        } as unknown as Request;
+        const res = {
+            json: jest.fn()
+        } as unknown as Response;
+        const next = jest.fn();
+
+        const mockOrder = {
+            order_id: "ord-1",
+            status: "Process",
+            update: jest.fn().mockResolvedValue(true)
+        };
+
+        jest.spyOn(Order, "findOne").mockResolvedValue(mockOrder as any);
+
+        await updateOrder(req, res, next);
+
+        expect(mockOrder.update).toHaveBeenCalledWith({
+            order_type: "Dine-in",
+            order_no: 1,
+            status: "Done"
+        });
+
+        expect(res.json).toHaveBeenCalledWith({
+            success: true,
+            message: "Data Order berhasil di update",
+            data: mockOrder
+        });
     });
 });

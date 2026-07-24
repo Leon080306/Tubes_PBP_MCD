@@ -49,6 +49,10 @@ export default function CartCashier() {
         }
     };
 
+    const handleClearItem = (cartItemId: string) => {
+        dispatch(cartActions.removeFromCart(cartItemId));
+    }
+
     return (
         <>
             <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
@@ -56,6 +60,7 @@ export default function CartCashier() {
                 <Box sx={{ flex: 1, overflow: "auto" }}>
                     {items.map((item: any) => (
                         <Box key={item.cartItemId} sx={{ mb: 2 }}>
+
 
                             <Typography sx={{ fontWeight: "bold" }}>
                                 {item.menu.nama}
@@ -69,6 +74,7 @@ export default function CartCashier() {
                                     mt: 1
                                 }}
                             >
+                                <Button onClick={() => handleClearItem(item.cartItemId)}>Clear</Button>
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                                     <Button
                                         size="small"
@@ -113,6 +119,7 @@ export default function CartCashier() {
                     <Button
                         variant="contained"
                         fullWidth
+                        disabled={items.length === 0}
                         onClick={() => handleCheckout("Dine-in")}
                         sx={{ mt: 2, background: "#ffbc0d", color: "#000", flex: 1 }}
                     >
@@ -121,6 +128,7 @@ export default function CartCashier() {
                     <Button
                         variant="contained"
                         fullWidth
+                        disabled={items.length === 0}
                         onClick={() => handleCheckout("Takeaway")}
                         sx={{ mt: 2, background: "#ffbc0d", color: "#000", flex: 1 }}
                     >
